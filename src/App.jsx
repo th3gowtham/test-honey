@@ -1,16 +1,53 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import React, { useState } from "react";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import Home from "./pages/Home";
+import About from "./pages/About";
+import Classes from "./pages/Classes";
+import Contact from "./pages/Contact";
+import Gallery from "./pages/Gallery";
+import Pg from "./pages/Pg";
+import Teachers from "./pages/Teachers";
+import Product from "./pages/Product";
+import PlogDetails from "./pages/PlogDetails";
+import Login from "./components/Login"; // Make sure Login is a modal component
+import { useEffect } from "react";
+import AOS from "aos";
+import "aos/dist/aos.css";
+import Header from "./components/Header";
+
+
+
+
+// Import global styles if needed
+// import "./styles/main.css";
 
 function App() {
-  return(
-    
-       <div className="text-center mt-10">
-      <h1 className="text-3xl font-bold text-blue-600">React + Vite + Tailwind CSS</h1>
-    </div>
-    
-  )
+  const [showLogin, setShowLogin] = useState(false);
+
+  useEffect(() => {
+    AOS.init({ once: true });
+  }, []);
+  return (
+    <Router>
+      <Header onLoginClick={() => setShowLogin(true)} />
+      <Routes>
+        <Route path="/" element={<Home />} />
+       
+        <Route path="/about" element={<About />} />
+        <Route path="/classes" element={<Classes />} />
+        <Route path="/contact" element={<Contact />} />
+        <Route path="/gallery" element={<Gallery />} />
+        <Route path="/pg" element={<Pg />} />
+        <Route path="/teachers" element={<Teachers />} />
+        <Route path="/product" element={<Product />} />
+        <Route path="/plog_details" element={<PlogDetails />} />
+      
+      </Routes>
+      {showLogin && (
+        <Login onClose={() => setShowLogin(false)} />
+      )}
+    </Router>
+  );
 }
 
-export default App
+export default App;
