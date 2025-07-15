@@ -5,7 +5,7 @@ import React, { createContext, useContext, useEffect, useState } from 'react';  
 
 const AuthContext = createContext();   //managing and passing the roles across pages without prop 
 
-export const AuthProvider = ({ children }) => {    //wraps your app and shares values with all its children
+export const AuthProvider = ({ children }) => {    //wraps your app and shares values with all its children and then
   const [userRole, setUserRole] = useState(null);
   const [userName, setUserName] = useState(null);
 
