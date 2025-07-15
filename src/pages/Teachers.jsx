@@ -13,6 +13,10 @@ import p5 from "../assets/p5.jpg";
 import p6 from "../assets/p6.jpg";
 import p7 from "../assets/p7.jpg";
 import { FaFacebookF, FaInstagram, FaLinkedinIn } from "react-icons/fa6";
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Pagination, Autoplay } from "swiper/modules";
+import "swiper/css";
+import "swiper/css/pagination";
 
 const Teachers = () => (
   <>
@@ -45,17 +49,130 @@ const Teachers = () => (
           <span className="text-uppercase position-relative d-inline-block px-2">Testimonials</span>
           <h2 className="fw-bold my-3">What Parents Say!</h2>
         </div>
-        <div className="row row-cols-1 row-cols-md-2 row-cols-lg-3">
-          <div className="col p-3"><div className="item h-100 bg-white shadow p-4 rounded"><p className="bg-light p-4 shadow">The journey lasted 10 months, starting when my child could only read alphabets. Now, at 5 years old, they can confidently read sentences. The classes were always engaging with rhymes and fun activities, making learning enjoyable and effective.</p><div className="d-flex align-items-center gap-3"><div className="flex-grow-1"><div className="name fw-bold h5">Nirmala</div></div></div></div></div>
-          <div className="col p-3"><div className="item h-100 bg-white shadow p-4 rounded"><p className="bg-light p-4 shadow">We're thrilled to see our child reading so well at such a young age, while others older than them are still struggling with reading. It's amazing to witness the progress!</p><div className="d-flex align-items-center gap-3"><div className="flex-grow-1"><div className="name fw-bold h5">Yaazhini</div></div></div></div></div>
-          <div className="col p-3"><div className="item h-100 bg-white shadow p-4 rounded"><p className="bg-light p-4 shadow">Thank you for arranging these sessions. The teacher’s patience and clear explanations made the classes enjoyable, and I’m grateful for the wonderful learning experience.</p><div className="d-flex align-items-center gap-3"><div className="flex-grow-1"><div className="name fw-bold h5">Shailja</div></div></div></div></div>
-          <div className="col p-3"><div className="item h-100 bg-white shadow p-4 rounded"><p className="bg-light p-4 shadow">My child was sad that it was their last class. They enjoyed and learned a lot throughout the lessons, and we’re very grateful for this enriching experience.</p><div className="d-flex align-items-center gap-3"><div className="flex-grow-1"><div className="name fw-bold h5">Jothi</div></div></div></div></div>
-          <div className="col p-3"><div className="item h-100 bg-white shadow p-4 rounded"><p className="bg-light p-4 shadow">Thank you to the teacher for helping my child learn phonics. The kids will surely miss the engaging sessions and the support provided.</p><div className="d-flex align-items-center gap-3"><div className="flex-grow-1"><div className="name fw-bold h5">Surya</div></div></div></div></div>
-          <div className="col p-3"><div className="item h-100 bg-white shadow p-4 rounded"><p className="bg-light p-4 shadow">Thank you for taking this class! It has been a truly beneficial experience, and we’re grateful for all the hard work and effort put into teaching the kids.</p><div className="d-flex align-items-center gap-3"><div className="flex-grow-1"><div className="name fw-bold h5">Manjula</div></div></div></div></div>
-          <div className="col p-3"><div className="item h-100 bg-white shadow p-4 rounded"><p className="bg-light p-4 shadow">Thank you for the positive impact on my child’s learning. Your passion for teaching has made a huge difference, and we feel fortunate to have been part of your class.</p><div className="d-flex align-items-center gap-3"><div className="flex-grow-1"><div className="name fw-bold h5">Deepthi</div></div></div></div></div>
-          <div className="col p-3"><div className="item h-100 bg-white shadow p-4 rounded"><p className="bg-light p-4 shadow">As the phonics class comes to an end, I want to thank the teacher for their dedication, patience, and incredible teaching. The progress my child has made in reading and pronunciation is remarkable.</p><div className="d-flex align-items-center gap-3"><div className="flex-grow-1"><div className="name fw-bold h5">Rajesh</div></div></div></div></div>
-          <div className="col p-3"><div className="item h-100 bg-white shadow p-4 rounded"><p className="bg-light p-4 shadow">The class was really good and easy to understand. At first, I thought it would be difficult, but the teacher made it simple and enjoyable. I’m excited to continue learning.</p><div className="d-flex align-items-center gap-3"><div className="flex-grow-1"><div className="name fw-bold h5">Saranya</div></div></div></div></div>
-        </div>
+        <Swiper
+          modules={[Pagination, Autoplay]}
+          spaceBetween={30}
+          grabCursor={true}
+          loop={true}
+          autoplay={{ delay: 2500, disableOnInteraction: false }}
+          pagination={{ clickable: true, dynamicBullets: false }}
+          breakpoints={{
+            0: { slidesPerView: 1 },
+            640: { slidesPerView: 1 },
+            768: { slidesPerView: 2 },
+            1024: { slidesPerView: 3 },
+          }}
+          className="mb-5"
+        >
+          <SwiperSlide>
+            <div className="bg-light p-4 shadow">
+              <p>
+                The journey lasted 10 months, starting when my child could only read alphabets. Now, at 5 years old, they can confidently read sentences. The classes were always engaging with rhymes and fun activities, making learning enjoyable and effective.
+              </p>
+              <div className="d-flex align-items-center gap-3">
+                <div className="flex-grow-1">
+                  <div className="name fw-bold h5">Nirmala</div>
+                </div>
+              </div>
+            </div>
+          </SwiperSlide>
+          <SwiperSlide>
+            <div className="bg-light p-4 shadow">
+              <p>
+                We're thrilled to see our child reading so well at such a young age, while others older than them are still struggling with reading. It's amazing to witness the progress!
+              </p>
+              <div className="d-flex align-items-center gap-3">
+                <div className="flex-grow-1">
+                  <div className="name fw-bold h5">Yaazhini</div>
+                </div>
+              </div>
+            </div>
+          </SwiperSlide>
+          <SwiperSlide>
+            <div className="bg-light p-4 shadow">
+              <p>
+                Thank you for arranging these sessions. The teacher’s patience and clear explanations made the classes enjoyable, and I’m grateful for the wonderful learning experience.
+              </p>
+              <div className="d-flex align-items-center gap-3">
+                <div className="flex-grow-1">
+                  <div className="name fw-bold h5">Shailja</div>
+                </div>
+              </div>
+            </div>
+          </SwiperSlide>
+          <SwiperSlide>
+            <div className="bg-light p-4 shadow">
+              <p>
+                My child was sad that it was their last class. They enjoyed and learned a lot throughout the lessons, and we’re very grateful for this enriching experience.
+              </p>
+              <div className="d-flex align-items-center gap-3">
+                <div className="flex-grow-1">
+                  <div className="name fw-bold h5">Jothi</div>
+                </div>
+              </div>
+            </div>
+          </SwiperSlide>
+          <SwiperSlide>
+            <div className="bg-light p-4 shadow">
+              <p>
+                Thank you to the teacher for helping my child learn phonics. The kids will surely miss the engaging sessions and the support provided.
+              </p>
+              <div className="d-flex align-items-center gap-3">
+                <div className="flex-grow-1">
+                  <div className="name fw-bold h5">Surya</div>
+                </div>
+              </div>
+            </div>
+          </SwiperSlide>
+          <SwiperSlide>
+            <div className="bg-light p-4 shadow">
+              <p>
+                Thank you for taking this class! It has been a truly beneficial experience, and we’re grateful for all the hard work and effort put into teaching the kids.
+              </p>
+              <div className="d-flex align-items-center gap-3">
+                <div className="flex-grow-1">
+                  <div className="name fw-bold h5">Manjula</div>
+                </div>
+              </div>
+            </div>
+          </SwiperSlide>
+          <SwiperSlide>
+            <div className="bg-light p-4 shadow">
+              <p>
+                Thank you for the positive impact on my child’s learning. Your passion for teaching has made a huge difference, and we feel fortunate to have been part of your class.
+              </p>
+              <div className="d-flex align-items-center gap-3">
+                <div className="flex-grow-1">
+                  <div className="name fw-bold h5">Deepthi</div>
+                </div>
+              </div>
+            </div>
+          </SwiperSlide>
+          <SwiperSlide>
+            <div className="bg-light p-4 shadow">
+              <p>
+                As the phonics class comes to an end, I want to thank the teacher for their dedication, patience, and incredible teaching. The progress my child has made in reading and pronunciation is remarkable.
+              </p>
+              <div className="d-flex align-items-center gap-3">
+                <div className="flex-grow-1">
+                  <div className="name fw-bold h5">Rajesh</div>
+                </div>
+              </div>
+            </div>
+          </SwiperSlide>
+          <SwiperSlide>
+            <div className="bg-light p-4 shadow">
+              <p>
+                The class was really good and easy to understand. At first, I thought it would be difficult, but the teacher made it simple and enjoyable. I’m excited to continue learning.
+              </p>
+              <div className="d-flex align-items-center gap-3">
+                <div className="flex-grow-1">
+                  <div className="name fw-bold h5">Saranya</div>
+                </div>
+              </div>
+            </div>
+          </SwiperSlide>
+        </Swiper>
       </div>
     </div>
     <footer>

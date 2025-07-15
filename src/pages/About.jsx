@@ -11,7 +11,7 @@ import about2 from "../assets/about-2.jpg";
 import { FaAddressCard, FaCalendarCheck, FaBuffer, FaAustralSign, FaApple, FaAppStoreIos, FaFacebookF, FaInstagram, FaLinkedinIn } from "react-icons/fa6";
 
 const About = () => (
-  <>
+  <div style={{ overflowX: 'hidden' }}>
    
 
     {/* Breadcrumb */}
@@ -43,7 +43,7 @@ const About = () => (
               </p>
               <div className="d-flex my-4 gap-3 flex-column flex-md-row">
                 <div className="flex-shrink-0">
-                  <img src={about2} alt="img" />
+                  <img src={about2} className="img-fluid" alt="img" />
                 </div>
                 <div className="flex-grow-1">
                   <div className="item py-2 px-4 position-relative d-flex align-items-center border-top justify-content-center justify-content-md-start">Curiosity-Driven Learning</div>
@@ -208,7 +208,7 @@ const About = () => (
       </div>
     </footer>
     {/* End Footer */}
-  </>
+  </div>
 );
 
 export default About; 

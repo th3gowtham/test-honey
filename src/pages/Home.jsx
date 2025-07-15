@@ -48,7 +48,16 @@ const Home = () => {
   }, []);
 
   return(
-  <>
+  <div style={{ overflowX: 'hidden' }}>
+    <style>{`
+     .quote-icon {
+  color: #127d8e;
+  font-size: 3rem;        
+  vertical-align: -0.4em;    
+  margin-right: 0.1em;       
+  line-height: 0;
+}
+    `}</style>
     <section className="landing text-white" data-aos="fade-in">
       <div className="container mh-100 d-flex align-items-center">
         <div className="row align-items-center">
@@ -170,7 +179,7 @@ const Home = () => {
               <p className="text-muted m-0 m-auto">At The Honeybee Learning, we are committed to providing an exceptional educational experience for children. Our carefully crafted curriculum and engaging online classes empower young learners to reach their full potential. With a focus on personalized learning, we create an environment where your child can grow, explore, and thrive.<br />Our approach is centered around fostering creativity, critical thinking, and a love for learning, all while ensuring each child receives the attention and care they need to succeed.</p>
               <div className="d-flex my-4 gap-3 flex-column flex-md-row">
                 <div className="flex-shrink-0">
-                  <img src={about2} alt="img" />
+                  <img src={about2} className="img-fluid" alt="img" />
                 </div>
                 <div className="flex-grow-1">
                   <div className="item py-2 px-4 position-relative d-flex align-items-center border-top justify-content-center justify-content-md-start">Curiosity-Driven Learning</div>
@@ -610,137 +619,110 @@ const Home = () => {
           }}
           className="mb-5"
         >
-          {/* 1. Nirmala */}
           <SwiperSlide>
             <div className="bg-light p-4 shadow">
-              <p>
-                The journey lasted 10 months, starting when my child could only read alphabets. Now, at 5 years old, they can confidently read sentences. The classes were always engaging with rhymes and fun activities, making learning enjoyable and effective.
+              <p >
+               <span className="quote-icon">❝</span> The journey lasted 10 months, starting when my child could only read alphabets. Now, at 5 years old, they can confidently read sentences. The classes were always engaging with rhymes and fun activities, making learning enjoyable and effective.
               </p>
               <div className="d-flex align-items-center gap-3">
-                <div className="flex-shrink-0"></div>
                 <div className="flex-grow-1">
                   <div className="name fw-bold h5">Nirmala</div>
-                  <div className="job text-muted mt-2 fst-italic"></div>
                 </div>
               </div>
             </div>
           </SwiperSlide>
-          {/* 2. Yaazhini */}
           <SwiperSlide>
             <div className="bg-light p-4 shadow">
-              <p>
-                We're thrilled to see our child reading so well at such a young age, while others older than them are still struggling with reading. It's amazing to witness the progress!
+              <p >
+              <span className="quote-icon">❝</span>We're thrilled to see our child reading so well at such a young age, while others older than them are still struggling with reading. It's amazing to witness the progress!
               </p>
               <div className="d-flex align-items-center gap-3">
-                <div className="flex-shrink-0"></div>
                 <div className="flex-grow-1">
                   <div className="name fw-bold h5">Yaazhini</div>
-                  <div className="job text-muted mt-2 fst-italic"></div>
                 </div>
               </div>
             </div>
           </SwiperSlide>
-          {/* 3. Shailja */}
           <SwiperSlide>
             <div className="bg-light p-4 shadow">
-              <p>
-                Thank you for arranging these sessions. The teacher’s patience and clear explanations made the classes enjoyable, and I’m grateful for the wonderful learning experience.
+              <p >
+              <span className="quote-icon">❝</span>Thank you for arranging these sessions. The teacher’s patience and clear explanations made the classes enjoyable, and I’m grateful for the wonderful learning experience.
               </p>
               <div className="d-flex align-items-center gap-3">
-                <div className="flex-shrink-0"></div>
                 <div className="flex-grow-1">
                   <div className="name fw-bold h5">Shailja</div>
-                  <div className="job text-muted mt-2 fst-italic"></div>
                 </div>
               </div>
             </div>
           </SwiperSlide>
-          {/* 4. Jothi */}
           <SwiperSlide>
             <div className="bg-light p-4 shadow">
-              <p>
-                My child was sad that it was their last class. They enjoyed and learned a lot throughout the lessons, and we’re very grateful for this enriching experience.
+              <p >
+              <span className="quote-icon">❝</span>  My child was sad that it was their last class. They enjoyed and learned a lot throughout the lessons, and we’re very grateful for this enriching experience.
               </p>
               <div className="d-flex align-items-center gap-3">
-                <div className="flex-shrink-0"></div>
                 <div className="flex-grow-1">
                   <div className="name fw-bold h5">Jothi</div>
-                  <div className="job text-muted mt-2 fst-italic"></div>
                 </div>
               </div>
             </div>
           </SwiperSlide>
-          {/* 5. Surya */}
           <SwiperSlide>
             <div className="bg-light p-4 shadow">
-              <p>
-                Thank you to the teacher for helping my child learn phonics. The kids will surely miss the engaging sessions and the support provided.
+              <p >
+              <span className="quote-icon">❝</span>Thank you to the teacher for helping my child learn phonics. The kids will surely miss the engaging sessions and the support provided.
               </p>
               <div className="d-flex align-items-center gap-3">
-                <div className="flex-shrink-0"></div>
                 <div className="flex-grow-1">
                   <div className="name fw-bold h5">Surya</div>
-                  <div className="job text-muted mt-2 fst-italic"></div>
                 </div>
               </div>
             </div>
           </SwiperSlide>
-          {/* 6. Manjula */}
           <SwiperSlide>
             <div className="bg-light p-4 shadow">
-              <p>
-                Thank you for taking this class! It has been a truly beneficial experience, and we’re grateful for all the hard work and effort put into teaching the kids.
+              <p >
+              <span className="quote-icon">❝</span>Thank you for taking this class! It has been a truly beneficial experience, and we’re grateful for all the hard work and effort put into teaching the kids.
               </p>
               <div className="d-flex align-items-center gap-3">
-                <div className="flex-shrink-0"></div>
                 <div className="flex-grow-1">
                   <div className="name fw-bold h5">Manjula</div>
-                  <div className="job text-muted mt-2 fst-italic"></div>
                 </div>
               </div>
             </div>
           </SwiperSlide>
-          {/* 7. Deepthi */}
           <SwiperSlide>
             <div className="bg-light p-4 shadow">
               <p>
-                Thank you for the positive impact on my child’s learning. Your passion for teaching has made a huge difference, and we feel fortunate to have been part of your class.
+              <span className="quote-icon">❝</span>Thank you for the positive impact on my child’s learning. Your passion for teaching has made a huge difference, and we feel fortunate to have been part of your class.
               </p>
               <div className="d-flex align-items-center gap-3">
-                <div className="flex-shrink-0"></div>
                 <div className="flex-grow-1">
                   <div className="name fw-bold h5">Deepthi</div>
-                  <div className="job text-muted mt-2 fst-italic"></div>
                 </div>
               </div>
             </div>
           </SwiperSlide>
-          {/* 8. Rajesh */}
           <SwiperSlide>
             <div className="bg-light p-4 shadow">
               <p>
-                As the phonics class comes to an end, I want to thank the teacher for their dedication, patience, and incredible teaching. The progress my child has made in reading and pronunciation is remarkable.
+              <span className="quote-icon">❝</span> As the phonics class comes to an end, I want to thank the teacher for their dedication, patience, and incredible teaching. The progress my child has made in reading and pronunciation is remarkable.
               </p>
               <div className="d-flex align-items-center gap-3">
-                <div className="flex-shrink-0"></div>
                 <div className="flex-grow-1">
                   <div className="name fw-bold h5">Rajesh</div>
-                  <div className="job text-muted mt-2 fst-italic"></div>
                 </div>
               </div>
             </div>
           </SwiperSlide>
-          {/* 9. Saranya */}
           <SwiperSlide>
             <div className="bg-light p-4 shadow">
               <p>
-                The class was really good and easy to understand. At first, I thought it would be difficult, but the teacher made it simple and enjoyable. I’m excited to continue learning.
+              <span className="quote-icon">❝</span>The class was really good and easy to understand. At first, I thought it would be difficult, but the teacher made it simple and enjoyable. I’m excited to continue learning.
               </p>
               <div className="d-flex align-items-center gap-3">
-                <div className="flex-shrink-0"></div>
                 <div className="flex-grow-1">
                   <div className="name fw-bold h5">Saranya</div>
-                  <div className="job text-muted mt-2 fst-italic"></div>
                 </div>
               </div>
             </div>
@@ -836,7 +818,7 @@ const Home = () => {
         </div>
       </div>
     </footer>
-  </>
-);
+  </div>
+  );
 }
 export default Home; 
