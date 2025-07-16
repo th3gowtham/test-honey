@@ -39,7 +39,7 @@ const Login = ({ onClose }) => {
      
 
     } catch (err) {
-      alert("Login failed: " + err.message);
+      alert("Login failed: " + err);
     }
   };
 
