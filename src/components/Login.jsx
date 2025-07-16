@@ -26,7 +26,7 @@ const Login = ({ onClose }) => {
       await setPersistence(auth, rememberMe ? browserLocalPersistence : browserSessionPersistence);
       const result = await signInWithPopup(auth, googleprovider);
       const idToken = await result.user.getIdToken();
-      const res = await axios.post('http://localhost:5000/api/auth/google-login', { idToken });
+      const res = await axios.post('https://thehoneybee.onrender.com/api/auth/google-login', { idToken }); //http://localhost:5000/api/auth/google-login 
       console.log("Login response:", res.data);
 
       const { role, name } = res.data;
@@ -39,7 +39,7 @@ const Login = ({ onClose }) => {
      
 
     } catch (err) {
-      alert("Login failed: " + err.message);
+      alert("Login failed: " + err);
     }
   };
 
