@@ -14,14 +14,17 @@ const PrivateChat = () => {
             <p className="text-sm text-gray-500">Private Chat</p>
           </div>
         </div>
-        <div className="flex flex-wrap items-center gap-4 sm:gap-6">
+        <div className="flex flex-wrap items-center gap-4 sm:gap-8">
           <button className="px-4 py-2 bg-teal-500 text-white rounded-lg text-sm flex items-center gap-2 hover:bg-teal-600 transition">
-            <Calendar className="w-4 h-4" />
+            <Calendar className="w-4 h-4 " />
             <span>Book Call</span>
           </button>
-          <button>
-            <MoreVertical className="w-5 h-5 text-gray-400" />
-          </button>
+          <div>
+            <button className='pl-6'>
+               <MoreVertical className="w-5 h-5 text-gray-400 " />
+            </button>
+          </div>
+    
         </div>
       </div>
 
@@ -83,4 +86,3 @@ const PrivateChat = () => {
 };
 
 export default PrivateChat;
-// doneeee

@@ -74,7 +74,9 @@ const App = () => {
       {/* 🔔 Notification Icon */}
       <div className="absolute top-5 right-4 sm:right-6 lg:right-8 cursor-pointer z-40 flex items-center"
         onClick={() => setShowNotifications(true)}>
-        <Bell className="w-6 h-6 sm:w-7 sm:h-7 text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-gray-100" />
+          <div className="p-3 pt-1.5 ">
+            <Bell className="w-6 h-6 sm:w-7 sm:h-7 text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-gray-100" /></div>
+        
       </div>
 
       {/* 🐝 Profile Icon */}

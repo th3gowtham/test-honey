@@ -58,4 +58,3 @@ const AnnouncementsView = () => {
 };
 
 export default AnnouncementsView;
-//done
