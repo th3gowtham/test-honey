@@ -10,7 +10,7 @@ import Teachers from "./pages/Teachers";
 import Product from "./pages/Product";
 import PlogDetails from "./pages/PlogDetails";
 import Login from "./components/Login"; // Make sure Login is a modal component
-import ChatApp from './chatApp' // chat app
+import ChatApp from './ChatApp' // chat app
 import { useEffect } from "react";
 import AOS from "aos";
 import "aos/dist/aos.css";
