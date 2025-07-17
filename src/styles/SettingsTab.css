@@ -1,0 +1,57 @@
+.settings-tab {
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem; /* space-y-10 */
+}
+
+/* Section Titles */
+.settings-section h3 {
+  display: flex;
+  align-items: center;
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #111827; /* text-gray-900 */
+  margin-bottom: 1rem;
+}
+
+.settings-section h3 svg {
+  margin-right: 0.5rem;
+}
+
+.settings-section p {
+  font-size: 0.875rem;
+  color: #6b7280; /* text-gray-500 */
+  margin-bottom: 1.5rem;
+}
+
+/* Preference Items */
+.preference-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+@media (min-width: 640px) {
+  .preference-item {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+}
+
+.preference-text h4 {
+  font-weight: 500;
+  color: #111827; /* text-gray-900 */
+  font-size: 0.875rem;
+}
+
+@media (min-width: 640px) {
+  .preference-text h4 {
+    font-size: 1rem;
+  }
+}
+
+.preference-text p {
+  font-size: 0.875rem;
+  color: #6b7280; /* text-gray-500 */
+}

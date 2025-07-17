@@ -6,38 +6,127 @@ const AccountTab = () => {
   }
 
   return (
-    <div className="space-y-6 p-4 sm:p-6">
+    <div
+      style={{
+        padding: "1rem",
+        maxWidth: "100%",
+        display: "flex",
+        flexDirection: "column",
+        gap: "1.5rem",
+      }}
+    >
       {/* Account Info Section */}
       <div>
-        <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-4 flex items-center">
-          <Shield className="w-5 h-5 mr-2 shrink-0" />
+        <h3
+          style={{
+            fontSize: "1rem",
+            fontWeight: "600",
+            color: "#111827",
+            marginBottom: "1rem",
+            display: "flex",
+            alignItems: "center",
+          }}
+        >
+          <Shield size={20} style={{ marginRight: "0.5rem", flexShrink: 0 }} />
           Account Information
         </h3>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "1fr",
+            gap: "1rem",
+          }}
+        >
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label
+              style={{
+                display: "block",
+                fontSize: "0.875rem",
+                fontWeight: "500",
+                color: "#374151",
+                marginBottom: "0.25rem",
+              }}
+            >
               Account Type
             </label>
-            <p className="text-gray-900 font-medium text-sm sm:text-base">Student</p>
+            <p
+              style={{
+                color: "#111827",
+                fontWeight: "500",
+                fontSize: "0.875rem",
+              }}
+            >
+              Student
+            </p>
           </div>
+
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label
+              style={{
+                display: "block",
+                fontSize: "0.875rem",
+                fontWeight: "500",
+                color: "#374151",
+                marginBottom: "0.25rem",
+              }}
+            >
               Member Since
             </label>
-            <p className="text-gray-900 text-sm sm:text-base">January 2024</p>
+            <p
+              style={{
+                color: "#111827",
+                fontSize: "0.875rem",
+              }}
+            >
+              January 2024
+            </p>
           </div>
+
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label
+              style={{
+                display: "block",
+                fontSize: "0.875rem",
+                fontWeight: "500",
+                color: "#374151",
+                marginBottom: "0.25rem",
+              }}
+            >
               Last Login
             </label>
-            <p className="text-gray-900 text-sm sm:text-base">Today, 2:30 PM</p>
+            <p
+              style={{
+                color: "#111827",
+                fontSize: "0.875rem",
+              }}
+            >
+              Today, 2:30 PM
+            </p>
           </div>
+
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label
+              style={{
+                display: "block",
+                fontSize: "0.875rem",
+                fontWeight: "500",
+                color: "#374151",
+                marginBottom: "0.25rem",
+              }}
+            >
               Status
             </label>
-            <span className="px-2 py-1 text-xs bg-green-100 text-green-800 rounded">
+            <span
+              style={{
+                display: "inline-block",
+                padding: "0.25rem 0.5rem",
+                fontSize: "0.75rem",
+                backgroundColor: "#d1fae5",
+                color: "#065f46",
+                borderRadius: "0.375rem",
+              }}
+            >
               Active
             </span>
           </div>
@@ -45,19 +134,64 @@ const AccountTab = () => {
       </div>
 
       {/* Danger Zone Section */}
-      <div className="border-t pt-6">
-        <h3 className="text-base sm:text-lg font-semibold text-red-600 mb-2">
+      <div
+        style={{
+          borderTop: "1px solid #e5e7eb",
+          paddingTop: "1.5rem",
+        }}
+      >
+        <h3
+          style={{
+            fontSize: "1rem",
+            fontWeight: "600",
+            color: "#dc2626",
+            marginBottom: "0.5rem",
+          }}
+        >
           Danger Zone
         </h3>
-        <p className="text-sm text-gray-500 mb-4">
+        <p
+          style={{
+            fontSize: "0.875rem",
+            color: "#6b7280",
+            marginBottom: "1rem",
+          }}
+        >
           These actions cannot be undone
         </p>
 
         <button
           onClick={Signout}
-          className="w-full px-4 py-2 bg-red-50 text-red-600 border border-red-200 rounded-lg hover:bg-red-100 transition text-sm sm:text-base flex items-center justify-center"
+          style={{
+            width: "100%",
+            padding: "0.5rem 1rem",
+            backgroundColor: "#fef2f2",
+            color: "#dc2626",
+            border: "1px solid #fecaca",
+            borderRadius: "0.5rem",
+            fontSize: "0.875rem",
+            fontWeight: "500",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            cursor: "pointer",
+            transition: "background-color 0.3s ease",
+          }}
+          onMouseOver={(e) => {
+            e.currentTarget.style.backgroundColor = "#fee2e2";
+          }}
+          onMouseOut={(e) => {
+            e.currentTarget.style.backgroundColor = "#fef2f2";
+          }}
         >
-          <span className="mr-2 text-lg">▷</span>
+          <span
+            style={{
+              marginRight: "0.5rem",
+              fontSize: "1rem",
+            }}
+          >
+            ▷
+          </span>
           Sign Out
         </button>
       </div>
