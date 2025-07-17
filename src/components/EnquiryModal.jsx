@@ -4,7 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import emailjs from '@emailjs/browser';
 import './EnquiryModal.css';
 
-const EnquiryModal = ({ show, onClose }) => {
+const EnquiryModal = ({ show, onClose, course }) => {
   const { userRole } = useAuth();
   if (!show || userRole !== 'Student') return null;
 
@@ -12,7 +12,7 @@ const EnquiryModal = ({ show, onClose }) => {
     name: '',
     email: '',
     phone: '',
-    course: '',
+    course: course || '',
     preferredDate: '',
     preferredTimeSlot: '',
     message: ''
@@ -78,6 +78,12 @@ const EnquiryModal = ({ show, onClose }) => {
       return () => clearTimeout(timer);
     }
   }, [status.show]);
+
+  useEffect(() => {
+    if (course) {
+      setFormData(prev => ({ ...prev, course }));
+    }
+  }, [course]);
 
   const dateInputRef = useRef(null);
 
