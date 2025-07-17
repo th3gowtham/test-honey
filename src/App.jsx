@@ -10,10 +10,12 @@ import Teachers from "./pages/Teachers";
 import Product from "./pages/Product";
 import PlogDetails from "./pages/PlogDetails";
 import Login from "./components/Login"; // Make sure Login is a modal component
+import ChatApp from './chatApp' // chat app
 import { useEffect } from "react";
 import AOS from "aos";
 import "aos/dist/aos.css";
 import Header from "./components/Header";
+
 
 
 
@@ -41,6 +43,7 @@ function App() {
         <Route path="/teachers" element={<Teachers />} />
         <Route path="/product" element={<Product />} />
         <Route path="/plog_details" element={<PlogDetails />} />
+        <Route path="/chat" element={<ChatApp />} />  // chat app
       
       </Routes>
       {showLogin && (
@@ -48,6 +51,7 @@ function App() {
       )}
     </Router>
   );
+
 }
 
 export default App;
