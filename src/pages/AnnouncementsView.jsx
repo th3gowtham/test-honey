@@ -1,55 +1,54 @@
 import { Megaphone } from "lucide-react";
+import "../styles/AnnouncementsView.css"
 
 const AnnouncementsView = () => {
   return (
-    <div className="flex-1 flex flex-col min-h-screen">
+    <div className="announcements-container">
       {/* Header */}
-      <div className="bg-white border-b border-gray-200 p-4 md:p-6 pt-16 md:pt-6">
-        <h1 className="text-lg sm:text-xl font-semibold text-gray-900 flex items-center gap-2">
-          <Megaphone className="w-5 h-5 text-teal-600" />
+      <div className="announcements-header">
+        <h1 className="announcements-title">
+          <Megaphone size={20} color="#0d9488" /> {/* teal-600 */}
           Community Announcements
         </h1>
-        <p className="text-sm text-gray-500 mt-1">🔔 Stay updated with the latest updates</p>
+        <p className="announcements-subtitle">
+          🔔 Stay updated with the latest updates
+        </p>
       </div>
 
       {/* Announcements Section */}
-      <div className="flex-1 overflow-y-auto px-4 py-4 md:px-6 lg:px-8 space-y-6 md:space-y-4">
+      <div className="announcements-list">
         {/* Announcement Card */}
-        <div className="bg-white rounded-lg border border-gray-200 p-4 shadow-sm">
-          <div className="flex flex-col md:flex-row md:items-center md:space-x-3 mb-3">
-            <div className="w-8 h-8 bg-red-500 rounded-full flex items-center justify-center mb-2 sm:mb-0">
-              <span className="text-white text-sm font-medium">A</span>
-            </div>
-            <div className="text-sm">
-              <span className="font-medium text-gray-900">Admin</span>
-              <span className="text-xs text-gray-500 ml-2">Yesterday</span>
+        <div className="announcement-card">
+          <div className="announcement-header">
+            <div className="announcement-avatar avatar-red">A</div>
+            <div className="announcement-info">
+              <span className="announcement-author">Admin</span>
+              <span className="announcement-time">Yesterday</span>
             </div>
           </div>
-          <p className="text-gray-800 text-sm">
+          <p className="announcement-text">
             🎉 Welcome to the new academic year! We are excited to have you all here.
           </p>
         </div>
 
         {/* Second Announcement */}
-        <div className="bg-white rounded-lg border border-gray-200 p-4 shadow-sm">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-3 mb-3">
-            <div className="w-8 h-8 bg-orange-500 rounded-full flex items-center justify-center mb-2 sm:mb-0">
-              <span className="text-white text-sm font-medium">A</span>
-            </div>
-            <div className="text-sm">
-              <span className="font-medium text-gray-900">Admin</span>
-              <span className="text-xs text-gray-500 ml-2">2 hours ago</span>
+        <div className="announcement-card">
+          <div className="announcement-header">
+            <div className="announcement-avatar avatar-orange">A</div>
+            <div className="announcement-info">
+              <span className="announcement-author">Admin</span>
+              <span className="announcement-time">2 hours ago</span>
             </div>
           </div>
-          <p className="text-gray-800 text-sm">
+          <p className="announcement-text">
             ⚠️ Important: School will be closed on Monday due to maintenance work.
           </p>
         </div>
       </div>
 
       {/* Footer */}
-      <div className="bg-gray-50 p-4 text-center">
-        <p className="text-sm text-gray-500">
+      <div className="announcements-footer">
+        <p className="announcements-footer-text">
           Only admins can send community announcements
         </p>
       </div>

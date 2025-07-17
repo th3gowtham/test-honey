@@ -1,65 +1,62 @@
 import { Calendar, MoreVertical, Send } from 'lucide-react';
-
+import "../styles/BatchBroadcast.css"
 const BatchBroadcast = () => {
   return (
-    <div className="flex-1 flex flex-col min-h-screen">
+    <div className="batch-broadcast">
       {/* Header */}
-      <div className="bg-white border-b border-gray-200 p-4 md:p-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4 pt-16 md:pt-4">
-        <div className="flex items-center space-x-3">
-          <div className="w-10 h-10 bg-teal-500 rounded-full flex items-center justify-center">
-            <span className="text-white font-medium">S</span>
+      <div className="batch-header">
+        <div className="batch-header-info">
+          <div className="batch-avatar">
+            <span>S</span>
           </div>
-          <div>
-            <h2 className="font-semibold text-gray-900 text-base sm:text-lg">Math 101 Batch</h2>
-            <p className="text-sm text-gray-500">📢 Broadcast • 25 students</p>
+          <div className="batch-header-text">
+            <h2>Math 101 Batch</h2>
+            <p>📢 Broadcast • 25 students</p>
           </div>
         </div>
-        <div className="flex flex-wrap items-center gap-4 sm:gap-8">
-          <button className="px-4 py-2 bg-teal-500 text-white rounded-lg text-sm flex items-center gap-2 hover:bg-teal-600 transition">
-            <Calendar className="w-4 h-4 " />
+        <div className="batch-actions">
+          <button className="batch-btn">
+            <Calendar size={16} />
             <span>Book Call</span>
           </button>
           <div>
-            <button className='pl-6'>
-               <MoreVertical className="w-5 h-5 text-gray-400 " />
+            <button className="batch-more-btn">
+              <MoreVertical size={20} />
             </button>
           </div>
-    
         </div>
       </div>
 
       {/* Chat Messages */}
-      <div className="flex-1 overflow-y-auto px-4 py-4 space-y-6 md:space-y-4 md:px-6 lg:px-8">
-        <div className="flex items-start space-x-3">
-          <div className="w-8 h-8 bg-teal-500 rounded-full flex items-center justify-center">
-            <span className="text-white text-sm">S</span>
+      <div className="batch-messages">
+        <div className="batch-message">
+          <div className="message-avatar">
+            <span>S</span>
           </div>
           <div>
-            <div className="flex flex-wrap items-center gap-1 mb-1">
-              <span className="font-medium text-gray-900">Sarah Johnson</span>
-              <span className="w-2 h-2 bg-red-500 rounded-full"></span>
-              <span className="text-xs text-gray-500">2:30 PM</span>
+            <div className="message-meta">
+              <span className="name">Sarah Johnson</span>
+              <span className="status"></span>
+              <span>2:30 PM</span>
             </div>
-            <div className="bg-gray-100 rounded-lg p-3 max-w-xs sm:max-w-md">
-              <p className="text-gray-800 text-sm">
-                Good morning! Today we’ll cover quadratic equations.
-              </p>
+            <div className="message-bubble">
+              <p>Good morning! Today we’ll cover quadratic equations.</p>
             </div>
           </div>
         </div>
       </div>
 
       {/* Message Input */}
-      <div className="bg-white border-t border-gray-200 p-4">
-        <div className="flex flex-col md:flex-row items-stretch md:items-center gap-3">
-          <button className="text-gray-400 hover:text-gray-600 text-xl">📎</button>
+      <div className="batch-input">
+        <div className="batch-input-wrapper">
+          <button className="batch-attach-btn">📎</button>
           <input
             type="text"
             placeholder="Type your message..."
-            className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 text-sm"
+            className="batch-text-input"
           />
-          <button className="bg-teal-500 text-white p-2 rounded-lg hover:bg-teal-600 flex items-center justify-center transition">
-            <Send className="w-5 h-5" />
+          <button className="batch-send-btn">
+            <Send size={20} />
           </button>
         </div>
       </div>

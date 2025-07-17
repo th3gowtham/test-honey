@@ -1,5 +1,6 @@
 // Header component for the main navigation bar
 // This handles the top navigation, user authentication state, and various interactive elements
+import { useLocation } from 'react-router-dom'; // Import useLocation
 import { useEffect, useState } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { auth } from '../services/firebase';
@@ -12,6 +13,12 @@ import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 
 
 const Header = ({ onLoginClick }) => {         // Main Header component that receives a callback for login button clicks
+    const location = useLocation(); // 👈 Get the current route
+
+  // Hide header when on /chat route
+  if (location.pathname.startsWith('/chat')) {
+    return null;
+  }
 
   const [user, setUser] = useState(null);// Track the current authenticated user and then 
   const [isLoading, setIsLoading] = useState(true); // Track if Firebase auth is still initializing

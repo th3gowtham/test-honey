@@ -1,6 +1,7 @@
 import { Bell, Settings } from "lucide-react";
 import { useState } from "react";
 import ToggleSwitch from "../components/ToggleSwitch.jsx";
+import "../styles/SettingsTab.css"
 
 const SettingsTab = () => {
   const [darkMode, setDarkMode] = useState(false);
@@ -11,18 +12,16 @@ const SettingsTab = () => {
   const [message, setMessage] = useState(false);
 
   return (
-    <div className="space-y-10">
+    <div className="settings-tab">
       {/* Notifications Section */}
-      <section>
-        <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-          <Bell className="w-5 h-5 mr-2" />
+      <section className="settings-section">
+        <h3>
+          <Bell className="icon" />
           Notification Preferences
         </h3>
-        <p className="text-sm text-gray-500 mb-6">
-          Choose what notifications you want to receive
-        </p>
+        <p>Choose what notifications you want to receive</p>
 
-        <div className="space-y-5">
+        <div className="preferences">
           {[
             {
               label: "Message Notifications",
@@ -49,15 +48,10 @@ const SettingsTab = () => {
               toggle: () => setEmailNotification(!emailNotification),
             },
           ].map((item, idx) => (
-            <div
-              key={idx}
-              className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3"
-            >
-              <div>
-                <h4 className="font-medium text-gray-900 text-sm sm:text-base">
-                  {item.label}
-                </h4>
-                <p className="text-sm text-gray-500">{item.desc}</p>
+            <div key={idx} className="preference-item">
+              <div className="preference-text">
+                <h4>{item.label}</h4>
+                <p>{item.desc}</p>
               </div>
               <ToggleSwitch isOn={item.value} onToggle={item.toggle} />
             </div>
@@ -66,13 +60,13 @@ const SettingsTab = () => {
       </section>
 
       {/* App Preferences Section */}
-      <section>
-        <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-          <Settings className="w-5 h-5 mr-2" />
+      <section className="settings-section">
+        <h3>
+          <Settings className="icon" />
           App Preferences
         </h3>
 
-        <div className="space-y-5">
+        <div className="preferences">
           {[
             {
               label: "Dark Mode",
@@ -87,15 +81,10 @@ const SettingsTab = () => {
               toggle: () => setSoundEffects(!soundEffects),
             },
           ].map((item, idx) => (
-            <div
-              key={idx}
-              className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3"
-            >
-              <div>
-                <h4 className="font-medium text-gray-900 text-sm sm:text-base">
-                  {item.label}
-                </h4>
-                <p className="text-sm text-gray-500">{item.desc}</p>
+            <div key={idx} className="preference-item">
+              <div className="preference-text">
+                <h4>{item.label}</h4>
+                <p>{item.desc}</p>
               </div>
               <ToggleSwitch isOn={item.value} onToggle={item.toggle} />
             </div>
@@ -107,4 +96,3 @@ const SettingsTab = () => {
 };
 
 export default SettingsTab;
-
