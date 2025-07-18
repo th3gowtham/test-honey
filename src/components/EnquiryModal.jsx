@@ -4,19 +4,33 @@ import { useAuth } from '../context/AuthContext';
 import emailjs from '@emailjs/browser';
 import './EnquiryModal.css';
 
-const EnquiryModal = ({ show, onClose, course }) => {
-  const { userRole } = useAuth();
-  if (!show || userRole !== 'Student') return null;
+const EnquiryModal = ({ show, onClose, onSubmit, onSkip, selectedCourse }) => {
+  const { userRole, userName, user } = useAuth();
 
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
+    name: userName || user?.displayName || '',
+    email: user?.email || '',
     phone: '',
-    course: course || '',
+    course: selectedCourse || '',
     preferredDate: '',
     preferredTimeSlot: '',
     message: ''
   });
+
+  // Update all fields when modal opens, user info changes, or course changes
+  useEffect(() => {
+    if (show) {
+      setFormData({
+        name: userName || user?.displayName || '',
+        email: user?.email || '',
+        phone: '',
+        course: selectedCourse || '',
+        preferredDate: '',
+        preferredTimeSlot: '',
+        message: ''
+      });
+    }
+  }, [show, user, userName, selectedCourse]);
 
   const [status, setStatus] = useState({
     success: false,
@@ -43,31 +57,33 @@ const EnquiryModal = ({ show, onClose, course }) => {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-
-    emailjs.send(
-      'service_ihc4di7',
-      'template_mauhknb',
-      formData,
-      'L8cGXGnMaq2Pj005_'
-    )
-      .then(() => {
-        setStatus({ success: true, error: false, show: true });
-        setFormData({
-          name: '',
-          email: '',
-          phone: '',
-          course: '',
-          preferredDate: '',
-          preferredTimeSlot: '',
-          message: ''
-        });
-      })
-      .catch((error) => {
-        setStatus({ success: false, error: true, show: true });
-        console.log('FAILED...', error);
+    try {
+      await emailjs.send(
+        'service_ihc4di7',
+        'template_mauhknb',
+        formData,
+        'L8cGXGnMaq2Pj005_'
+      );
+      setStatus({ success: true, error: false, show: true });
+      setFormData({
+        name: '',
+        email: '',
+        phone: '',
+        course: '',
+        preferredDate: '',
+        preferredTimeSlot: '',
+        message: ''
       });
+      // Call onSubmit after successful form submission
+      setTimeout(() => {
+        onSubmit();
+      }, 1500);
+    } catch (error) {
+      setStatus({ success: false, error: true, show: true });
+      console.log('FAILED...', error);
+    }
   };
 
   useEffect(() => {
@@ -79,12 +95,6 @@ const EnquiryModal = ({ show, onClose, course }) => {
     }
   }, [status.show]);
 
-  useEffect(() => {
-    if (course) {
-      setFormData(prev => ({ ...prev, course }));
-    }
-  }, [course]);
-
   const dateInputRef = useRef(null);
 
   // Date logic
@@ -95,12 +105,16 @@ const EnquiryModal = ({ show, onClose, course }) => {
   maxDate.setDate(maxDate.getDate() + 31);
   const maxDateStr = maxDate.toISOString().split('T')[0];
 
+  // Only return null after all hooks are called
+  if (!show || userRole !== 'Student') return null;
+
   return (
     <div className="enquiry-modal-overlay">
       <div className="enquiry-modal">
         <button className="enquiry-modal-close" onClick={onClose}>&times;</button>
         <div className="enquiry-modal-header">
           <h2>Course Enquiry Form</h2>
+          <p className="text-muted">Fill this form to get more information about the course or skip to proceed with enrollment</p>
         </div>
         <form onSubmit={handleSubmit} className="enquiry-modal-form">
           <div className="enquiry-modal-row">
@@ -144,19 +158,14 @@ const EnquiryModal = ({ show, onClose, course }) => {
             </div>
             <div className="enquiry-modal-group">
               <label htmlFor="course">Course</label>
-              <select
+              <input
                 id="course"
+                type="text"
                 name="course"
                 value={formData.course}
-                onChange={handleChange}
-                required
-              >
-                <option value="">Select a course</option>
-                <option value="Web Development">Web Development</option>
-                <option value="Data Science">Data Science</option>
-                <option value="Cybersecurity">Cybersecurity</option>
-                <option value="AI & ML">AI & ML</option>
-              </select>
+                readOnly
+                className="readonly-input"
+              />
             </div>
           </div>
           <div className="enquiry-modal-row">
@@ -226,13 +235,14 @@ const EnquiryModal = ({ show, onClose, course }) => {
           </div>
           <div className="enquiry-modal-row">
             <div className="enquiry-modal-button-group">
-              <button type="submit">Submit Enquiry</button>
+              <button type="button" onClick={onSkip} className="skip-button">Skip & Proceed to Payment</button>
+              <button type="submit" className="submit-button">Submit Enquiry</button>
             </div>
           </div>
         </form>
         {status.show && status.success && (
           <div className="enquiry-modal-message success">
-            Your enquiry has been sent successfully! We will contact you soon.
+            Your enquiry has been sent successfully! Proceeding to payment...
           </div>
         )}
         {status.show && status.error && (

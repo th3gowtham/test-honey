@@ -1,10 +1,16 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
+import { toast } from "react-toastify";
+import CourseCard from "../components/CourseCard";
+import EnquiryModal from "../components/EnquiryModal";
+import { FaFacebookF, FaInstagram, FaLinkedinIn } from "react-icons/fa6";
+import "swiper/css";
 import "../styles/all.min.css";
 import "../styles/bootstrap.min.css";
 import "../styles/swiper-bundle.min.css";
 import "../styles/main.css";
-import CourseCard from "../components/CourseCard";
+import img2r from "../assets/2r.png";
 import phoni from "../assets/phoni.jpeg";
 import gram from "../assets/gram.jpg";
 import ha from "../assets/ha.jpg";
@@ -20,9 +26,10 @@ import dm from "../assets/dm.jpg";
 import ai from "../assets/ai.jpg";
 import des from "../assets/des.png";
 import ani from "../assets/ani.png";
-import { FaEnvelope, FaPhone, FaLocationDot, FaClock, FaFacebookF, FaInstagram, FaLinkedinIn } from "react-icons/fa6";
-import EnquiryModal from "../components/EnquiryModal";
+import { usePayment } from "../context/PaymentContext";
 
+// --- Course Data ---
+// Add a `fee` property to each course that supports payment
 const courses = [
   {
     imgSrc: phoni,
@@ -31,7 +38,7 @@ const courses = [
     age: "3+ Years",
     seats: "Upto 5 Kids per Batch",
     duration: "9 Months",
-    link: "https://wa.me/message/BITGLQYLAPJRO1",
+    fee: 4999,
   },
   {
     imgSrc: gram,
@@ -40,7 +47,7 @@ const courses = [
     age: "4+ Years",
     seats: "Upto 5 Kids per Batch",
     duration: "1 Year",
-    link: "https://wa.me/message/BITGLQYLAPJRO1",
+    fee: 5999,
   },
   {
     imgSrc: ha,
@@ -49,7 +56,7 @@ const courses = [
     age: "6+ Years",
     seats: "Upto 5 Kids per Batch",
     duration: "4 Months",
-    link: "https://wa.me/message/BITGLQYLAPJRO1",
+    fee: 3999,
   },
   {
     imgSrc: portfolio3,
@@ -58,7 +65,7 @@ const courses = [
     age: "3+ Years",
     seats: "Upto 5 Kids per Batch",
     duration: "4 Months",
-    link: "https://wa.me/message/BITGLQYLAPJRO1",
+    fee :3999,
   },
   {
     imgSrc: math,
@@ -67,7 +74,7 @@ const courses = [
     age: "5+ Years",
     seats: "Upto 5 Kids per Batch",
     duration: "12 Months",
-    link: "https://wa.me/message/BITGLQYLAPJRO1",
+    fee :3999,
   },
   {
     imgSrc: s,
@@ -76,7 +83,7 @@ const courses = [
     age: "5+ Years",
     seats: "Upto 5 Kids per Batch",
     duration: "5 Months",
-    link: "https://wa.me/message/BITGLQYLAPJRO1",
+    fee :3999,
   },
   {
     imgSrc: portfolio3,
@@ -85,7 +92,7 @@ const courses = [
     age: "5+ Years",
     seats: "Upto 5 Kids per Batch",
     duration: "4 Months",
-    link: "https://wa.me/message/BITGLQYLAPJRO1",
+    fee :3999,
   },
   {
     imgSrc: cod,
@@ -94,7 +101,7 @@ const courses = [
     age: "6+ Years",
     seats: "Upto 4 Kids per Batch",
     duration: "3 Months",
-    link: "https://wa.me/message/BITGLQYLAPJRO1",
+    fee :3999,
   },
   {
     imgSrc: com,
@@ -103,7 +110,7 @@ const courses = [
     age: "8+ Years",
     seats: "Upto 4 Kids per Batch",
     duration: "6 Months",
-    link: "https://wa.me/message/BITGLQYLAPJRO1",
+    fee :3999,
   },
   {
     imgSrc: art,
@@ -112,83 +119,147 @@ const courses = [
     age: "8+ Years",
     seats: "Upto 5 per Batch",
     duration: "3 Months",
-    link: "https://wa.me/message/BITGLQYLAPJRO1",
+    fee :3999,
   },
+
 ];
 
 const advancedCourses = [
   {
+    imgSrc: math,
+    title: "Mathematics",
+    description: "Fun and engaging math classes for children to build a strong foundation in numbers, shapes, and problem-solving.",
+    age: "4+ Years",
+    seats: "Upto 5 Kids per Batch",
+    duration: "1 Year",
+    fee: 6999,
+  },
+  {
+    imgSrc: s,
+    title: "Science",
+    description: "Interactive science classes for children to explore the world around them, from basic concepts to advanced experiments.",
+    age: "5+ Years",
+    seats: "Upto 5 Kids per Batch",
+    duration: "1 Year",
+    fee: 7999,
+  },
+  {
+    imgSrc: cod,
+    title: "Coding",
+    description: "Introduction to programming for children, teaching them the basics of coding and problem-solving through fun activities.",
+    age: "7+ Years",
+    seats: "Upto 5 Kids per Batch",
+    duration: "1 Year",
+    fee: 8999,
+  },
+  {
+    imgSrc: com,
+    title: "Communication Skills",
+    description: "Enhance your child's communication skills through engaging activities and interactive sessions.",
+    age: "4+ Years",
+    seats: "Upto 5 Kids per Batch",
+    duration: "1 Year",
+    fee: 5999,
+  },
+  {
+    imgSrc: art,
+    title: "Art & Craft",
+    description: "Creative and artistic classes for children to explore their imagination and develop their artistic skills.",
+    age: "3+ Years",
+    seats: "Upto 5 Kids per Batch",
+    duration: "1 Year",
+    fee: 4999,
+  },
+  {
     imgSrc: web,
     title: "Web Development",
-    description: "A fun, interactive approach to learn building a webiste through blending and engaging methods.",
+    description: "Introduction to web development for children, teaching them the basics of HTML, CSS, and JavaScript.",
     age: "10+ Years",
-    seats: "Upto 4 per Batch",
-    duration: "6 Months",
-    link: "https://wa.me/message/BITGLQYLAPJRO1",
+    seats: "Upto 5 Kids per Batch",
+    duration: "1 Year",
+    fee: 12999,
   },
   {
     imgSrc: game,
     title: "Game Development",
-    description: "A fun, interactive approach to learn and create real world game applications using insdustry leading technology.",
+    description: "Fun and engaging game development classes for children to learn about game design and programming.",
     age: "10+ Years",
-    seats: "Upto 4 per Batch",
-    duration: "4 Months",
-    link: "https://wa.me/message/BITGLQYLAPJRO1",
+    seats: "Upto 5 Kids per Batch",
+    duration: "1 Year",
+    fee: 11999,
   },
   {
     imgSrc: dm,
     title: "Digital Marketing",
-    description: "Learn Digital Marketing from Foundations to Advanced and product building strategies with our personalised course.",
-    age: "10+ Years",
-    seats: "Upto 5 per Batch",
-    duration: "4 Months",
-    link: "https://wa.me/message/BITGLQYLAPJRO1",
+    description: "Introduction to digital marketing for children, teaching them about social media, SEO, and online advertising.",
+    age: "12+ Years",
+    seats: "Upto 5 Kids per Batch",
+    duration: "1 Year",
+    fee: 10999,
   },
   {
     imgSrc: ai,
-    title: "Artificial Intelligence & Machine Learning",
-    description: "An engaging and interactive approach to develop strong technical skills in AI & ML through fun lessons and engaging activities.",
-    age: "8+ Years",
-    seats: "Upto 5 per Batch",
-    duration: "4 Months",
-    link: "https://wa.me/message/BITGLQYLAPJRO1",
+    title: "Artificial Intelligence",
+    description: "Introduction to artificial intelligence for children, teaching them about machine learning and neural networks.",
+    age: "12+ Years",
+    seats: "Upto 5 Kids per Batch",
+    duration: "1 Year",
+    fee: 13999,
   },
   {
     imgSrc: des,
-    title: "Graphic Design & Photoshop",
-    description: "An engaging and interactive approach to develop strong design skills in Graphic Design & Photoshop through fun lessons and engaging activities.",
-    age: "8+ Years",
-    seats: "Upto 5 per Batch",
-    duration: "4 Months",
-    link: "https://wa.me/message/BITGLQYLAPJRO1",
+    title: "Graphic Design",
+    description: "Introduction to graphic design for children, teaching them about color theory, typography, and basic design principles.",
+    age: "10+ Years",
+    seats: "Upto 5 Kids per Batch",
+    duration: "1 Year",
+    fee: 9999,
   },
   {
     imgSrc: ani,
-    title: "Animation & Video Editing",
-    description: "An engaging and interactive approach to learn 3D Animations and Video Editing skills through fun lessons and engaging activities.",
-    age: "8+ Years",
-    seats: "Upto 5 per Batch",
-    duration: "4 Months",
-    link: "https://wa.me/message/BITGLQYLAPJRO1",
+    title: "Animation",
+    description: "Introduction to animation for children, teaching them about keyframe animation and basic animation principles.",
+    age: "10+ Years",
+    seats: "Upto 5 Kids per Batch",
+    duration: "1 Year",
+    fee: 8999,
   },
 ];
 
 const Classes = () => {
-  const [showModal, setShowModal] = useState(false);
-  const [selectedCourse, setSelectedCourse] = useState("");
+  const { user } = useAuth();
+  const { startPayment, loading } = usePayment();
+  const [showLoginNeeded, setShowLoginNeeded] = useState(false);
+  const [showEnquiryModal, setShowEnquiryModal] = useState(false);
+  const [selectedCourse, setSelectedCourse] = useState(null);
 
-  const handleApply = (courseName) => {
-    setSelectedCourse(courseName);
-    setShowModal(true);
+  // Handler for "Enroll Now" button
+  const handleApply = (course) => {
+    if (!user || !user.email) {
+      setShowLoginNeeded(true);
+      setTimeout(() => setShowLoginNeeded(false), 2000);
+      return;
+    }
+    setSelectedCourse(course);
+    setShowEnquiryModal(true);
+  };
+
+  // Modal handlers
+  const handleEnquirySubmit = () => {
+    setShowEnquiryModal(false);
+    if (selectedCourse) startPayment(selectedCourse);
+  };
+  const handleSkipEnquiry = () => {
+    setShowEnquiryModal(false);
+    if (selectedCourse) startPayment(selectedCourse);
   };
   const handleCloseModal = () => {
-    setShowModal(false);
-    setSelectedCourse("");
+    setShowEnquiryModal(false);
+    setSelectedCourse(null);
   };
 
   return (
     <>
-
       <nav aria-label="breadcrumb" className="breadcrumb-section position-relative">
         <div className="position-absolute top-50 start-50 translate-middle">
           <h2 className="text-center display-3 text-white">Our Classes</h2>
@@ -202,7 +273,12 @@ const Classes = () => {
           </div>
           <div className="row row-cols-1 row-cols-md-2 row-cols-lg-3">
             {courses.map((course, idx) => (
-              <CourseCard key={idx} {...course} onApply={handleApply} />
+              <CourseCard
+                key={idx}
+                {...course}
+                onApply={() => handleApply(course)}
+                loading={loading && selectedCourse && selectedCourse.title === course.title}
+              />
             ))}
           </div>
         </div>
@@ -215,11 +291,15 @@ const Classes = () => {
       <div className="container mb-5">
         <div className="row row-cols-1 row-cols-md-2 row-cols-lg-3">
           {advancedCourses.map((course, idx) => (
-            <CourseCard key={idx} {...course} onApply={handleApply} />
+            <CourseCard
+              key={idx}
+              {...course}
+              onApply={() => handleApply(course)}
+              loading={loading && selectedCourse && selectedCourse.title === course.title}
+            />
           ))}
         </div>
       </div>
-      <EnquiryModal show={showModal} onClose={handleCloseModal} course={selectedCourse} />
       <footer>
         <div className="container text-white">
           <div className="row row-cols-1 row-cols-md-2 row-cols-lg-4">
@@ -304,8 +384,34 @@ const Classes = () => {
           </div>
         </div>
       </footer>
+      <EnquiryModal
+        show={showEnquiryModal}
+        onClose={handleCloseModal}
+        onSubmit={handleEnquirySubmit}
+        onSkip={handleSkipEnquiry}
+        selectedCourse={selectedCourse?.title}
+      />
+      {showLoginNeeded && (
+        <div
+          style={{
+            position: 'fixed',
+            top: '80px',
+            right: '30px',
+            background: '#fde7e9',
+            color: '#dc3545',
+            border: '1px solid #dc3545',
+            borderRadius: '8px',
+            padding: '1rem 2rem',
+            zIndex: 2000,
+            fontWeight: 600,
+            boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
+          }}
+        >
+          Please login to enroll in the course
+        </div>
+      )}
     </>
   );
 };
 
-export default Classes; 
+export default Classes;

@@ -35,7 +35,7 @@ import cod from '../assets/cod.jpg';
 import com from '../assets/com.jpeg';
 import art from '../assets/art.jpeg';
 import class3img from '../assets/class-3.jpg';
-
+import { usePayment } from "../context/PaymentContext";
 
 
 const Home = () => {
@@ -46,6 +46,13 @@ const Home = () => {
       easing: 'ease-in-out',
     });
   }, []);
+
+  const { startPayment, loading } = usePayment();
+
+  const handleEnroll = (course) => {
+    // You can show a modal first if you want, then call startPayment(course)
+    startPayment(course);
+  };
 
   return(
   <div style={{ overflowX: 'hidden' }}>

@@ -9,11 +9,13 @@ import Pg from "./pages/Pg";
 import Teachers from "./pages/Teachers";
 import Product from "./pages/Product";
 import PlogDetails from "./pages/PlogDetails";
-import Login from "./components/Login"; // Make sure Login is a modal component
+import Login from "./components/Login";
 import { useEffect } from "react";
 import AOS from "aos";
 import "aos/dist/aos.css";
 import Header from "./components/Header";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 
 
@@ -30,6 +32,18 @@ function App() {
   return (
     <Router>
       <Header onLoginClick={() => setShowLogin(true)} />
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+      />
       <Routes>
         <Route path="/" element={<Home />} />
        
