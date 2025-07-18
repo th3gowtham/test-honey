@@ -28,8 +28,7 @@ import des from "../assets/des.png";
 import ani from "../assets/ani.png";
 import { usePayment } from "../context/PaymentContext";
 
-// --- Course Data ---
-// Add a `fee` property to each course that supports payment
+
 const courses = [
   {
     imgSrc: phoni,

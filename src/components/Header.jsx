@@ -112,7 +112,7 @@ const Header = ({ onLoginClick }) => {         // Main Header component that rec
                       handleLogout();
                       collapseMobileNavbar();
                     }}
-                          // Show signout button if user is authenticated
+                          // It Show signout button if user is authenticated
                     className="main-link btn btn-lg rounded-pill px-4"
                   >
                     Sign Out
@@ -120,7 +120,7 @@ const Header = ({ onLoginClick }) => {         // Main Header component that rec
                 ) : (
 
                   <button
-                    onClick={onLoginClick}              // Show login button if no user is authenticated
+                    onClick={()=>{onLoginClick();collapseMobileNavbar();}}              // Show login button if no user is authenticated
                     className="main-link btn btn-lg rounded-pill px-4"
                   >
                     Login
