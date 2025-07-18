@@ -1,3 +1,59 @@
+@media (max-width: 768px) {
+  .chat-sidebar {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 80%;
+    height: 100%;
+    background-color: #fff;
+    z-index: 10;
+    border-right: 1px solid #ddd;
+    transition: transform 0.3s ease-in-out;
+  }
+
+  .chat-sidebar.hidden {
+    display: none;
+  }
+
+  .chat-main {
+    width: 100%;
+    height: 100vh;
+    overflow-y: auto;
+    padding: 1rem;
+  }
+
+  .chat-back-btn {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1rem;
+    background: none;
+    border: none;
+    cursor: pointer;
+  }
+
+  .chat-notification,
+  .chat-profile {
+    position: absolute;
+    top: 1rem;
+    width: 36px;
+    height: 36px;
+    background-color: #e0e0e0;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 20;
+  }
+
+  .chat-notification {
+    right: 3.5rem;
+  }
+
+  .chat-profile {
+    right: 1rem;
+  }
+}
+
 /* Root Container */
 .chat-app {
   height: 100vh;
