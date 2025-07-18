@@ -4,6 +4,8 @@ import { auth, googleprovider } from '../services/firebase';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import React from 'react';
+
 
 const Login = ({ onClose }) => {
   const navigate = useNavigate();
