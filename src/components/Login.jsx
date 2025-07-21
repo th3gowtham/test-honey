@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { signInWithPopup, setPersistence, browserLocalPersistence, browserSessionPersistence } from 'firebase/auth';
-import { auth, googleprovider } from '../services/firebase';
+import { auth, googleprovider } from '../firebaseprofile.js';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';

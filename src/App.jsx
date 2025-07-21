@@ -15,10 +15,7 @@ import { useEffect } from "react";
 import AOS from "aos";
 import "aos/dist/aos.css";
 import Header from "./components/Header";
-
-
-
-
+import { Toaster } from "react-hot-toast";
 
 // Import global styles if needed
 // import "./styles/main.css";
@@ -31,6 +28,7 @@ function App() {
   }, []);
   return (
     <Router>
+      <Toaster position="top-center" />
       <Header onLoginClick={() => setShowLogin(true)} />
       <Routes>
         <Route path="/" element={<Home />} />

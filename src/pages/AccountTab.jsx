@@ -1,4 +1,5 @@
 import { Shield } from "lucide-react";
+import "../styles/AccountTab.css";
 
 const AccountTab = () => {
   function Signout() {
@@ -6,192 +7,46 @@ const AccountTab = () => {
   }
 
   return (
-    <div
-      style={{
-        padding: "1rem",
-        maxWidth: "100%",
-        display: "flex",
-        flexDirection: "column",
-        gap: "1.5rem",
-      }}
-    >
+    <div className="account-tab">
       {/* Account Info Section */}
       <div>
-        <h3
-          style={{
-            fontSize: "1rem",
-            fontWeight: "600",
-            color: "#111827",
-            marginBottom: "1rem",
-            display: "flex",
-            alignItems: "center",
-          }}
-        >
-          <Shield size={20} style={{ marginRight: "0.5rem", flexShrink: 0 }} />
+        <h3 className="account-section-title">
+          <Shield size={20} />
           Account Information
         </h3>
 
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "1fr",
-            gap: "1rem",
-          }}
-        >
+        <div className="account-info-grid">
           <div>
-            <label
-              style={{
-                display: "block",
-                fontSize: "0.875rem",
-                fontWeight: "500",
-                color: "#374151",
-                marginBottom: "0.25rem",
-              }}
-            >
-              Account Type
-            </label>
-            <p
-              style={{
-                color: "#111827",
-                fontWeight: "500",
-                fontSize: "0.875rem",
-              }}
-            >
-              Student
-            </p>
+            <label className="account-info-label">Account Type</label>
+            <p className="account-info-value">Student</p>
           </div>
 
           <div>
-            <label
-              style={{
-                display: "block",
-                fontSize: "0.875rem",
-                fontWeight: "500",
-                color: "#374151",
-                marginBottom: "0.25rem",
-              }}
-            >
-              Member Since
-            </label>
-            <p
-              style={{
-                color: "#111827",
-                fontSize: "0.875rem",
-              }}
-            >
-              January 2024
-            </p>
+            <label className="account-info-label">Member Since</label>
+            <p className="account-info-value">January 2024</p>
           </div>
 
           <div>
-            <label
-              style={{
-                display: "block",
-                fontSize: "0.875rem",
-                fontWeight: "500",
-                color: "#374151",
-                marginBottom: "0.25rem",
-              }}
-            >
-              Last Login
-            </label>
-            <p
-              style={{
-                color: "#111827",
-                fontSize: "0.875rem",
-              }}
-            >
-              Today, 2:30 PM
-            </p>
+            <label className="account-info-label">Last Login</label>
+            <p className="account-info-value">Today, 2:30 PM</p>
           </div>
 
           <div>
-            <label
-              style={{
-                display: "block",
-                fontSize: "0.875rem",
-                fontWeight: "500",
-                color: "#374151",
-                marginBottom: "0.25rem",
-              }}
-            >
-              Status
-            </label>
-            <span
-              style={{
-                display: "inline-block",
-                padding: "0.25rem 0.5rem",
-                fontSize: "0.75rem",
-                backgroundColor: "#d1fae5",
-                color: "#065f46",
-                borderRadius: "0.375rem",
-              }}
-            >
-              Active
-            </span>
+            <label className="account-info-label">Status</label>
+            <span className="account-status-active">Active</span>
           </div>
         </div>
       </div>
 
       {/* Danger Zone Section */}
-      <div
-        style={{
-          borderTop: "1px solid #e5e7eb",
-          paddingTop: "1.5rem",
-        }}
-      >
-        <h3
-          style={{
-            fontSize: "1rem",
-            fontWeight: "600",
-            color: "#dc2626",
-            marginBottom: "0.5rem",
-          }}
-        >
-          Danger Zone
-        </h3>
-        <p
-          style={{
-            fontSize: "0.875rem",
-            color: "#6b7280",
-            marginBottom: "1rem",
-          }}
-        >
+      <div className="danger-zone">
+        <h3 className="danger-zone-title">Danger Zone</h3>
+        <p className="danger-zone-text">
           These actions cannot be undone
         </p>
 
-        <button
-          onClick={Signout}
-          style={{
-            width: "100%",
-            padding: "0.5rem 1rem",
-            backgroundColor: "#fef2f2",
-            color: "#dc2626",
-            border: "1px solid #fecaca",
-            borderRadius: "0.5rem",
-            fontSize: "0.875rem",
-            fontWeight: "500",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            cursor: "pointer",
-            transition: "background-color 0.3s ease",
-          }}
-          onMouseOver={(e) => {
-            e.currentTarget.style.backgroundColor = "#fee2e2";
-          }}
-          onMouseOut={(e) => {
-            e.currentTarget.style.backgroundColor = "#fef2f2";
-          }}
-        >
-          <span
-            style={{
-              marginRight: "0.5rem",
-              fontSize: "1rem",
-            }}
-          >
-            ▷
-          </span>
+        <button onClick={Signout} className="sign-out-button">
+          <span className="sign-out-icon">▷</span>
           Sign Out
         </button>
       </div>
