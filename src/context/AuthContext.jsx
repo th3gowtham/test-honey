@@ -15,6 +15,9 @@ export const AuthProvider = ({ children }) => {
     setLoading(true);
     return axios.get('http://localhost:5000/api/auth/me', { withCredentials: true })
       .then(res => {
+        // Log what is received from the backend
+        console.log("[AuthContext] /api/auth/me response:", res.data);
+
         setUserRole(res.data.role);
         setUserName(res.data.name);
         setUser(res.data.user);

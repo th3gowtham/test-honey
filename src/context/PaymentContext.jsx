@@ -5,10 +5,18 @@ import { toast } from "react-toastify";
 const PaymentContext = createContext();
 
 export const PaymentProvider = ({ children }) => {
-  const { user } = useAuth();
+  const { user, userRole } = useAuth();
   const [loading, setLoading] = useState(false);
 
   const startPayment = async (course) => {
+    // Log user and role for debugging
+    console.log("[PaymentContext] user:", user, "userRole:", userRole);
+
+    // Only allow students to pay
+    if (userRole !== "Student") {
+      toast.error("Only students can enroll in courses.");
+      return;
+    }
     if (!user || !user.email) {
       toast.error("Please login to enroll in the course");
       return;
