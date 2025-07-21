@@ -1,7 +1,6 @@
 
-import React, { createContext, useContext, useEffect, useState } from 'react';
-import { auth } from '../services/firebase';
-import { onAuthStateChanged } from 'firebase/auth';
+import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
+import axios from 'axios';
 
 const AuthContext = createContext();
 
@@ -11,55 +10,67 @@ export const AuthProvider = ({ children }) => {
   const [userName, setUserName] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    // Always listen to Firebase auth state
-    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
-      if (firebaseUser) {
-        setUser(firebaseUser);
-        // Optionally, set userRole and userName from sessionStorage or fetch from backend
-      } else {
+  // Fetch user info from backend, return promise for awaiting
+  const refreshUser = useCallback(() => {
+    setLoading(true);
+    return axios.get('http://localhost:5000/api/auth/me', { withCredentials: true })
+      .then(res => {
+        setUserRole(res.data.role);
+        setUserName(res.data.name);
+        setUser(res.data.user);
+        setLoading(false);
+      })
+      .catch(() => {
         setUser(null);
         setUserRole(null);
         setUserName(null);
-      }
-      setLoading(false); // Auth state is now known
-    });
-
-    // Optionally, load role/name from sessionStorage for display
-    const role = sessionStorage.getItem('userRole');
-    const name = sessionStorage.getItem('userName');
-    if (role && name) {
-      setUserRole(role);
-      setUserName(name);
-    }
-
-    return () => unsubscribe();
+        setLoading(false);
+      });
   }, []);
 
-  const login = (userData) => {
-    setUser(userData);
-    sessionStorage.setItem('user', JSON.stringify(userData));
+  useEffect(() => {
+    refreshUser();
+  }, [refreshUser]);
+
+  // Listen for cross-tab auth events
+  useEffect(() => {
+    const handler = (e) => {
+      if (e.key === 'auth-event') {
+        refreshUser();
+      }
+    };
+    window.addEventListener('storage', handler);
+    return () => window.removeEventListener('storage', handler);
+  }, [refreshUser]);
+
+  // Broadcast to other tabs
+  const broadcastAuthEvent = () => {
+    localStorage.setItem('auth-event', Date.now().toString());
   };
 
+  // Call this after login/logout/role change, return promise for awaiting
+  const login = () => {
+    const p = refreshUser();
+    broadcastAuthEvent();
+    return p;
+  };
   const logout = () => {
-    setUser(null);
-    sessionStorage.removeItem('user');
-    sessionStorage.removeItem('userRole');
-    sessionStorage.removeItem('userName');
+    const p = refreshUser();
+    broadcastAuthEvent();
+    return p;
   };
 
   return (
-    <AuthContext.Provider value={{ 
+    <AuthContext.Provider value={{
       user,
-      userRole, 
-      userName, 
-      
-      setUserRole, 
+      userRole,
+      userName,
+      setUserRole,
       setUserName,
       login,
       logout,
-      
-      loading
+      loading,
+      refreshUser
     }}>
       {children}
     </AuthContext.Provider>

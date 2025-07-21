@@ -9,7 +9,7 @@ import React from 'react';
 
 const Login = ({ onClose }) => {
   const navigate = useNavigate();
-  const { setUserRole, setUserName } = useAuth();
+  const { login } = useAuth();
   const [rememberMe, setRememberMe] = useState(true);
 
   // implemted for Unified close function for both X and successful login
@@ -28,18 +28,10 @@ const Login = ({ onClose }) => {
       await setPersistence(auth, rememberMe ? browserLocalPersistence : browserSessionPersistence);
       const result = await signInWithPopup(auth, googleprovider);
       const idToken = await result.user.getIdToken();
-      const res = await axios.post('http://localhost:5000/api/auth/google-login', { idToken });
-      console.log("Login response:", res.data);
-
-      const { role, name } = res.data;
-      alert(`Welcome ${role}, ${name}`);
-      setUserRole(role);
-      setUserName(name);
-      sessionStorage.setItem("userRole", role);
-      sessionStorage.setItem("userName", name);
-      closeModal(); 
-     
-
+      // Send rememberMe flag and allow cookies
+      await axios.post('http://localhost:5000/api/auth/google-login', { idToken, rememberMe }, { withCredentials: true });
+      await login(); // <-- Wait for state to update!
+      closeModal();
     } catch (err) {
       alert("Login failed: " + err.message);
     }

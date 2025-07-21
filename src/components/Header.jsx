@@ -1,39 +1,24 @@
 // Header component for the main navigation bar
 // This handles the top navigation, user authentication state, and various interactive elements
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
-import { auth } from '../services/firebase';
-import { onAuthStateChanged, signOut } from 'firebase/auth';
 import { useAuth } from '../context/AuthContext';
 import img2r from "../assets/2r.png";
 import EnquiryModal from './EnquiryModal';
 import "./Header.css"
 import React from 'react';
+import axios from 'axios';
 
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 
 
 const Header = ({ onLoginClick }) => {         // Main Header component that receives a callback for login button clicks
 
-  const [isLoading, setIsLoading] = useState(true);
   const [showEnquiryModal, setShowEnquiryModal] = useState(false);
   const [showLoginNeeded, setShowLoginNeeded] = useState(false);
   const navigate = useNavigate();
 
-  const { user, loading, userRole, userName, login, logout } = useAuth();
-
-  useEffect(() => {
-    const unsub = onAuthStateChanged(auth, (currentUser) => {
-      if (currentUser) {
-        login(currentUser);
-      } else {
-        logout();
-      }
-      setIsLoading(false);
-    });
-
-    return () => unsub();
-  }, [login, logout]);
+  const { user, loading, userRole, userName, logout } = useAuth();
 
   const collapseMobileNavbar = () => {
     if (window.innerWidth <= 991) {
@@ -44,8 +29,8 @@ const Header = ({ onLoginClick }) => {         // Main Header component that rec
 
   const handleLogout = async () => {
     try {
-      await signOut(auth);
-      logout();
+      await axios.post('http://localhost:5000/api/auth/logout', {}, { withCredentials: true });
+      await logout(); // <-- Wait for state to update!
       navigate('/');
     } catch (error) {
       console.error('Logout failed:', error);
