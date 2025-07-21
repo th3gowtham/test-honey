@@ -48,17 +48,34 @@ const ChatApp = () => {
       </div>
 
       {/* Main Content */}
-      <main className={`chat-main ${!showSidebar ? 'hidden' : ''}`}>
+      <main className="chat-main">
         {isMobileView && activeChat && (
           <button
-            onClick={() => setShowSidebar(true)}
+            onClick={() => setShowSidebar(true)
+              
+            }
             className="chat-back-btn"
           >
+            
             <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
           </button>
         )}
+        {isMobileView && activeChat && (
+          <button 
+          onClick={() => {
+            setShowSidebar(true);
+            setActiveChat(null); // 👈 This hides the arrow
+            }}
+            className="chat-back-btn"
+  >
+    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+    </svg>
+  </button>
+)}
+
         {activeChat === null && <WelcomeScreen />}
         {activeChat === 'Math 101 Batch' && <BatchBroadcast />}
         {activeChat === 'Sarah Johnson' && <PrivateChat />}

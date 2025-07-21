@@ -35,7 +35,10 @@ import cod from '../assets/cod.jpg';
 import com from '../assets/com.jpeg';
 import art from '../assets/art.jpeg';
 import class3img from '../assets/class-3.jpg';
-
+import { usePayment } from "../context/PaymentContext";
+import CourseCard from "../components/CourseCard";
+import EnquiryModal from "../components/EnquiryModal";
+import { useAuth } from "../context/AuthContext";
 
 
 const Home = () => {
@@ -46,6 +49,130 @@ const Home = () => {
       easing: 'ease-in-out',
     });
   }, []);
+
+  const { startPayment, loading } = usePayment();
+  const { user } = useAuth();
+  const [showEnquiryModal, setShowEnquiryModal] = React.useState(false);
+  const [selectedCourse, setSelectedCourse] = React.useState(null);
+  const [showLoginNeeded, setShowLoginNeeded] = React.useState(false);
+
+  const handleApply = (course) => {
+    if (!user || !user.email) {
+      setShowLoginNeeded(true);
+      setTimeout(() => setShowLoginNeeded(false), 2000);
+      return;
+    }
+    setSelectedCourse(course);
+    setShowEnquiryModal(true);
+  };
+
+  const handleEnquirySubmit = () => {
+    setShowEnquiryModal(false);
+    if (selectedCourse) startPayment(selectedCourse);
+  };
+
+  const handleSkipEnquiry = () => {
+    setShowEnquiryModal(false);
+    if (selectedCourse) startPayment(selectedCourse);
+  };
+
+  const handleCloseModal = () => {
+    setShowEnquiryModal(false);
+    setSelectedCourse(null);
+  };
+  const courses = [
+    {
+      imgSrc: phoni,
+      title: "Jolly Phonics",
+      description: "A fun, interactive approach to teaching children essential reading and writing skills through phonics, blending, and engaging activities.",
+      age: "3+ Years",
+      seats: "Upto 5 Kids per Batch",
+      duration: "9 Months",
+      fee: 4999,
+    },
+    {
+      imgSrc: gram,
+      title: "Jolly Grammar",
+      description: "A fun, interactive approach to teaching children essential grammar skills through phonics, blending, and engaging activities.",
+      age: "4+ Years",
+      seats: "Upto 5 Kids per Batch",
+      duration: "1 Year",
+      fee: 5999,
+    },
+    {
+      imgSrc: ha,
+      title: "Spoken English",
+      description: "A fun and interactive spoken English class for building confidence through engaging activities, storytelling, and real-life conversations!",
+      age: "6+ Years",
+      seats: "Upto 5 Kids per Batch",
+      duration: "4 Months",
+      fee: 3999,
+    },
+    {
+      imgSrc: portfolio3,
+      title: "Handwriting Class (English)",
+      description: "A focused and engaging class that helps children improve their handwriting skills through structured practice and creative activities, promoting neatness and clarity.",
+      age: "3+ Years",
+      seats: "Upto 5 Kids per Batch",
+      duration: "4 Months",
+      fee :3999,
+    },
+    {
+      imgSrc: math,
+      title: "Math Class",
+      description: "An engaging and interactive approach to help children develop strong mathematical skills through fun lessons and engaging activities.",
+      age: "5+ Years",
+      seats: "Upto 5 Kids per Batch",
+      duration: "12 Months",
+      fee :3999,
+    },
+    {
+      imgSrc: s,
+      title: "Tamil Phonics",
+      description: "An engaging and interactive method to help children learn Tamil sounds, pronunciation, and reading skills through ancient teaching methods.",
+      age: "5+ Years",
+      seats: "Upto 5 Kids per Batch",
+      duration: "5 Months",
+      fee :3999,
+    },
+    {
+      imgSrc: portfolio3,
+      title: "Tamil Handwriting Class",
+      description: "A focused and engaging class that helps children improve their tamil handwriting skills through structured practice and creative activities, promoting neatness and clarity.",
+      age: "5+ Years",
+      seats: "Upto 5 Kids per Batch",
+      duration: "4 Months",
+      fee :3999,
+    },
+    {
+      imgSrc: cod,
+      title: "Computer Basics",
+      description: "A fun and interactive way for children to learn computer basics, including typing, using software, and safe internet practices!",
+      age: "6+ Years",
+      seats: "Upto 4 Kids per Batch",
+      duration: "3 Months",
+      fee :3999,
+    },
+    {
+      imgSrc: com,
+      title: "Programming for Beginners & Kids",
+      description: "An engaging and interactive way for children and beginners to learn programming, develop problem-solving skills, and create their own digital projects!",
+      age: "8+ Years",
+      seats: "Upto 4 Kids per Batch",
+      duration: "6 Months",
+      fee :3999,
+    },
+    {
+      imgSrc: art,
+      title: "Mandala & Warli Art Class",
+      description: "A dynamic and creative class that encourages children to explore various art forms, develop their artistic skills, and express their imagination through hands-on projects.",
+      age: "8+ Years",
+      seats: "Upto 5 per Batch",
+      duration: "3 Months",
+      fee :3999,
+    },
+  
+  ];
 
   return(
   <div style={{ overflowX: 'hidden' }}>
@@ -193,380 +320,24 @@ const Home = () => {
         </div>
       </div>
     </div>
-    <div className="popular-classes bg-light" data-aos="fade-up">
-      <div className="container">
-        <div className="main-heading">
-          <span className="special text-uppercase position-relative d-inline-block px-2">Our Classes</span>
-          <h2 className="fw-bold my-3">Popular Classes</h2>
-        </div>
-        <div className="row row-cols-1 row-cols-md-2 row-cols-lg-3">
-          {/* Expanded class cards from index.html */}
-          {/* Jolly Phonics */}
-          <div className="col p-3">
-            <div className="item h-100 bg-white shadow p-4 rounded" data-aos="fade-up">
-              <div className="image">
-                <img src={phoni} className="img-fluid" alt="Jolly Phonics" />
-              </div>
-              <div className="content">
-                <h4 className="fw-bold">Jolly Phonics</h4>
-                <p className="text-muted">A fun, interactive approach to teaching children essential reading and writing skills through phonics, blending, and engaging activities.</p>
-                <div className="table-responsive">
-                  <table className="table mb-3" style={{border: '1px solid #e0e0e0'}}>
-                    <tbody>
-                      <tr>
-                        <th className="fw-bold" style={{width: '50%'}}>Age of Kids</th>
-                        <td>3+ Years</td>
-                      </tr>
-                      <tr>
-                        <th className="fw-bold">Total Seats</th>
-                        <td>Upto 5 Kids per Batch</td>
-                      </tr>
-                      <tr>
-                        <th className="fw-bold">Duration</th>
-                        <td>9 Months</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-                <div className="text-center">
-                  <Link to="/classes" className="main-link mb-2 mb-lg-0 d-inline-block text-decoration-none text-white py-2 px-4 rounded-pill">Know More</Link>
-                </div>
-              </div>
-            </div>
+    <div className="popular-classes">
+        <div className="container">
+          <div className="main-heading text-center">
+            <span className="text-uppercase position-relative d-inline-block px-2">Popular Classes</span>
+            <h2 className="fw-bold my-3">Classes We Provide</h2>
           </div>
-          {/* Jolly Grammar */}
-          <div className="col p-3">
-            <div className="item h-100 bg-white shadow p-4 rounded" data-aos="fade-up">
-              <div className="image">
-                <img src={gram} className="img-fluid" alt="Jolly Grammar" />
-              </div>
-              <div className="content">
-                <h4 className="fw-bold">Jolly Grammar</h4>
-                <p className="text-muted">A fun, interactive approach to teaching children essential grammar skills through phonics, blending, and engaging activities.</p>
-                <div className="table-responsive">
-                  <table className="table mb-3" style={{border: '1px solid #e0e0e0'}}>
-                    <tbody>
-                      <tr>
-                        <th className="fw-bold" style={{width: '50%'}}>Age of Kids</th>
-                        <td>4+ Years</td>
-                      </tr>
-                      <tr>
-                        <th className="fw-bold">Total Seats</th>
-                        <td>Upto 5 Kids per Batch</td>
-                      </tr>
-                      <tr>
-                        <th className="fw-bold">Duration</th>
-                        <td>1 Year</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-                <div className="text-center">
-                  <Link to="/classes" className="main-link mb-2 mb-lg-0 d-inline-block text-decoration-none text-white py-2 px-4 rounded-pill">Know More</Link>
-                </div>
-              </div>
-            </div>
-          </div>
-          {/* Technical and Non-Technical Classes */}
-          <div className="col p-3">
-            <div className="item h-100 bg-white shadow p-4 rounded" data-aos="fade-up">
-              <div className="image">
-                <img src={game} className="img-fluid" alt="Technical and Non-Technical Classes" />
-              </div>
-              <div className="content">
-                <h4 className="fw-bold">Technical and Non-Technical Classes</h4>
-                <p className="text-muted">Programming Languages such as Python, Java, Html, C and Domains such as Artificial Intelligence, Data science, Machine Learning, Web development, Android App Development, Web design, Graphic Design, Video Rendering.</p>
-                <div className="table-responsive">
-                  <table className="table mb-3" style={{border: '1px solid #e0e0e0'}}>
-                    <tbody>
-                      <tr>
-                        <th className="fw-bold" style={{width: '50%'}}>Age of Kids</th>
-                        <td>8+ Years</td>
-                      </tr>
-                      <tr>
-                        <th className="fw-bold">Total Seats</th>
-                        <td>Upto 10 per Batch</td>
-                      </tr>
-                      <tr>
-                        <th className="fw-bold">Duration</th>
-                        <td>3 Months</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-                <div className="text-center">
-                  <Link to="/classes" className="main-link mb-2 mb-lg-0 d-inline-block text-decoration-none text-white py-2 px-4 rounded-pill">Know More</Link>
-                </div>
-              </div>
-            </div>
-          </div>
-          {/* Spoken English */}
-          <div className="col p-3">
-            <div className="item h-100 bg-white shadow p-4 rounded" data-aos="fade-up">
-              <div className="image">
-                <img src={ha} className="img-fluid" alt="Spoken English" />
-              </div>
-              <div className="content">
-                <h4 className="fw-bold">Spoken English</h4>
-                <p className="text-muted">A fun and interactive spoken English class for building confidence through engaging activities, storytelling, and real-life conversations!</p>
-                <div className="table-responsive">
-                  <table className="table mb-3" style={{border: '1px solid #e0e0e0'}}>
-                    <tbody>
-                      <tr>
-                        <th className="fw-bold" style={{width: '50%'}}>Age of Kids</th>
-                        <td>6+ Years</td>
-                      </tr>
-                      <tr>
-                        <th className="fw-bold">Total Seats</th>
-                        <td>Upto 5 Kids per Batch</td>
-                      </tr>
-                      <tr>
-                        <th className="fw-bold">Duration</th>
-                        <td>4 Months</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-                <div className="text-center">
-                  <Link to="/classes" className="main-link mb-2 mb-lg-0 d-inline-block text-decoration-none text-white py-2 px-4 rounded-pill">Know More</Link>
-                </div>
-              </div>
-            </div>
-          </div>
-          {/* Math Class */}
-          <div className="col p-3">
-            <div className="item h-100 bg-white shadow p-4 rounded" data-aos="fade-up">
-              <div className="image">
-                <img src={math} className="img-fluid" alt="Math Class" />
-              </div>
-              <div className="content">
-                <h4 className="fw-bold">Math Class</h4>
-                <p className="text-muted">An engaging and interactive approach to help children develop strong mathematical skills through fun lessons and engaging activities.</p>
-                <div className="table-responsive">
-                  <table className="table mb-3" style={{border: '1px solid #e0e0e0'}}>
-                    <tbody>
-                      <tr>
-                        <th className="fw-bold" style={{width: '50%'}}>Age of Kids</th>
-                        <td>5+ Years</td>
-                      </tr>
-                      <tr>
-                        <th className="fw-bold">Total Seats</th>
-                        <td>Upto 5 Kids per Batch</td>
-                      </tr>
-                      <tr>
-                        <th className="fw-bold">Duration</th>
-                        <td>12 Months</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-                <div className="text-center">
-                  <Link to="/classes" className="main-link mb-2 mb-lg-0 d-inline-block text-decoration-none text-white py-2 px-4 rounded-pill">Know More</Link>
-                </div>
-              </div>
-            </div>
-          </div>
-          {/* Tamil Phonics */}
-          <div className="col p-3">
-            <div className="item h-100 bg-white shadow p-4 rounded" data-aos="fade-up">
-              <div className="image">
-                <img src={s} className="img-fluid" alt="Tamil Phonics" />
-              </div>
-              <div className="content">
-                <h4 className="fw-bold">Tamil Phonics</h4>
-                <p className="text-muted">An engaging and interactive method to help children learn Tamil sounds, pronunciation, and reading skills through ancient teaching methods.</p>
-                <div className="table-responsive">
-                  <table className="table mb-3" style={{border: '1px solid #e0e0e0'}}>
-                    <tbody>
-                      <tr>
-                        <th className="fw-bold" style={{width: '50%'}}>Age of Kids</th>
-                        <td>5+ Years</td>
-                      </tr>
-                      <tr>
-                        <th className="fw-bold">Total Seats</th>
-                        <td>Upto 5 Kids per Batch</td>
-                      </tr>
-                      <tr>
-                        <th className="fw-bold">Duration</th>
-                        <td>5 Months</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-                <div className="text-center">
-                  <Link to="/classes" className="main-link mb-2 mb-lg-0 d-inline-block text-decoration-none text-white py-2 px-4 rounded-pill">Know More</Link>
-                </div>
-              </div>
-            </div>
-          </div>
-          {/* Handwriting Class */}
-          <div className="col p-3">
-            <div className="item h-100 bg-white shadow p-4 rounded" data-aos="fade-up">
-              <div className="image">
-                <img src={portfolio3} className="img-fluid" alt="Handwriting Class" />
-              </div>
-              <div className="content">
-                <h4 className="fw-bold">Handwriting Class</h4>
-                <p className="text-muted">A focused and engaging class that helps children improve their handwriting skills through structured practice and creative activities, promoting neatness and clarity.</p>
-                <div className="table-responsive">
-                  <table className="table mb-3" style={{border: '1px solid #e0e0e0'}}>
-                    <tbody>
-                      <tr>
-                        <th className="fw-bold" style={{width: '50%'}}>Age of Kids</th>
-                        <td>3+ Years</td>
-                      </tr>
-                      <tr>
-                        <th className="fw-bold">Total Seats</th>
-                        <td>Upto 5 Kids per Batch</td>
-                      </tr>
-                      <tr>
-                        <th className="fw-bold">Duration</th>
-                        <td>4 Months</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-                <div className="text-center">
-                  <Link to="/classes" className="main-link mb-2 mb-lg-0 d-inline-block text-decoration-none text-white py-2 px-4 rounded-pill">Know More</Link>
-                </div>
-              </div>
-            </div>
-          </div>
-          {/* Computer Basics */}
-          <div className="col p-3">
-            <div className="item h-100 bg-white shadow p-4 rounded" data-aos="fade-up">
-              <div className="image">
-                <img src={cod} className="img-fluid" alt="Computer Basics" />
-              </div>
-              <div className="content">
-                <h4 className="fw-bold">Computer Basics</h4>
-                <p className="text-muted">A fun and interactive way for children to learn computer basics, including typing, using software, and safe internet practices!</p>
-                <div className="table-responsive">
-                  <table className="table mb-3" style={{border: '1px solid #e0e0e0'}}>
-                    <tbody>
-                      <tr>
-                        <th className="fw-bold" style={{width: '50%'}}>Age of Kids</th>
-                        <td>6+ Years</td>
-                      </tr>
-                      <tr>
-                        <th className="fw-bold">Total Seats</th>
-                        <td>Upto 5 Kids per Batch</td>
-                      </tr>
-                      <tr>
-                        <th className="fw-bold">Duration</th>
-                        <td>3 Months</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-                <div className="text-center">
-                  <Link to="/classes" className="main-link mb-2 mb-lg-0 d-inline-block text-decoration-none text-white py-2 px-4 rounded-pill">Know More</Link>
-                </div>
-              </div>
-            </div>
-          </div>
-          {/* Programming for Beginners & Kids */}
-          <div className="col p-3">
-            <div className="item h-100 bg-white shadow p-4 rounded" data-aos="fade-up">
-              <div className="image">
-                <img src={com} className="img-fluid" alt="Programming for Beginners & Kids" />
-              </div>
-              <div className="content">
-                <h4 className="fw-bold">Programming for Beginners & Kids</h4>
-                <p className="text-muted">An engaging and interactive way for children and beginners to learn programming, develop problem-solving skills, and create their own digital projects!</p>
-                <div className="table-responsive">
-                  <table className="table mb-3" style={{border: '1px solid #e0e0e0'}}>
-                    <tbody>
-                      <tr>
-                        <th className="fw-bold" style={{width: '50%'}}>Age of Kids</th>
-                        <td>8+ Years</td>
-                      </tr>
-                      <tr>
-                        <th className="fw-bold">Total Seats</th>
-                        <td>Upto 5 Kids per Batch</td>
-                      </tr>
-                      <tr>
-                        <th className="fw-bold">Duration</th>
-                        <td>6 Months</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-                <div className="text-center">
-                  <Link to="/classes" className="main-link mb-2 mb-lg-0 d-inline-block text-decoration-none text-white py-2 px-4 rounded-pill">Know More</Link>
-                </div>
-              </div>
-            </div>
-          </div>
-          {/* Mandala & Warli Art Class */}
-          <div className="col p-3">
-            <div className="item h-100 bg-white shadow p-4 rounded" data-aos="fade-up">
-              <div className="image">
-                <img src={art} className="img-fluid" alt="Mandala & Warli Art Class" />
-              </div>
-              <div className="content">
-                <h4 className="fw-bold">Mandala & Warli Art Class</h4>
-                <p className="text-muted">A dynamic and creative class that encourages children to explore various art forms, develop their artistic skills, and express their imagination through hands-on projects.</p>
-                <div className="table-responsive">
-                  <table className="table mb-3" style={{border: '1px solid #e0e0e0'}}>
-                    <tbody>
-                      <tr>
-                        <th className="fw-bold" style={{width: '50%'}}>Age of Kids</th>
-                        <td>8+ Years</td>
-                      </tr>
-                      <tr>
-                        <th className="fw-bold">Total Seats</th>
-                        <td>Upto 10 per Batch</td>
-                      </tr>
-                      <tr>
-                        <th className="fw-bold">Duration</th>
-                        <td>3 Months</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-                <div className="text-center">
-                  <Link to="/classes" className="main-link mb-2 mb-lg-0 d-inline-block text-decoration-none text-white py-2 px-4 rounded-pill">Know More</Link>
-                </div>
-              </div>
-            </div>
-          </div>
-          {/* Drawing Class */}
-          <div className="col p-3">
-            <div className="item h-100 bg-white shadow p-4 rounded" data-aos="fade-left">
-              <div className="image">
-                <img src={class3img} className="img-fluid" alt="Drawing Class" />
-              </div>
-              <div className="content">
-                <h4 className="fw-bold">Drawing Class</h4>
-                <p className="text-muted">A creative and interactive class designed to help children explore their artistic abilities while learning various drawing techniques and expressing their imagination.</p>
-                <div className="table-responsive">
-                  <table className="table mb-3" style={{border: '1px solid #e0e0e0'}}>
-                    <tbody>
-                      <tr>
-                        <th className="fw-bold" style={{width: '50%'}}>Age of Kids</th>
-                        <td>3+ Years</td>
-                      </tr>
-                      <tr>
-                        <th className="fw-bold">Total Seats</th>
-                        <td>Upto 5 Kids per Batch</td>
-                      </tr>
-                      <tr>
-                        <th className="fw-bold">Duration</th>
-                        <td>5 Months</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-                <div className="text-center">
-                  <Link to="/classes" className="main-link mb-2 mb-lg-0 d-inline-block text-decoration-none text-white py-2 px-4 rounded-pill">Know More</Link>
-                </div>
-              </div>
-            </div>
+          <div className="row row-cols-1 row-cols-md-2 row-cols-lg-3">
+            {courses.map((course, idx) => (
+              <CourseCard
+                key={idx}
+                {...course}
+                onApply={() => handleApply(course)}
+                loading={loading && selectedCourse && selectedCourse.title === course.title}
+              />
+            ))}
           </div>
         </div>
       </div>
-    </div>
     <div className="book-seat bg-light" data-aos="fade-up">
       <div className="container">
         <div className="row">
@@ -818,6 +589,32 @@ const Home = () => {
         </div>
       </div>
     </footer>
+    <EnquiryModal
+      show={showEnquiryModal}
+      onClose={handleCloseModal}
+      onSubmit={handleEnquirySubmit}
+      onSkip={handleSkipEnquiry}
+      selectedCourse={selectedCourse?.title}
+    />
+    {showLoginNeeded && (
+      <div
+        style={{
+          position: 'fixed',
+          top: '80px',
+          right: '30px',
+          background: '#fde7e9',
+          color: '#dc3545',
+          border: '1px solid #dc3545',
+          borderRadius: '8px',
+          padding: '1rem 2rem',
+          zIndex: 2000,
+          fontWeight: 600,
+          boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
+        }}
+      >
+        Please login to enroll in the course
+      </div>
+    )}
   </div>
   );
 }
