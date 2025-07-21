@@ -19,6 +19,7 @@ import { ToastContainer } from "react-toastify";
 
 
 
+import { Toaster } from "react-hot-toast";
 
 // Import global styles if needed
 // import "./styles/main.css";
@@ -31,6 +32,7 @@ function App() {
   }, []);
   return (
     <Router>
+      <Toaster position="top-center" />
       <Header onLoginClick={() => setShowLogin(true)} />
       <ToastContainer
         position="top-right"

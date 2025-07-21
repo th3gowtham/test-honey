@@ -3,7 +3,7 @@
 import { useLocation } from 'react-router-dom'; // Import useLocation
 import { useEffect, useState } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
-import { auth } from '../services/firebase';
+import { auth } from '../firebaseprofile.js';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
 import { useAuth } from '../context/AuthContext';
 import img2r from "../assets/2r.png";
