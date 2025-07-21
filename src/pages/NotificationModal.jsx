@@ -14,7 +14,7 @@ const NotificationModal = ({ onClose }) => {
             className="close-btn"
             aria-label="Close notification modal"
           >
-            <X className="w-5 h-5" />
+            <X className="w-5 h-5 block" />
           </button>
         </div>
 

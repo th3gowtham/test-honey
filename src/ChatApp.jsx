@@ -29,7 +29,6 @@ const ChatApp = () => {
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
-
   return (
     <div className="chat-app">
       {/* Sidebar */}
@@ -51,31 +50,31 @@ const ChatApp = () => {
       <main className="chat-main">
         {isMobileView && activeChat && (
           <button
-            onClick={() => setShowSidebar(true)
-              
-            }
-            className="chat-back-btn"
-          >
-            
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-            </svg>
-          </button>
-        )}
-        {isMobileView && activeChat && (
-          <button 
-          onClick={() => {
-            setShowSidebar(true);
-            setActiveChat(null); // 👈 This hides the arrow
+            onClick={() => {
+              setShowSidebar(true);
+              setActiveChat(null);
             }}
             className="chat-back-btn"
-  >
-    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-    </svg>
-  </button>
-)}
+            
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-5 w-5"       
+              style={{ marginLeft: '-4px' }} 
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M15 19l-7-7 7-7"
+              />
+            </svg>
 
+          </button>
+        )}
         {activeChat === null && <WelcomeScreen />}
         {activeChat === 'Math 101 Batch' && <BatchBroadcast />}
         {activeChat === 'Sarah Johnson' && <PrivateChat />}
@@ -84,18 +83,21 @@ const ChatApp = () => {
 
       {/* 🔔 Notification Icon */}
       <div className="chat-notification" onClick={() => setShowNotifications(true)}>
-        <div className="icon-wrapper">
+        <div>
           <Bell />
         </div>
       </div>
 
       {/* 🐝 Profile Icon */}
-      <div
-        className="chat-profile"
-        onClick={() => setShowProfileSettings(true)}
-      >
-        <span>🐝</span>
-      </div>
+      {!(isMobileView && activeChat) && (
+        <div
+          className="chat-profile"
+          onClick={() => setShowProfileSettings(true)}
+        >
+          <span>🐝</span>
+        </div>
+      )}
+
 
       {/* Modals */}
       {showNotifications && <NotificationModal onClose={() => setShowNotifications(false)} />}

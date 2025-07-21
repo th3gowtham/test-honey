@@ -7,9 +7,10 @@
     height: 100%;
     background-color: #fff;
     z-index: 10;
-    border-right: 1px solid #ddd;
+    border-right: 1px solid #ddd; 
     transition: transform 0.3s ease-in-out;
   }
+
 
   .chat-sidebar.hidden {
     display: none;
@@ -33,16 +34,12 @@
 
   .chat-notification,
   .chat-profile {
-    position: absolute;
-    top: 1rem;
-    width: 36px;
-    height: 36px;
-    background-color: #e0e0e0;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 20;
+ position: absolute;
+  top: 1rem;
+  width: 36px;
+  height: 36px;
+  background-color: #e0e0e0;
+  
   }
 
   .chat-notification {
@@ -53,6 +50,7 @@
     right: 1rem;
   }
 }
+
 
 /* Root Container */
 .chat-app {
@@ -121,13 +119,20 @@
 
 /* Notification Icon */
 .chat-notification {
-  position: absolute;
-  top: 1.25rem; /* top-5 */
-  right: 1rem; /* right-4 */
-  z-index: 40;
+   position: absolute;
+  top: 1rem;
+  right: 1rem;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 9999px;
   display: flex;
   align-items: center;
+  justify-content: center;
   cursor: pointer;
+  z-index: 40;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+
+  
 }
 
 @media (min-width: 640px) {
@@ -211,3 +216,5 @@
   justify-content: center;
   z-index: 50;
 }
+
+

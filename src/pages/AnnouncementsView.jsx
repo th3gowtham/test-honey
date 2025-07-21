@@ -1,21 +1,30 @@
-import { Megaphone } from "lucide-react";
-import "../styles/AnnouncementsView.css"
+import { Calendar, MoreVertical, Bell } from "lucide-react";
+import "../styles/AnnouncementsView.css";
 
 const AnnouncementsView = () => {
   return (
     <div className="announcements-container">
       {/* Header */}
       <div className="announcements-header">
-        <h1 className="announcements-title">
-          <Megaphone size={20} color="#0d9488" /> {/* teal-600 */}
-          Community Announcements
-        </h1>
-        <p className="announcements-subtitle">
-          🔔 Stay updated with the latest updates
-        </p>
+        <div className="announcements-header-info">
+          <div className="announcements-avatar">A</div>
+          <div className="announcements-header-text">
+            <h2>Community Announcements</h2>
+            <p>🔔 Stay updated with the latest updates</p>
+          </div>
+        </div>
+        <div className="announcements-actions">
+          <button className="announcements-btn">
+            <Calendar size={16} />
+            <span>Schedule</span>
+          </button>
+          {/* <button className="announcements-more-btn">
+           
+          </button> */}
+        </div>
       </div>
 
-      {/* Announcements Section */}
+      {/* Announcements List */}
       <div className="announcements-list">
         {/* Announcement Card */}
         <div className="announcement-card">
@@ -57,3 +66,4 @@ const AnnouncementsView = () => {
 };
 
 export default AnnouncementsView;
+
