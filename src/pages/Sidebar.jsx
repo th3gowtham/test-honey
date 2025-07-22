@@ -1,4 +1,4 @@
-import { Search, User, Users, Bell } from 'lucide-react';
+import { Search, User, Users2, BellDot,MessageSquare } from 'lucide-react';
 import "../styles/Sidebar.css"
 import { useState, useEffect } from 'react';
 
@@ -34,23 +34,20 @@ const Sidebar = ({ currentView, setCurrentView, setActiveChat }) => {
   }
 
   const BottomNav = () => (
-    
     <div className="mobile-bottom-nav">
-      
-      {[
-        { icon: <Users size={20} />, key: "batch-broadcasts" },
-        { icon: <User size={20} />, key: "private-chat" },
-        { icon: <Bell size={20} />, key: "announcements" },
-      ].map(({ icon, key }) => (
-        <button
-          key={key}
-          onClick={() => setCurrentView(key)}
-          className={`nav-icon-button circle-button ${currentView === key ? 'active' : ''}`}
-        >
-          {icon}
-        </button>
-      ))}
+    <div className={`nav-item ${currentView === 'batch-broadcasts' ? 'active' : ''}`} onClick={() => setCurrentView('batch-broadcasts')}>
+      <MessageSquare />
+      <span>Chats</span>
     </div>
+    <div className={`nav-item ${currentView === 'private-chat' ? 'active' : ''}`} onClick={() => setCurrentView('private-chat')}>
+      <BellDot />
+      <span>Private</span>
+    </div>
+    <div className={`nav-item ${currentView === 'announcements' ? 'active' : ''}`} onClick={() => setCurrentView('announcements')}>
+      <Users2 />
+      <span>Communities</span>
+    </div>
+  </div>
   );
 
   return (
