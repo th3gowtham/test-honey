@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Bell } from "lucide-react";
+import { Bell, ArrowLeft} from "lucide-react";
 
 import Sidebar from "./pages/Sidebar";
 import WelcomeScreen from './pages/WelcomeScreen';
@@ -57,21 +57,7 @@ const ChatApp = () => {
             className="chat-back-btn"
             
           >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-5 w-5"       
-              style={{ marginLeft: '-4px' }} 
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M15 19l-7-7 7-7"
-              />
-            </svg>
+            <ArrowLeft size={24} color="black" strokeWidth={2} />
 
           </button>
         )}

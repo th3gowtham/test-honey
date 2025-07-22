@@ -1,3 +1,24 @@
+.chat-profile {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  width: 3.5rem; /* fixed size */
+  height: 3.5rem;
+  background-color: #facc15;
+  border-radius: 9999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 40;
+}
+
+.chat-profile span {
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 1.125rem; /* fixed font size */
+}
+
 @media (max-width: 768px) {
   .chat-sidebar {
     position: absolute;
@@ -30,10 +51,10 @@
     background: none;
     border: none;
     cursor: pointer;
+    
   }
 
-  .chat-notification,
-  .chat-profile {
+  .chat-notification {
  position: absolute;
   top: 1rem;
   width: 36px;
@@ -46,9 +67,9 @@
     right: 3.5rem;
   }
 
-  .chat-profile {
+  /* .chat-profile {
     right: 1rem;
-  }
+  } */
 }
 
 
@@ -102,13 +123,10 @@
 /* Mobile Back Button */
 .chat-back-btn {
   position: absolute;
-  top: 1rem; /* top-4 */
-  left: 1rem; /* left-4 */
-  z-index: 50;
-  padding: 0.5rem; /* p-2 */
-  background-color: #ffffff;
-  border-radius: 9999px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  padding: 0;
+  margin-top: 20px;
+  
+
 }
 
 .chat-back-btn svg {
@@ -139,6 +157,7 @@
   .chat-notification {
     right: 1.5rem; /* sm:right-6 */
   }
+  
 }
 
 @media (min-width: 1024px) {
@@ -170,29 +189,29 @@
 }
 
 /* Profile Icon */
-.chat-profile {
+/* .chat-profile {
   position: absolute;
-  top: 1rem; /* top-4 */
-  left: 1rem; /* left-4 */
-  width: 2.5rem; /* w-10 */
-  height: 2.5rem; /* h-10 */
-  background-color: #facc15; /* bg-yellow-500 */
+  top: 1rem;
+  left: 1rem; 
+  width: 2.5rem; 
+  height: 2.5rem; 
+  background-color: #facc15;
   border-radius: 9999px;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   z-index: 40;
-}
+} */
 
 @media (min-width: 640px) {
-  .chat-profile {
+  /* .chat-profile {
     top: 1.25rem; /* sm:top-5 */
-    left: 1.25rem; /* sm:left-5 */
-    width: 3rem; /* sm:w-12 */
-    height: 3rem; /* sm:h-12 */
-  }
-}
+    /* left: 1.25rem; sm:left-5 */
+    /* width: 3rem; sm:w-12 */
+    /* height: 3rem; sm:h-12 */
+  } */
+/* } */
 
 .chat-profile span {
   color: #ffffff; /* text-white */
@@ -217,4 +236,18 @@
   z-index: 50;
 }
 
+/* ✅ Show button on small screens */
+@media (max-width: 767px) {
+  .chat-back-btn {
+    display: flex; /* ✅ Updated */
+    align-items: center;
+    justify-content: center;
+  }
+}
+
+.chat-back-btn svg {
+  width: 1.5rem;
+  height: 1.5rem;
+  color: #374151;
+}
 
