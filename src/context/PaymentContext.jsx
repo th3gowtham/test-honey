@@ -5,7 +5,7 @@ import { toast } from "react-toastify";
 const PaymentContext = createContext();
 
 export const PaymentProvider = ({ children }) => {
-  const { user, userRole } = useAuth();
+  const { user, userRole ,userName } = useAuth();
   const [loading, setLoading] = useState(false);
 
   const startPayment = async (course) => {
@@ -28,7 +28,7 @@ export const PaymentProvider = ({ children }) => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           amount: course.fee,
-          name: user.displayName || '',
+          name: userName || '',
           email: user.email,
           courseName: course.title
         }),
