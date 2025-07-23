@@ -1,12 +1,26 @@
 /* Sidebar Layout */
 .sidebar {
   width: 100%;
-  max-width: 320px;
+  max-width: 20rem;
   background-color: #fff;
   border-right: 1px solid #e5e7eb;
   display: flex;
   flex-direction: column;
   height: 100vh;
+}
+
+@media (max-width: 768px) {
+  .sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw; /* full width */
+    height: 100vh; /* full height */
+    max-width: none; /* remove width limit */
+    z-index: 50;
+    border-right: none; /* remove partition line */
+    background-color: #fff;
+  }
 }
 
 /* User Info */
@@ -17,24 +31,14 @@
 
 .sidebar-user-header {
   display: flex;
-  align-items: center;
-  gap: 12px;
+  flex-direction: column; 
+  gap: 8px;
+  margin-left: 70px;
+  margin-top: 5px;
+  margin-bottom: 10px;
+  
 }
 
-.sidebar-user-avatar {
-  width: 48px;
-  height: 48px;
-  background-color: #facc15; /* yellow-500 */
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.avatar-emoji {
-  color: #fff;
-  font-weight: bold;
-}
 
 .sidebar-title {
   font-weight: 600;
@@ -217,4 +221,135 @@
 .chat-avatar-text {
   color: #fff;
   font-weight: 500;
+}
+.mobile-bottom-nav {
+  position: fixed;
+  bottom: 1.5rem;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  z-index: 50;
+}
+
+.circle-button {
+  width: 50px;
+  height: 50px;
+  background-color: #14b8a6; /* Yellow background for visibility */
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  border: none;
+  cursor: pointer;
+  transition: transform 0.2s, background-color 0.3s;
+  color: #1f2937; /* Dark icon for contrast */
+  /* padding-left: 10px; */
+}
+
+.circle-button:hover {
+  background-color: #fbbf24;
+  transform: scale(1.1);
+}
+
+.circle-button.active {
+  background-color: #0ca795; /* Darker yellow for active */
+  color: #fff;
+}
+
+@media (min-width: 768px) {
+  .mobile-bottom-nav {
+    display: none; /* Hide in desktop  */
+  }
+}
+
+
+
+/* Bottom Navigation Bar */
+.mobile-bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: #111827; /* Dark background */
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  border-top: 1px solid #2d2d2d;
+  z-index: 50;
+  gap: 1rem; /* or clamp it */
+  padding: clamp(0.5rem, 1vw, 1rem);
+
+}
+
+.nav-item {
+  min-width: 48px;
+  min-height: 48px;
+  padding: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1px;
+  flex: 1;
+  color: #d1d5db;
+  font-size: 0.75rem;
+  padding: clamp(0.5rem, 1vw, 1rem);
+
+}
+
+.nav-item svg {
+  width: 24px;
+  height: 24px;
+  stroke-width: 2.5;
+  color: #d1d5db;
+  transition: color 0.2s;
+}
+
+.nav-item.active {
+  color: #10b981; /* Highlight active label */
+}
+
+.nav-item.active svg {
+  color: #10b981; /* Highlight active icon */
+}
+
+/* Tablet View: 421px – 768px */
+@media (min-width: 421px) and (max-width: 768px) {
+  .circle-button {
+    display: flex; /* Keep visible on tablet */
+    position: fixed;
+    top: clamp(1rem, 3vw, 2rem); /* Responsive spacing */
+    left: clamp(1rem, 3vw, 2rem);
+    width: 50px;
+    height: 50px;
+    background-color: #14b8a6;
+    border-radius: 50%;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    border: none;
+    cursor: pointer;
+    transition: transform 0.2s, background-color 0.3s;
+    z-index: 100;
+  }
+
+  .circle-button:hover {
+    background-color: #fbbf24;
+    transform: scale(1.1);
+  }
+
+  .circle-button.active {
+    background-color: #0ca795;
+    color: #fff;
+  }
+  .sidebar-user-header{
+     padding-left: 0; /* remove extra left padding */
+     margin-left: 70px; /* pull slightly left towards back button */
+     /* margin-top: 10px; */
+
+  }
+  
 }
