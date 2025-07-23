@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import axios from 'axios';
 
@@ -23,7 +22,11 @@ export const AuthProvider = ({ children }) => {
         setUser(res.data.user);
         setLoading(false);
       })
-      .catch(() => {
+      .catch((err) => {
+        if (err.response && err.response.status !== 401) {
+          // Only log unexpected errors, not 401
+          console.error("[AuthContext] /api/auth/me error:", err);
+        }
         setUser(null);
         setUserRole(null);
         setUserName(null);

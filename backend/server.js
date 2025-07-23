@@ -21,7 +21,7 @@ app.use(cookieParser());
 // Auth Routes
 app.use('/api/auth', authRoutes);
 
-// Razorpay Setup
+// Razorpay Setup , replace 
 const razorpay = new Razorpay({
   key_id: 'rzp_test_veVuTj6cfOddyD',
   key_secret: 'SglcJjO6LLvOQSjbyjFyGPoy'
