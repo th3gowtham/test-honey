@@ -1,28 +1,86 @@
+import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
+import axios from 'axios';
 
-import React, { createContext, useContext, useEffect, useState } from 'react';   // necessary hook imports , usecontext for using it later in components
+const AuthContext = createContext();
 
-
-
-const AuthContext = createContext();   //managing and passing the roles across pages without prop 
-
-export const AuthProvider = ({ children }) => {    //wraps your app and shares values with all its children and then
+export const AuthProvider = ({ children }) => {
+  const [user, setUser] = useState(null);
   const [userRole, setUserRole] = useState(null);
   const [userName, setUserName] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {                                    // Runs once when the component mounts , It retrieves previously saved values from sessionStorage 
-    const role = sessionStorage.getItem('userRole');
-    const name = sessionStorage.getItem('userName');
-    if (role && name) {
-      setUserRole(role);
-      setUserName(name);
-    }
+  // Fetch user info from backend, return promise for awaiting
+  const refreshUser = useCallback(() => {
+    setLoading(true);
+    return axios.get('http://localhost:5000/api/auth/me', { withCredentials: true })
+      .then(res => {
+        // Log what is received from the backend
+        console.log("[AuthContext] /api/auth/me response:", res.data);
+
+        setUserRole(res.data.role);
+        setUserName(res.data.name);
+        setUser(res.data.user);
+        setLoading(false);
+      })
+      .catch((err) => {
+        if (err.response && err.response.status !== 401) {
+          // Only log unexpected errors, not 401
+          console.error("[AuthContext] /api/auth/me error:", err);
+        }
+        setUser(null);
+        setUserRole(null);
+        setUserName(null);
+        setLoading(false);
+      });
   }, []);
 
-  return (                // provides the values to any child component that calls useAuth()
-    <AuthContext.Provider value={{ userRole, userName, setUserRole, setUserName }}>       
+  useEffect(() => {
+    refreshUser();
+  }, [refreshUser]);
+
+  // Listen for cross-tab auth events
+  useEffect(() => {
+    const handler = (e) => {
+      if (e.key === 'auth-event') {
+        refreshUser();
+      }
+    };
+    window.addEventListener('storage', handler);
+    return () => window.removeEventListener('storage', handler);
+  }, [refreshUser]);
+
+  // Broadcast to other tabs
+  const broadcastAuthEvent = () => {
+    localStorage.setItem('auth-event', Date.now().toString());
+  };
+
+  // Call this after login/logout/role change, return promise for awaiting
+  const login = () => {
+    const p = refreshUser();
+    broadcastAuthEvent();
+    return p;
+  };
+  const logout = () => {
+    const p = refreshUser();
+    broadcastAuthEvent();
+    return p;
+  };
+
+  return (
+    <AuthContext.Provider value={{
+      user,
+      userRole,
+      userName,
+      setUserRole,
+      setUserName,
+      login,
+      logout,
+      loading,
+      refreshUser
+    }}>
       {children}
     </AuthContext.Provider>
   );
 };
 
-export const useAuth = () => useContext(AuthContext);     // custom hook to access the context easily, wherever in child
+export const useAuth = () => useContext(AuthContext);

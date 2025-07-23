@@ -1,14 +1,15 @@
 // Header component for the main navigation bar
 // This handles the top navigation, user authentication state, and various interactive elements
+import { useState } from 'react';
 import { useLocation } from 'react-router-dom'; // Import useLocation
-import { useEffect, useState } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
-import { auth } from '../services/firebase';
-import { onAuthStateChanged, signOut } from 'firebase/auth';
 import { useAuth } from '../context/AuthContext';
 import img2r from "../assets/2r.png";
 import EnquiryModal from './EnquiryModal';
 import "./Header.css"
+import React from 'react';
+import axios from 'axios';
+
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 
 
@@ -20,34 +21,11 @@ const Header = ({ onLoginClick }) => {         // Main Header component that rec
     return null;
   }
 
-  const [user, setUser] = useState(null);// Track the current authenticated user and then 
-  const [isLoading, setIsLoading] = useState(true); // Track if Firebase auth is still initializing
+  const [showEnquiryModal, setShowEnquiryModal] = useState(false);
+  const [showLoginNeeded, setShowLoginNeeded] = useState(false);
+  const navigate = useNavigate();
 
-  const [showEnquiryModal, setShowEnquiryModal] = useState(false);  // Control whether the enquiry modal is visible
-
-  const [showLoginNeeded, setShowLoginNeeded] = useState(false); // It shows a temporary message when login is needed for certain actions
-
-  const navigate = useNavigate(); // Hook for programmatic navigation
-
-  const { userRole, userName, setUserRole, setUserName } = useAuth();// Get user role and name from the auth context, plus setters to update them
-
-
-
-  useEffect(() => {  // Listen for authentication state changes ,This runs whenever the user logs in or out
-    const unsub = onAuthStateChanged(auth, (currentUser) => {
-      setUser(currentUser);
-      setIsLoading(false); // Mark auth as initialized
-
-      if (!currentUser) {     // If no user is logged in, clear the role and name from both state and session storage
-        setUserRole(null);
-        setUserName(null);
-        sessionStorage.removeItem("userRole");
-        sessionStorage.removeItem("userName");
-      }
-    });
-
-    return () => unsub(); // Clean up the listener when component unmounts
-  }, []);
+  const { user, loading, userRole, userName, logout } = useAuth();
 
   const collapseMobileNavbar = () => {
     if (window.innerWidth <= 991) {
@@ -56,25 +34,17 @@ const Header = ({ onLoginClick }) => {         // Main Header component that rec
   };
 
 
-  const handleLogout = async () => {    // Handle user logout by signing out from Firebase and redirecting to home
-    await signOut(auth);
-    navigate('/');
-  };
-
-
-  const handleEnquiryClick = (e) => {// Handle enquiry button clicks
-    // Students can access the enquiry modal, others get a login reminder
-    e.preventDefault();
-    if (userRole === 'Student') {
-      setShowEnquiryModal(true);
-    } else {
-      setShowLoginNeeded(true);
-
-      setTimeout(() => {               // Hide the login needed message after 2 seconds
-        setShowLoginNeeded(false);
-      }, 2000);
+  const handleLogout = async () => {
+    try {
+      await axios.post('http://localhost:5000/api/auth/logout', {}, { withCredentials: true });
+      await logout(); // <-- Wait for state to update!
+      navigate('/');
+    } catch (error) {
+      console.error('Logout failed:', error);
     }
   };
+
+
 
   return (
     // Main navigation bar with light background and shadow, sticky positioning
@@ -120,19 +90,12 @@ const Header = ({ onLoginClick }) => {         // Main Header component that rec
           {/* Action buttons section - stacked on mobile, horizontal on desktop */}
           <div className="d-flex flex-column flex-lg-row gap-2 align-items-center ms-lg-3">
 
-            {/* Enquiry button that checks user role before allowing access */}
-            <a
-              href="#"
-              className="main-link btn btn-lg rounded-pill px-4"
-              onClick={handleEnquiryClick}
-            >
-              Enquire Now
-            </a>
+           
 
             {/* Direct link to join classes */}
             <Link to="/classes" className="main-link btn btn-lg rounded-pill px-4" onClick={collapseMobileNavbar}>Join Class</Link>
             {/* Conditional rendering based on authentication status - only show after Firebase auth is initialized */}
-            {!isLoading && (
+            {!loading && (
               <>
                 {user ? (
 
@@ -141,7 +104,7 @@ const Header = ({ onLoginClick }) => {         // Main Header component that rec
                       handleLogout();
                       collapseMobileNavbar();
                     }}
-                          // Show signout button if user is authenticated
+                          // It Show signout button if user is authenticated
                     className="main-link btn btn-lg rounded-pill px-4"
                   >
                     Sign Out
@@ -149,7 +112,7 @@ const Header = ({ onLoginClick }) => {         // Main Header component that rec
                 ) : (
 
                   <button
-                    onClick={onLoginClick}              // Show login button if no user is authenticated
+                    onClick={()=>{onLoginClick();collapseMobileNavbar();}}              // Show login button if no user is authenticated
                     className="main-link btn btn-lg rounded-pill px-4"
                   >
                     Login
