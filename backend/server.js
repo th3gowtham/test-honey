@@ -3,6 +3,7 @@ const cors = require('cors');
 const Razorpay = require('razorpay');
 const crypto = require('crypto');
 const authRoutes = require('./routes/auth');
+const cookieParser = require('cookie-parser');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -15,11 +16,12 @@ app.use(cors({
 
 // Middleware
 app.use(express.json());
+app.use(cookieParser());
 
 // Auth Routes
 app.use('/api/auth', authRoutes);
 
-// Razorpay Setup
+// Razorpay Setup , replace 
 const razorpay = new Razorpay({
   key_id: 'rzp_test_veVuTj6cfOddyD',
   key_secret: 'SglcJjO6LLvOQSjbyjFyGPoy'
