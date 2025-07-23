@@ -1,6 +1,7 @@
 // Header component for the main navigation bar
 // This handles the top navigation, user authentication state, and various interactive elements
 import { useState } from 'react';
+import { useLocation } from 'react-router-dom'; // Import useLocation
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import img2r from "../assets/2r.png";
@@ -13,6 +14,12 @@ import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 
 
 const Header = ({ onLoginClick }) => {         // Main Header component that receives a callback for login button clicks
+    const location = useLocation(); // 👈 Get the current route
+
+  // Hide header when on /chat route
+  if (location.pathname.startsWith('/chat')) {
+    return null;
+  }
 
   const [showEnquiryModal, setShowEnquiryModal] = useState(false);
   const [showLoginNeeded, setShowLoginNeeded] = useState(false);
