@@ -29,6 +29,7 @@ const ChatApp = () => {
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
+  
   return (
     <div className="chat-app">
       {/* Sidebar */}
@@ -38,11 +39,14 @@ const ChatApp = () => {
           setCurrentView={(view) => {
             setCurrentView(view);
             setActiveChat(null);
+
           }}
           setActiveChat={(chat) => {
             setActiveChat(chat);
             if (isMobileView) setShowSidebar(false);
           }}
+            setProfileTab={setProfileTab}
+            setShowProfileSettings={setShowProfileSettings}
         />
       </div>
 
@@ -61,6 +65,8 @@ const ChatApp = () => {
 
           </button>
         )}
+       
+      
         {activeChat === null && <WelcomeScreen />}
         {activeChat === 'Math 101 Batch' && <BatchBroadcast />}
         {activeChat === 'Sarah Johnson' && <PrivateChat />}
@@ -75,10 +81,11 @@ const ChatApp = () => {
       </div>
 
       {/* 🐝 Profile Icon */}
+      
       {!(isMobileView && activeChat) && (
         <div
           className="chat-profile"
-          onClick={() => setShowProfileSettings(true)}
+          // onClick={() => setShowProfileSettings(true)}
         >
           <span>🐝</span>
         </div>
