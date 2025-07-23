@@ -227,3 +227,25 @@
   }
   
 }
+@media (min-width: 420px) and (max-width: 492px) {
+  .private-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .private-actions {
+    width: 100%;
+    justify-content: flex-start;
+    margin-top: 8px;
+  }
+
+  .private-btn {
+    transform: translateY(0); /* Reset */
+    margin-right: 0;
+  }
+
+  .private-header-info {
+    padding-left: 15px;
+  }
+}

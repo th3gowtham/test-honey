@@ -1,3 +1,9 @@
+.chat-app-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
 .chat-profile {
   position: absolute;
   top: 1rem;
@@ -11,6 +17,7 @@
   justify-content: center;
   cursor: pointer;
   z-index: 40;
+  margin-left: 60px;
 }
 
 .chat-profile span {
@@ -55,7 +62,7 @@
   }
 
   .chat-notification {
- position: absolute;
+ /* position: absolute; */
   top: 1rem;
   width: 36px;
   height: 36px;
@@ -96,8 +103,21 @@
 }
 
 @media (min-width: 768px) {
+  .chat-container {
+    display: flex;
+    gap: 20px; /* Adds space between sidebar and chat content */
+    padding: 20px; /* Optional: adds space inside the container */
+  }
+
   .chat-sidebar {
-    display: block;
+    min-width: 250px;
+  }
+
+  .chat-main {
+    flex: 1;
+  }
+  .chat-notification{
+    margin-left: 30px;
   }
 }
 
@@ -149,6 +169,7 @@
   cursor: pointer;
   z-index: 40;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  
 
   
 }
@@ -162,7 +183,7 @@
 
 @media (min-width: 1024px) {
   .chat-notification {
-    right: 2rem; /* lg:right-8 */
+    right: 1rem; /* lg:right-8 */
   }
 }
 
@@ -187,32 +208,6 @@
 .chat-notification:hover svg {
   color: #1f2937; /* hover:text-gray-800 */
 }
-
-/* Profile Icon */
-/* .chat-profile {
-  position: absolute;
-  top: 1rem;
-  left: 1rem; 
-  width: 2.5rem; 
-  height: 2.5rem; 
-  background-color: #facc15;
-  border-radius: 9999px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  z-index: 40;
-} */
-
-@media (min-width: 640px) {
-  /* .chat-profile {
-    top: 1.25rem; /* sm:top-5 */
-    /* left: 1.25rem; sm:left-5 */
-    /* width: 3rem; sm:w-12 */
-    /* height: 3rem; sm:h-12 */
-  } */
-/* } */
-
 .chat-profile span {
   color: #ffffff; /* text-white */
   font-weight: 700; /* font-bold */
@@ -223,6 +218,7 @@
   .chat-profile span {
     font-size: 1.25rem; /* sm:text-xl */
   }
+  
 }
 
 /* Modal Backdrop */
@@ -243,6 +239,10 @@
     align-items: center;
     justify-content: center;
   }
+   .chat-profile{
+     /* display: flex; */
+    margin: 0;  
+  }
 }
 
 .chat-back-btn svg {
@@ -250,4 +250,5 @@
   height: 1.5rem;
   color: #374151;
 }
+
 

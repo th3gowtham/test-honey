@@ -16,15 +16,10 @@ const AnnouncementsView = () => {
         <div className="announcements-actions">
           <button className="announcements-btn">
             <Calendar size={16} />
-            <span>Schedule</span>
+            <span>Book Call</span>
           </button>
-          {/* <button className="announcements-more-btn">
-           
-          </button> */}
         </div>
       </div>
-
-      {/* Announcements List */}
       <div className="announcements-list">
         {/* Announcement Card */}
         <div className="announcement-card">
