@@ -29,9 +29,8 @@
   flex-direction: column;
   gap: 0.5rem;
   padding: 1rem;
-  border-bottom: 0px solid #e5e7eb; /* border-gray-200 */
-=======
   border-bottom: 1px solid #e5e7eb; /* border-gray-200 */
+  
 }
 
 @media (min-width: 640px) {
@@ -79,45 +78,32 @@
 
 /* Tabs */
 .modal-tabs {
-  display:flex;
-  gap: 1rem;
-  background: #f6f9fc;
-  padding: 0.1rem 0;
-  border-bottom: none;
-  font-size: 0.875rem;
-  justify-content: space-between;
+  display: flex;
+  overflow-x: auto;
+  border-bottom: 1px solid #e5e7eb; /* border-gray-200 */
+  font-size: 0.875rem; /* text-sm */
 }
 
 .modal-tab {
   flex: 1;
-  text-align: center;
-  padding: 0.75rem 1.5rem;
-  font-weight: 600;
+  padding: 0.75rem 1rem;
+  font-weight: 500; /* font-medium */
   white-space: nowrap;
-  background: #f6f9fc;
+  background: none;
   border: none;
-  border-radius: 0.7rem;
   transition: all 0.2s ease;
   cursor: pointer;
-  color: #222327;
-  box-shadow: none;
-  min-width: 0;
-  margin-bottom: 0;
+  color: #6b7280; /* text-gray-500 */
+}
+
+.modal-tab:hover {
+  color: #374151; /* hover:text-gray-700 */
 }
 
 .modal-tab.active {
-  color: #111827;
-  background: #fff;
-  font-weight: 700;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-  z-index: 1;
-}
-
-.modal-tab:not(.active) {
-  background: #f6f9fc;
-  color: #6b7280;
-  font-weight: 500;
-  box-shadow: none;
+  color: #2563eb; /* text-blue-600 */
+  border-bottom: 2px solid #2563eb; /* border-blue-600 */
+  background-color: #eff6ff; /* bg-blue-50 */
 }
 
 /* Tab Content */
@@ -144,21 +130,5 @@
 
   .modal-close-btn {
     align-self: center;
-  }
-}
-
-@media (max-width: 639px) {
-  .modal-container {
-    margin: 0 0.5rem;
-  }
-
-  .modal-tabs {
-    gap: 0.5rem;
-    padding: 0.2rem;
-  }
-
-  .modal-tab {
-    padding: 0.75rem 0.5rem;
-    font-size: 0.8rem;
   }
 }

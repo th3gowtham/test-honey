@@ -1,6 +1,4 @@
 import { useState } from 'react';
-import { signInWithPopup, setPersistence, browserLocalPersistence, browserSessionPersistence } from 'firebase/auth';
-import { auth, googleprovider } from '../firebaseprofile.js';
 import {
   signInWithPopup,
   setPersistence,
