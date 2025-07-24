@@ -9,13 +9,16 @@ import Pg from "./pages/Pg";
 import Teachers from "./pages/Teachers";
 import Product from "./pages/Product";
 import PlogDetails from "./pages/PlogDetails";
-import Login from "./components/Login"; // Make sure Login is a modal component
+import Login from "./components/Login";
 import ChatApp from './ChatApp' // chat app
 import { useEffect } from "react";
 import AOS from "aos";
 import "aos/dist/aos.css";
 import Header from "./components/Header";
-import { Toaster } from "react-hot-toast";
+import { ToastContainer } from "react-toastify";
+
+
+
 
 // Import global styles if needed
 // import "./styles/main.css";
@@ -28,8 +31,19 @@ function App() {
   }, []);
   return (
     <Router>
-      <Toaster position="top-center" />
       <Header onLoginClick={() => setShowLogin(true)} />
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+      />
       <Routes>
         <Route path="/" element={<Home />} />
        

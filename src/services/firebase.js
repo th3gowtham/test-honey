@@ -1,6 +1,7 @@
 import { initializeApp } from "firebase/app";
-import { getFirestore } from "firebase/firestore";
+import { getFirestore } from "firebase/firestore"; 
 import { getAuth, GoogleAuthProvider, signInWithPopup, signOut } from "firebase/auth";
+
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -12,6 +13,7 @@ const firebaseConfig = {
   measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID
 };
 
+
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const googleprovider = new GoogleAuthProvider();
@@ -21,4 +23,4 @@ googleprovider.setCustomParameters({
 });
 const db = getFirestore(app);
 
-export { db, auth, googleprovider, signInWithPopup, signOut }; 
+export { db, auth, googleprovider, signInWithPopup, signOut };
