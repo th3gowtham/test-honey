@@ -1,6 +1,7 @@
 import { Search, MessageSquare, BellDot, Users2, User } from 'lucide-react';
 import "../styles/Sidebar.css";
 import { useState, useEffect } from 'react';
+import WelcomeScreen from './WelcomeScreen';
 
 const Sidebar = ({ currentView, setCurrentView, setActiveChat, setShowProfileSettings, setProfileTab }) => {
   const [isMobile, setIsMobile] = useState(false);
@@ -46,7 +47,6 @@ const Sidebar = ({ currentView, setCurrentView, setActiveChat, setShowProfileSet
       </div>
     </div>
   );
-
   const BottomNav = () => (
     <div className="mobile-bottom-nav">
       <div className={`nav-item ${currentView === 'batch-broadcasts' ? 'active' : ''}`} onClick={() => setCurrentView('batch-broadcasts')}>
@@ -67,7 +67,6 @@ const Sidebar = ({ currentView, setCurrentView, setActiveChat, setShowProfileSet
       </div>
     </div>
   );
-
   const Header = () => (
     <div className="sidebar-user-info">
       <div className="sidebar-user-header">
@@ -84,12 +83,10 @@ const Sidebar = ({ currentView, setCurrentView, setActiveChat, setShowProfileSet
       </div>
     </div>
   );
-
   return (
     <div className="chat-layout">
       {/* ✅ Only for Desktop */}
       {!isMobile && <LeftNavBar />}
-
       <div className={`sidebar ${isMobile ? 'mobile-sidebar' : ''}`}>
         <Header />
         <div className="sidebar-search">
@@ -97,8 +94,8 @@ const Sidebar = ({ currentView, setCurrentView, setActiveChat, setShowProfileSet
             <Search className="search-icon" />
             <input type="text" placeholder="Search chats..." className="search-input" />
           </div>
+          {isMobile && currentView=="welcome" && <WelcomeScreen /> }
         </div>
-
         {/* ✅ Chat list based on view */}
         <div className="sidebar-chat-list">
           {currentView === 'batch-broadcasts' && (
@@ -110,7 +107,6 @@ const Sidebar = ({ currentView, setCurrentView, setActiveChat, setShowProfileSet
               <div className="chat-badge">3</div>
             </div>
           )}
-
           {currentView === 'private-chat' && (
             <div className="chat-item" onClick={() => setActiveChat('Sarah Johnson')}>
               <div className="chat-user">
@@ -122,7 +118,6 @@ const Sidebar = ({ currentView, setCurrentView, setActiveChat, setShowProfileSet
               <div className="chat-badge">1</div>
             </div>
           )}
-
           {currentView === 'announcements' && (
             <div className="chat-item" onClick={() => setActiveChat('Community Announcements')}>
               <div>
@@ -134,9 +129,8 @@ const Sidebar = ({ currentView, setCurrentView, setActiveChat, setShowProfileSet
           )}
         </div>
       </div>
-
       {/* ✅ Only for Mobile */}
-      {isMobile && <BottomNav />}
+      {isMobile && <BottomNav /> }
     </div>
   );
 };

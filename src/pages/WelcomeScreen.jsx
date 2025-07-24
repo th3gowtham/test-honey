@@ -1,5 +1,21 @@
+import logoImg from "../assets/1.png";
+import { useState, useEffect } from 'react';
+
+// import img2r from "../assets/2r.png";
 const WelcomeScreen = () => {
+  const [isMobile, setIsMobile] = useState(false);
+    useEffect(() => {
+      const handleResize = () => {
+        setIsMobile(window.innerWidth <= 768);
+      };
+      handleResize();
+      window.addEventListener("resize", handleResize);
+      return () => window.removeEventListener("resize", handleResize);
+    }, []);
   return (
+    <>
+    {isMobile ? <br/>: ""}
+    
     <div
       style={{
         flex: 1,
@@ -7,45 +23,39 @@ const WelcomeScreen = () => {
         alignItems: "center",
         justifyContent: "center",
         backgroundColor: "#f9fafb", // Tailwind's bg-gray-50
-        padding: "1.5rem", // px-4 py-6
+        padding: "1.5rem", // px-6
+        minHeight: isMobile ? " " : "calc(100vh - 4rem)", // Full height for small screens
+        boxSizing: "border-box",
       }}
     >
       <div
         style={{
           textAlign: "center",
           width: "100%",
-          maxWidth: "20rem", // max-w-xs (small screens)
+          maxWidth: "320px", // max-w-sm
           margin: "0 auto",
         }}
       >
-        <div
-          style={{
-            width: "4rem", // w-16
-            height: "4rem", // h-16
-            backgroundColor: "#facc15", // Tailwind's bg-yellow-500
-            borderRadius: "9999px", // rounded-full
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            margin: "0 auto 1.25rem auto", // mx-auto mb-5
-          }}
-        >
-          <span
+        <div>
+          <img
+            src={logoImg}
+            alt="Logo"
             style={{
-              color: "#ffffff", // text-white
-              fontSize: "1.5rem", // text-2xl
+              width: "150px",
+              height: "150px",
+              objectFit: "contain",
+              margin: "0 auto 1rem",
             }}
-          >
-            🐝
-          </span>
+          />
         </div>
 
         <h1
           style={{
-            fontSize: "1.25rem", // text-xl
-            fontWeight: 600, // font-semibold
-            color: "#111827", // text-gray-900
-            marginBottom: "0.5rem", // mb-2
+            fontSize: "1.25rem",
+            fontWeight: 600,
+            color: "#111827",
+            marginBottom: "0.5rem",
+            fontWeight: "bold"
           }}
         >
           Welcome to HoneyBee Chat
@@ -53,14 +63,17 @@ const WelcomeScreen = () => {
 
         <p
           style={{
-            fontSize: "0.875rem", // text-sm
-            color: "#4b5563", // text-gray-600
+            fontSize: "0.875rem",
+            color: "#4b5563",
+            lineHeight: "1.5rem",
+            fontWeight: "bold"
           }}
         >
           Select a chat from the sidebar to start messaging
         </p>
       </div>
     </div>
+    </>
   );
 };
 

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Bell, ArrowLeft} from "lucide-react";
+import { Bell, ArrowLeft } from "lucide-react";
 
 import Sidebar from "./pages/Sidebar";
 import WelcomeScreen from './pages/WelcomeScreen';
@@ -18,7 +18,7 @@ const ChatApp = () => {
   const [profileTab, setProfileTab] = useState('Profile');
   const [isMobileView, setIsMobileView] = useState(false);
   const [showSidebar, setShowSidebar] = useState(true);
-
+  const [isBottomNavVisible, setIsBottomNavVisible] = useState(false);
   useEffect(() => {
     const handleResize = () => {
       setIsMobileView(window.innerWidth < 768);
@@ -45,12 +45,10 @@ const ChatApp = () => {
             setActiveChat(chat);
             if (isMobileView) setShowSidebar(false);
           }}
-            setProfileTab={setProfileTab}
-            setShowProfileSettings={setShowProfileSettings}
+          setProfileTab={setProfileTab}
+          setShowProfileSettings={setShowProfileSettings}
         />
       </div>
-
-      {/* Main Content */}
       <main className="chat-main">
         {isMobileView && activeChat && (
           <button
@@ -59,15 +57,12 @@ const ChatApp = () => {
               setActiveChat(null);
             }}
             className="chat-back-btn"
-            
           >
             <ArrowLeft size={24} color="black" strokeWidth={2} />
-
           </button>
         )}
-       
-      
-        {activeChat === null && <WelcomeScreen />}
+
+        {!activeChat && <WelcomeScreen />}
         {activeChat === 'Math 101 Batch' && <BatchBroadcast />}
         {activeChat === 'Sarah Johnson' && <PrivateChat />}
         {activeChat === 'Community Announcements' && <AnnouncementsView />}
@@ -79,19 +74,6 @@ const ChatApp = () => {
           <Bell />
         </div>
       </div>
-
-      {/* 🐝 Profile Icon */}
-      
-      {!(isMobileView && activeChat) && (
-        <div
-          className="chat-profile"
-          // onClick={() => setShowProfileSettings(true)}
-        >
-          <span>🐝</span>
-        </div>
-      )}
-
-
       {/* Modals */}
       {showNotifications && <NotificationModal onClose={() => setShowNotifications(false)} />}
       {showProfileSettings && (
