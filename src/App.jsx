@@ -18,6 +18,7 @@ import "aos/dist/aos.css";
 import Header from "./components/Header";
 import { ToastContainer } from "react-toastify";
 import Footer from './components/Footer';
+import { useLocation } from 'react-router-dom';
 
 
 
@@ -25,14 +26,14 @@ import Footer from './components/Footer';
 // Import global styles if needed
 // import "./styles/main.css";
 
-function App() {
+const AppContent = () => {
   const [showLogin, setShowLogin] = useState(false);
+  const location = useLocation();
 
-  useEffect(() => {
-    AOS.init({ once: true });
-  }, []);
+  const isChatRoute = location.pathname.startsWith('/chat');
+
   return (
-    <Router>
+    <>
       <Header onLoginClick={() => setShowLogin(true)} />
       <ToastContainer
         position="top-right"
@@ -60,13 +61,24 @@ function App() {
         <Route path="/chat" element={<ChatApp />} />  {/* chat app */}
       
       </Routes>
-      <Footer />
+      {!isChatRoute && <Footer />}
       {showLogin && (
         <Login onClose={() => setShowLogin(false)} />
       )}
+    </>
+  );
+};
+
+function App() {
+  useEffect(() => {
+    AOS.init({ once: true });
+  }, []);
+
+  return (
+    <Router>
+      <AppContent />
     </Router>
   );
-
 }
 
 export default App;
