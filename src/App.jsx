@@ -17,6 +17,7 @@ import AOS from "aos";
 import "aos/dist/aos.css";
 import Header from "./components/Header";
 import { ToastContainer } from "react-toastify";
+import Footer from './components/Footer';
 
 
 
@@ -59,6 +60,7 @@ function App() {
         <Route path="/chat" element={<ChatApp />} />  {/* chat app */}
       
       </Routes>
+      <Footer />
       {showLogin && (
         <Login onClose={() => setShowLogin(false)} />
       )}
