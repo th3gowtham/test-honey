@@ -103,8 +103,8 @@ const Login = ({ onClose }) => {
         <button
           onClick={closeModal}
           style={{
-            position: 'absolute', top: 16, right: 16, background: 'none',
-            border: 'none', fontSize: 22, color: ' #00394f', cursor: 'pointer', fontWeight: 'bold'
+            position: 'absolute', top: -20, right: -22, background: 'none',
+            border: 'none', fontSize: 35, color: ' #00394f', cursor: 'pointer',hover: 'black', fontWeight: 'bold'
           }}
           aria-label="Close"
         >×</button>
@@ -128,7 +128,7 @@ const Login = ({ onClose }) => {
             <input
               type="text"
               name="name"
-              placeholder="Name"
+              placeholder="UserName"
               value={form.name}
               onChange={handleChange}
               style={{ width: "100%", marginBottom: 12, padding: 8 }}

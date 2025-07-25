@@ -90,6 +90,7 @@ body {
     transform: none;
   }
 }
+
 .navbar .navbar-brand {
   color: #127d8e;
 }
@@ -204,8 +205,8 @@ body {
   -webkit-transform: translateY(-50%);
   transform: translateY(-50%);
   font-size: 20px;
-  top: 2rem;
-  inset-inline-start: -10px;
+  top: 1rem;
+  inset-inline-start:-22px;
   font-size: 2rem;
   color: #127d8e;
 }
@@ -214,10 +215,11 @@ body {
 }
 .testimonial .swiper .swiper-slide .name {
   color: #00394f;
+ margin-bottom: 32px;
 }
 .testimonial .swiper .swiper-pagination .swiper-pagination-bullet {
-  width: 20px;
-  height: 20px;
+  width: 10px;
+  height: 10px;
   text-align: center;
   line-height: 20px;
   font-size: 12px;
@@ -339,10 +341,11 @@ footer .copy-right span {
   height: 200px;
 }
 .contact-us svg {
-    background-color: #127d8e;
-    border-radius: 35px;
-    width: 62px;
-    height: 63px;
+  background-color: #127d8e;
+  border-radius: 55px;
+  padding: 11px;
+  width: 55px;
+  height: 52px;
 }
 .breadcrumb-section {
   background-color: #127d8e;

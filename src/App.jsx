@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
 import Home from "./pages/Home";
 import About from "./pages/About";
 import Classes from "./pages/Classes";
@@ -10,28 +10,20 @@ import Teachers from "./pages/Teachers";
 import Product from "./pages/Product";
 import PlogDetails from "./pages/PlogDetails";
 import Login from "./components/Login";
-import ChatApp from './ChatApp' // chat app
-import { useEffect } from "react";
+import ChatApp from './ChatApp';
 import AOS from "aos";
 import "aos/dist/aos.css";
 import Header from "./components/Header";
 import { ToastContainer } from "react-toastify";
 import Footer from './components/Footer';
 
+function FooterController({ showLogin, setShowLogin }) {
+  const location = useLocation();
+  const showFooterPaths = ["/", "/about", "/classes", "/contact", "/teachers","/product"];
+  const showFooter = showFooterPaths.includes(location.pathname);
 
-
-
-// Import global styles if needed
-// import "./styles/main.css";
-
-function App() {
-  const [showLogin, setShowLogin] = useState(false);
-
-  useEffect(() => {
-    AOS.init({ once: true });
-  }, []);
   return (
-    <Router>
+    <>
       <Header onLoginClick={() => setShowLogin(true)} />
       <ToastContainer
         position="top-right"
@@ -47,7 +39,6 @@ function App() {
       />
       <Routes>
         <Route path="/" element={<Home />} />
-       
         <Route path="/about" element={<About />} />
         <Route path="/classes" element={<Classes />} />
         <Route path="/contact" element={<Contact />} />
@@ -56,16 +47,28 @@ function App() {
         <Route path="/teachers" element={<Teachers />} />
         <Route path="/product" element={<Product />} />
         <Route path="/plog_details" element={<PlogDetails />} />
-        <Route path="/chat" element={<ChatApp />} />  // chat app
-      
+        <Route path="/chat" element={<ChatApp />} />
       </Routes>
-      <Footer />
+      {showFooter && <Footer />}
       {showLogin && (
         <Login onClose={() => setShowLogin(false)} />
       )}
+    </>
+  );
+}
+
+function App() {
+  const [showLogin, setShowLogin] = useState(false);
+
+  useEffect(() => {
+    AOS.init({ once: true });
+  }, []);
+
+  return (
+    <Router>
+      <FooterController showLogin={showLogin} setShowLogin={setShowLogin} />
     </Router>
   );
-
 }
 
 export default App;

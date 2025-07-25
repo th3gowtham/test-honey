@@ -1,16 +1,12 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import { toast } from "react-toastify";
 import CourseCard from "../components/CourseCard";
 import EnquiryModal from "../components/EnquiryModal";
-import { FaFacebookF, FaInstagram, FaLinkedinIn } from "react-icons/fa6";
 import "swiper/css";
 import "../styles/all.min.css";
 import "../styles/bootstrap.min.css";
 import "../styles/swiper-bundle.min.css";
 import "../styles/main.css";
-import img2r from "../assets/2r.png";
 import phoni from "../assets/phoni.jpeg";
 import gram from "../assets/gram.jpg";
 import ha from "../assets/ha.jpg";
@@ -64,7 +60,7 @@ const courses = [
     age: "3+ Years",
     seats: "Upto 5 Kids per Batch",
     duration: "4 Months",
-    fee :3999,
+    fee: 3999,
   },
   {
     imgSrc: math,
@@ -73,7 +69,7 @@ const courses = [
     age: "5+ Years",
     seats: "Upto 5 Kids per Batch",
     duration: "12 Months",
-    fee :3999,
+    fee: 3999,
   },
   {
     imgSrc: s,
@@ -82,7 +78,7 @@ const courses = [
     age: "5+ Years",
     seats: "Upto 5 Kids per Batch",
     duration: "5 Months",
-    fee :3999,
+    fee: 3999,
   },
   {
     imgSrc: portfolio3,
@@ -91,7 +87,7 @@ const courses = [
     age: "5+ Years",
     seats: "Upto 5 Kids per Batch",
     duration: "4 Months",
-    fee :3999,
+    fee: 3999,
   },
   {
     imgSrc: cod,
@@ -100,7 +96,7 @@ const courses = [
     age: "6+ Years",
     seats: "Upto 4 Kids per Batch",
     duration: "3 Months",
-    fee :3999,
+    fee: 3999,
   },
   {
     imgSrc: com,
@@ -109,7 +105,7 @@ const courses = [
     age: "8+ Years",
     seats: "Upto 4 Kids per Batch",
     duration: "6 Months",
-    fee :3999,
+    fee: 3999,
   },
   {
     imgSrc: art,
@@ -118,7 +114,7 @@ const courses = [
     age: "8+ Years",
     seats: "Upto 5 per Batch",
     duration: "3 Months",
-    fee :3999,
+    fee: 3999,
   },
 
 ];
@@ -283,6 +279,8 @@ const Classes = () => {
         </div>
       </div>
       {/* Advanced Courses Section */}
+      <div className="popular-classes">
+      <div className="container">
       <div className="main-heading text-center">
         <span className="text-uppercase position-relative d-inline-block px-2">Advanced Courses</span>
         <h2 className="fw-bold my-3">Technical & Non-Tech Classes </h2>
@@ -298,6 +296,9 @@ const Classes = () => {
             />
           ))}
         </div>
+      </div>
+      
+      </div>
       </div>
       <EnquiryModal
         show={showEnquiryModal}

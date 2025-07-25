@@ -1,13 +1,12 @@
 // Header component for the main navigation bar
 // This handles the top navigation, user authentication state, and various interactive elements
-import { useState } from 'react';
 import { useLocation } from 'react-router-dom'; // Import useLocation
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import img2r from "../assets/2r.png";
 import EnquiryModal from './EnquiryModal';
 import "./Header.css"
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import axios from 'axios';
 
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
@@ -26,6 +25,30 @@ const Header = ({ onLoginClick }) => {         // Main Header component that rec
   const navigate = useNavigate();
 
   const { user, loading, userRole, userName, logout } = useAuth();
+
+  const navbarCollapseRef = useRef(null);
+
+  // Close mobile menu when clicking outside
+  useEffect(() => {
+    function handleClickOutside(event) {
+      const isMobile = window.innerWidth <= 991;
+      const menu = document.getElementById('navbarSupportedContent');
+      const toggleBtn = document.getElementById('navbarToggleBtn');
+      if (
+        isMobile &&
+        menu &&
+        menu.classList.contains('show') &&
+        !menu.contains(event.target) &&
+        !toggleBtn.contains(event.target)
+      ) {
+        toggleBtn.click();
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
 
   const collapseMobileNavbar = () => {
     if (window.innerWidth <= 991) {
@@ -59,7 +82,7 @@ const Header = ({ onLoginClick }) => {         // Main Header component that rec
           </Link>
           {/* Welcome message for logged in users - hidden on mobile */}
           <span className=" ms-3 d-none d-lg-inline">
-            {userRole ? `Welcome ${userRole}, ${userName}` : 'No user logged in'}
+            {userRole ? `Welcome ${userRole}, ${userName}` : ''}
           </span>
         </div>
         {/* Mobile hamburger menu button */}
@@ -125,7 +148,7 @@ const Header = ({ onLoginClick }) => {         // Main Header component that rec
 
         {/* Welcome message for mobile users - shown below the navbar */}
         <span className=" d-lg-none mt-2 ms-2">
-          {userRole ? `Welcome ${userRole}, ${userName}` : 'No user logged in'}
+          {userRole ? `Welcome ${userRole}, ${userName}` : ''}
         </span>
 
         {/* Temporary notification that appears when login is required */}

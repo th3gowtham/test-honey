@@ -198,6 +198,8 @@
 input ,select ,textarea{
   background: azure;
   color: #333;
+  border-style: solid;
+  border-radius: 10px;
 }
 
 .enquiry-modal-group input[type="date"] {
