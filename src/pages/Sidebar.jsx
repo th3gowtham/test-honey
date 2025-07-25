@@ -1,9 +1,14 @@
 import { Search, MessageSquare, BellDot, Users2, User } from 'lucide-react';
 import "../styles/Sidebar.css";
 import { useState, useEffect } from 'react';
+import { useAuth } from '../context/AuthContext';
+import { getUserChats } from '../utils/chatUtils';
 
-const Sidebar = ({ currentView, setCurrentView, setActiveChat, setShowProfileSettings, setProfileTab }) => {
+const Sidebar = ({ currentView, setCurrentView, setActiveChat, setShowProfileSettings, setProfileTab, users }) => {
+  const { currentUser } = useAuth();
   const [isMobile, setIsMobile] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [chats, setChats] = useState([]);
 
   useEffect(() => {
     const handleResize = () => {
@@ -13,6 +18,33 @@ const Sidebar = ({ currentView, setCurrentView, setActiveChat, setShowProfileSet
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
+  
+  // Subscribe to user chats to get unread message counts
+  useEffect(() => {
+    if (!currentUser) return;
+    
+    const unsubscribe = getUserChats(currentUser.uid, (userChats) => {
+      setChats(userChats);
+    });
+    
+    return () => unsubscribe();
+  }, [currentUser]);
+  
+  // Combine users data with chat data to show unread counts
+  const enhancedUsers = users?.map(user => {
+    const userChat = chats.find(chat => 
+      chat.users.includes(user.uid) && chat.users.includes(currentUser?.uid)
+    );
+    return {
+      ...user,
+      unreadCount: userChat?.unreadCount || 0
+    };
+  }) || [];
+  
+  const filteredUsers = enhancedUsers.filter(user => 
+    user.displayName?.toLowerCase().includes(searchTerm.toLowerCase())
+  ) || [];
+
 
 
   const LeftNavBar = () => (
@@ -95,14 +127,20 @@ const Sidebar = ({ currentView, setCurrentView, setActiveChat, setShowProfileSet
         <div className="sidebar-search">
           <div className="search-container">
             <Search className="search-icon" />
-            <input type="text" placeholder="Search chats..." className="search-input" />
+            <input 
+              type="text" 
+              placeholder="Search chats..." 
+              className="search-input" 
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
           </div>
         </div>
 
         {/* ✅ Chat list based on view */}
         <div className="sidebar-chat-list">
           {currentView === 'batch-broadcasts' && (
-            <div className="chat-item" onClick={() => setActiveChat('Math 101 Batch')}>
+            <div className="chat-item" onClick={() => setActiveChat({ type: 'batch', name: 'Math 101 Batch', id: 'math101' })}>
               <div>
                 <h3 className="chat-title">Math 101 Batch</h3>
                 <p className="chat-subtitle">25 students</p>
@@ -112,19 +150,34 @@ const Sidebar = ({ currentView, setCurrentView, setActiveChat, setShowProfileSet
           )}
 
           {currentView === 'private-chat' && (
-            <div className="chat-item" onClick={() => setActiveChat('Sarah Johnson')}>
-              <div className="chat-user">
-                <div>
-                  <h3 className="chat-title">Sarah Johnson</h3>
-                  <p className="chat-subtitle">Teacher</p>
+            <>
+              {/* Default chat option */}
+              
+              
+              {/* Display filtered users from Firestore */}
+              {filteredUsers.map(user => (
+                <div 
+                  key={user.id} 
+                  className="chat-item" 
+                  onClick={() => setActiveChat({ type: 'private', name: user.displayName || 'User', id: user.uid })}
+                >
+                  <div className="chat-user">
+                    <div>
+                      <h3 className="chat-title">{user.displayName || 'User'}</h3>
+                      <p className="chat-subtitle">{user.role || 'Student'}</p>
+                    </div>
+                  </div>
+                  {/* Show unread message count if it exists and is greater than 0 */}
+                  {user.unreadCount > 0 && (
+                    <div className="chat-badge">{user.unreadCount}</div>
+                  )}
                 </div>
-              </div>
-              <div className="chat-badge">1</div>
-            </div>
+              ))}
+            </>
           )}
 
           {currentView === 'announcements' && (
-            <div className="chat-item" onClick={() => setActiveChat('Community Announcements')}>
+            <div className="chat-item" onClick={() => setActiveChat({ type: 'announcement', name: 'Community Announcements', id: 'community' })}>
               <div>
                 <h3 className="chat-title">Community Announcements</h3>
                 <p className="chat-subtitle">2 pinned</p>

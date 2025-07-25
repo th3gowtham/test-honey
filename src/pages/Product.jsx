@@ -6,8 +6,12 @@ import "../styles/swiper-bundle.min.css";
 import "../styles/main.css";
 import img2r from "../assets/2r.png";
 import { FaFacebookF, FaInstagram, FaLinkedinIn } from "react-icons/fa6";
+import { useAuth } from "../context/AuthContext";
 
-const Product = () => (
+const Product = () => {
+  const { user, userName, currentUser } = useAuth();
+  
+  return (
   <>
   
     <nav aria-label="breadcrumb" className="breadcrumb-section position-relative">
@@ -59,8 +63,18 @@ const Product = () => (
             <div className="box">
               <div className="title fw-bold h4">Newsletter</div>
               <form onSubmit={e => e.preventDefault()}>
-                <input type="text" placeholder="Your Name" className="form-control shadow-none fs-5 my-3" />
-                <input type="email" placeholder="Your Email" className="form-control shadow-none fs-5 my-3" />
+                <input 
+                  type="text" 
+                  placeholder="Your Name" 
+                  className="form-control shadow-none fs-5 my-3" 
+                  defaultValue={userName || currentUser?.displayName || ''}
+                />
+                <input 
+                  type="email" 
+                  placeholder="Your Email" 
+                  className="form-control shadow-none fs-5 my-3" 
+                  defaultValue={user?.email || currentUser?.email || ''}
+                />
                 <input type="submit" value="Submit Now" className="form-control shadow-none fs-5 my-3 rounded-pill border-0 text-white" />
               </form>
             </div>
@@ -74,6 +88,7 @@ const Product = () => (
       </div>
     </footer>
   </>
-);
+  );
+};
 
-export default Product; 
+export default Product;

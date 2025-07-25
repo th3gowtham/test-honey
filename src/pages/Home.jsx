@@ -51,7 +51,7 @@ const Home = () => {
   }, []);
 
   const { startPayment, loading } = usePayment();
-  const { user } = useAuth();
+  const { user, userName, currentUser } = useAuth();
   const [showEnquiryModal, setShowEnquiryModal] = React.useState(false);
   const [selectedCourse, setSelectedCourse] = React.useState(null);
   const [showLoginNeeded, setShowLoginNeeded] = React.useState(false);
@@ -573,8 +573,18 @@ const Home = () => {
             <div className="box">
               <div className="title fw-bold h4">Newsletter</div>
               <form action="">
-                <input type="text" placeholder="Your Name" className="form-control shadow-none fs-5 my-3" />
-                <input type="email" placeholder="Your Email" className="form-control shadow-none fs-5 my-3" />
+                <input 
+                  type="text" 
+                  placeholder="Your Name" 
+                  className="form-control shadow-none fs-5 my-3" 
+                  defaultValue={userName || currentUser?.displayName || ''}
+                />
+                <input 
+                  type="email" 
+                  placeholder="Your Email" 
+                  className="form-control shadow-none fs-5 my-3" 
+                  defaultValue={user?.email || currentUser?.email || ''}
+                />
                 <input type="submit" value="Submit Now" className="form-control shadow-none fs-5 my-3 rounded-pill border-0 text-white" />
               </form>
             </div>
@@ -618,4 +628,4 @@ const Home = () => {
   </div>
   );
 }
-export default Home; 
+export default Home;

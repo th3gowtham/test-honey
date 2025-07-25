@@ -226,7 +226,7 @@ const advancedCourses = [
 ];
 
 const Classes = () => {
-  const { user } = useAuth();
+  const { user, userName, currentUser } = useAuth();
   const { startPayment, loading } = usePayment();
   const [showLoginNeeded, setShowLoginNeeded] = useState(false);
   const [showEnquiryModal, setShowEnquiryModal] = useState(false);
@@ -367,8 +367,18 @@ const Classes = () => {
               <div className="box">
                 <div className="title fw-bold h4">Newsletter</div>
                 <form onSubmit={e => e.preventDefault()}>
-                  <input type="text" placeholder="Your Name" className="form-control shadow-none fs-5 my-3" />
-                  <input type="email" placeholder="Your Email" className="form-control shadow-none fs-5 my-3" />
+                  <input 
+                    type="text" 
+                    placeholder="Your Name" 
+                    className="form-control shadow-none fs-5 my-3" 
+                    defaultValue={userName || currentUser?.displayName || ''}
+                  />
+                  <input 
+                    type="email" 
+                    placeholder="Your Email" 
+                    className="form-control shadow-none fs-5 my-3" 
+                    defaultValue={user?.email || currentUser?.email || ''}
+                  />
                   <input type="submit" value="Submit Now" className="form-control shadow-none fs-5 my-3 rounded-pill border-0 text-white" />
                 </form>
               </div>

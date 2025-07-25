@@ -10,6 +10,7 @@ import Teachers from "./pages/Teachers";
 import Product from "./pages/Product";
 import PlogDetails from "./pages/PlogDetails";
 import Login from "./components/Login";
+import ForgotPassword from "./components/ForgotPassword";
 import ChatApp from './ChatApp' // chat app
 import { useEffect } from "react";
 import AOS from "aos";
@@ -55,7 +56,7 @@ function App() {
         <Route path="/teachers" element={<Teachers />} />
         <Route path="/product" element={<Product />} />
         <Route path="/plog_details" element={<PlogDetails />} />
-        <Route path="/chat" element={<ChatApp />} />  // chat app
+        <Route path="/chat" element={<ChatApp />} />  {/* chat app */}
       
       </Routes>
       {showLogin && (
