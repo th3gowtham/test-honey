@@ -1,21 +1,23 @@
 import { User, Phone, MapPin, Camera } from "lucide-react";
 import "../styles/ProfileTab.css"
+import { useAuth } from "../context/AuthContext";
 
 const ProfileTab = () => {
+  const { userName, user, currentUser, userRole } = useAuth();
   return (
     <div className="profile-container">
       {/* Profile Overview */}
       <div className="profile-overview">
         <div className="profile-avatar">
-          <span className="profile-avatar-initial">J</span>
+          <span className="profile-avatar-initial">{userName ? userName.charAt(0) : currentUser?.displayName?.charAt(0) || 'U'}</span>
           <div className="profile-avatar-camera">
             <Camera size={16} color="#ffffff" />
           </div>
         </div>
 
         <div className="profile-info">
-          <h3 className="profile-name">John Doe</h3>
-          <span className="profile-role">Student</span>
+          <h3 className="profile-name">{userName || currentUser?.displayName || 'User'}</h3>
+          <span className="profile-role">{userRole || 'Student'}</span>
           <p className="profile-description">
             Learner with access to enrolled batches
           </p>
@@ -32,14 +34,14 @@ const ProfileTab = () => {
           <label className="info-label">Full Name</label>
           <div className="info-box">
             <User size={16} color="#9ca3af" />
-            <span className="info-text">John Doe</span>
+            <span className="info-text">{userName || currentUser?.displayName || 'User'}</span>
           </div>
         </div>
 
         <div>
           <label className="info-label">Email</label>
           <div className="info-box">
-            <span className="info-text">john@honeybee.com</span>
+            <span className="info-text">{user?.email || currentUser?.email || 'No email available'}</span>
           </div>
         </div>
 

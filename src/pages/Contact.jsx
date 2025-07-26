@@ -6,8 +6,12 @@ import "../styles/swiper-bundle.min.css";
 import "../styles/main.css";
 import img2r from "../assets/2r.png";
 import { FaEnvelope, FaPhone, FaLocationDot, FaClock} from "react-icons/fa6";
+import { useAuth } from "../context/AuthContext";
 
-const Contact = () => (
+const Contact = () => {
+  const { user, userName, currentUser } = useAuth();
+  
+  return (
   <>
    
     <nav aria-label="breadcrumb" className="breadcrumb-section position-relative">
@@ -66,6 +70,7 @@ const Contact = () => (
     </form>
    
   </>
-);
+  );
+};
 
-export default Contact; 
+export default Contact;

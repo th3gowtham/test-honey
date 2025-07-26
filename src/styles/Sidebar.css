@@ -1,12 +1,69 @@
-/* Sidebar Layout */
+/* Layout Container */
+.chat-layout {
+  display: flex;
+  height: 100vh;
+  
+}
+
+/* Left Vertical Icon Nav (Desktop) */
+.left-nav-icons {
+  width: 60px;
+  background-color: #111b21;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 1rem;
+  border-right: 1px solid #2a2f32;
+  
+  
+}
+
+.nav-icon {
+  margin: 1rem 0;
+  color: #b1b3b5;
+  cursor: pointer;
+  position: relative;
+  
+}
+.left-nav-icons .nav-icon:last-child {
+  margin-top: auto; /* Push it to the bottom of the column */
+  margin-bottom: 12px;
+}
+
+
+.nav-icon svg {
+  width: 24px;
+  height: 24px;
+  color: #b1b3b5;
+  transition: color 0.3s;
+}
+
+.nav-icon.active svg {
+  color: white;
+}
+
+.active-dot {
+  position: absolute;
+  top: 0;
+  right: -2px;
+  width: 10px;
+  height: 10px;
+  background-color: #25d366;
+  border-radius: 50%;
+}
+
+/* Sidebar Content */
 .sidebar {
-  width: 100%;
-  max-width: 20rem;
+  flex: 1;
   background-color: #fff;
-  border-right: 1px solid #e5e7eb;
   display: flex;
   flex-direction: column;
   height: 100vh;
+  max-width: 320px;
+  overflow-y: auto;
+  border-right: 1px solid #e5e7eb;
+  /* background-color: red; */
+  width: 400px;
 }
 
 @media (max-width: 768px) {
@@ -14,16 +71,16 @@
     position: fixed;
     top: 0;
     left: 0;
-    width: 100vw; /* full width */
-    height: 100vh; /* full height */
-    max-width: none; /* remove width limit */
+    width: 100vw;
+    height: 100vh;
+    max-width: none;
     z-index: 50;
-    border-right: none; /* remove partition line */
+    border-right: none;
     background-color: #fff;
   }
 }
 
-/* User Info */
+/* Sidebar Header */
 .sidebar-user-info {
   padding: 16px;
   border-bottom: 1px solid #e5e7eb;
@@ -31,19 +88,18 @@
 
 .sidebar-user-header {
   display: flex;
-  flex-direction: column; 
+  flex-direction: column;
   gap: 8px;
   margin-left: 70px;
   margin-top: 5px;
   margin-bottom: 10px;
-  
 }
-
 
 .sidebar-title {
   font-weight: 600;
   color: #111827;
   font-size: 1rem;
+  margin-top: 15px;
 }
 
 .sidebar-subtitle {
@@ -52,7 +108,9 @@
 }
 
 .sidebar-user-details {
-  margin-top: 12px;
+  margin-top: 30px;
+  padding-left: 10px;
+  /* background-color: red; */
 }
 
 .sidebar-user-tags {
@@ -82,7 +140,7 @@
   word-break: break-word;
 }
 
-/* Search Box */
+/* Search */
 .sidebar-search {
   padding: 16px;
 }
@@ -112,47 +170,6 @@
 .search-input:focus {
   border-color: #14b8a6;
   box-shadow: 0 0 0 2px rgba(20, 184, 166, 0.2);
-}
-
-/* Navigation Tabs */
-.sidebar-tabs {
-  display: flex;
-  flex-direction: column;
-  border-bottom: 1px solid #e5e7eb;
-}
-
-.tab-button {
-  flex: 1;
-  padding: 12px 16px;
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: #6b7280;
-  border: none;
-  background: none;
-  transition: background-color 0.3s, color 0.3s;
-  cursor: pointer;
-}
-
-.tab-button:hover {
-  color: #374151;
-}
-
-.tab-button.active {
-  color: #0f766e;
-  border-bottom: 2px solid #0f766e;
-  background-color: #f0fdfa;
-}
-
-.tab-content {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.tab-icon {
-  width: 16px;
-  height: 16px;
-  margin-bottom: 4px;
 }
 
 /* Chat List */
@@ -222,82 +239,30 @@
   color: #fff;
   font-weight: 500;
 }
-.mobile-bottom-nav {
-  position: fixed;
-  bottom: 1.5rem;
-  left: 0;
-  right: 0;
-  display: flex;
-  justify-content: center;
-  gap: 2rem;
-  z-index: 50;
-}
 
-.circle-button {
-  width: 50px;
-  height: 50px;
-  background-color: #14b8a6; /* Yellow background for visibility */
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  border: none;
-  cursor: pointer;
-  transition: transform 0.2s, background-color 0.3s;
-  color: #1f2937; /* Dark icon for contrast */
-  /* padding-left: 10px; */
-}
-
-.circle-button:hover {
-  background-color: #fbbf24;
-  transform: scale(1.1);
-}
-
-.circle-button.active {
-  background-color: #0ca795; /* Darker yellow for active */
-  color: #fff;
-}
-
-@media (min-width: 768px) {
-  .mobile-bottom-nav {
-    display: none; /* Hide in desktop  */
-  }
-}
-
-
-
-/* Bottom Navigation Bar */
+/* Bottom Navigation (Mobile) */
 .mobile-bottom-nav {
   position: fixed;
   bottom: 0;
   left: 0;
   right: 0;
-  background-color: #111827; /* Dark background */
+  background-color: #111827;
   display: flex;
   justify-content: space-around;
   align-items: center;
   border-top: 1px solid #2d2d2d;
   z-index: 50;
-  gap: 1rem; /* or clamp it */
-  padding: clamp(0.5rem, 1vw, 1rem);
-
+  padding: 0.5rem 0;
 }
 
 .nav-item {
-  min-width: 48px;
-  min-height: 48px;
-  padding: 0.5rem;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 1px;
-  flex: 1;
   color: #d1d5db;
   font-size: 0.75rem;
-  padding: clamp(0.5rem, 1vw, 1rem);
-
+  flex: 1;
 }
 
 .nav-item svg {
@@ -309,47 +274,23 @@
 }
 
 .nav-item.active {
-  color: #10b981; /* Highlight active label */
+  color: #10b981;
 }
 
 .nav-item.active svg {
-  color: #10b981; /* Highlight active icon */
+  color: #10b981;
 }
 
-/* Tablet View: 421px – 768px */
+@media (min-width: 768px) {
+  .mobile-bottom-nav {
+    display: none;
+  }
+}
+
+/* Tablet Tweak */
 @media (min-width: 421px) and (max-width: 768px) {
-  .circle-button {
-    display: flex; /* Keep visible on tablet */
-    position: fixed;
-    top: clamp(1rem, 3vw, 2rem); /* Responsive spacing */
-    left: clamp(1rem, 3vw, 2rem);
-    width: 50px;
-    height: 50px;
-    background-color: #14b8a6;
-    border-radius: 50%;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    border: none;
-    cursor: pointer;
-    transition: transform 0.2s, background-color 0.3s;
-    z-index: 100;
-  }
-
-  .circle-button:hover {
-    background-color: #fbbf24;
-    transform: scale(1.1);
-  }
-
-  .circle-button.active {
-    background-color: #0ca795;
-    color: #fff;
-  }
-  .sidebar-user-header{
-     padding-left: 0; /* remove extra left padding */
-     margin-left: 70px; /* pull slightly left towards back button */
-     /* margin-top: 10px; */
-
+  .sidebar-user-header {
+    margin-left: 70px;
   }
   
 }

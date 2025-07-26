@@ -51,7 +51,7 @@ const Home = () => {
   }, []);
 
   const { startPayment, loading } = usePayment();
-  const { user } = useAuth();
+  const { user, userName, currentUser } = useAuth();
   const [showEnquiryModal, setShowEnquiryModal] = React.useState(false);
   const [selectedCourse, setSelectedCourse] = React.useState(null);
   const [showLoginNeeded, setShowLoginNeeded] = React.useState(false);
@@ -544,4 +544,4 @@ const Home = () => {
   </div>
   );
 }
-export default Home; 
+export default Home;

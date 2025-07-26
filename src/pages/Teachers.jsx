@@ -17,8 +17,12 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import { Pagination, Autoplay } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/pagination";
+import { useAuth } from "../context/AuthContext";
 
-const Teachers = () => (
+const Teachers = () => {
+  const { user, userName, currentUser } = useAuth();
+  
+  return (
   <>
    
     <nav aria-label="breadcrumb" className="breadcrumb-section position-relative">
@@ -190,6 +194,7 @@ const Teachers = () => (
     </div>
    
   </>
-);
+  );
+};
 
-export default Teachers; 
+export default Teachers;

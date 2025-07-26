@@ -1,6 +1,7 @@
 /* Backdrop */
 .modal-backdrop {
-  position: fixed;
+  display: flex;
+  /* position: fixed; */
   inset: 0;
   background-color: rgba(0, 0, 0, 0.5);
   display: flex;
@@ -29,6 +30,7 @@
   gap: 0.5rem;
   padding: 1rem;
   border-bottom: 1px solid #e5e7eb; /* border-gray-200 */
+  
 }
 
 @media (min-width: 640px) {
@@ -36,6 +38,7 @@
     flex-direction: row;
     align-items: center;
     justify-content: space-between;
+ 
   }
 }
 
@@ -108,8 +111,24 @@
   padding: 1rem;
 }
 
-@media (min-width: 640px) {
-  .modal-content {
-    padding: 1.5rem;
+@media (max-width: 767px) {
+  .modal-header {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.75rem 1rem;
+  }
+
+  .modal-title {
+    margin: 0; /* Remove auto */
+    font-size: 1rem;
+  }
+
+  .modal-subtitle {
+    display: none;   /* hide for clean mobile UI */
+  }
+
+  .modal-close-btn {
+    align-self: center;
   }
 }

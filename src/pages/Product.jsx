@@ -6,8 +6,12 @@ import "../styles/swiper-bundle.min.css";
 import "../styles/main.css";
 import img2r from "../assets/2r.png";
 import { FaFacebookF, FaInstagram, FaLinkedinIn } from "react-icons/fa6";
+import { useAuth } from "../context/AuthContext";
 
-const Product = () => (
+const Product = () => {
+  const { user, userName, currentUser } = useAuth();
+  
+  return (
   <>
   
     <nav aria-label="breadcrumb" className="breadcrumb-section position-relative">
@@ -17,6 +21,7 @@ const Product = () => (
     </nav>
     
   </>
-);
+  );
+};
 
-export default Product; 
+export default Product;

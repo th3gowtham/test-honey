@@ -1,5 +1,8 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from 'react';
 import { Bell, ArrowLeft} from "lucide-react";
+import { collection, getDocs } from 'firebase/firestore';
+import { db } from './services/firebase';
+import { useAuth } from './context/AuthContext';
 
 import Sidebar from "./pages/Sidebar";
 import WelcomeScreen from './pages/WelcomeScreen';
@@ -11,6 +14,7 @@ import BatchBroadcast from "./pages/BatchBroadcast";
 import "./styles/ChatApp.css"
 
 const ChatApp = () => {
+  const { currentUser } = useAuth();
   const [currentView, setCurrentView] = useState('welcome');
   const [activeChat, setActiveChat] = useState(null);
   const [showNotifications, setShowNotifications] = useState(false);
@@ -18,6 +22,7 @@ const ChatApp = () => {
   const [profileTab, setProfileTab] = useState('Profile');
   const [isMobileView, setIsMobileView] = useState(false);
   const [showSidebar, setShowSidebar] = useState(true);
+  const [users, setUsers] = useState([]);
 
   useEffect(() => {
     const handleResize = () => {
@@ -29,6 +34,32 @@ const ChatApp = () => {
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
+  
+  // Fetch users from Firestore
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const usersCollection = collection(db, 'users');
+        const userSnapshot = await getDocs(usersCollection);
+        const usersList = userSnapshot.docs.map(doc => ({
+          ...doc.data(),
+          id: doc.id
+        }));
+        
+        // Filter out current user from the list
+        const filteredUsers = currentUser ? 
+          usersList.filter(user => user.uid !== currentUser.uid) : 
+          usersList;
+          
+        setUsers(filteredUsers);
+      } catch (error) {
+        console.error('Error fetching users:', error);
+      }
+    };
+    
+    fetchUsers();
+  }, [currentUser]);
+  
   return (
     <div className="chat-app">
       {/* Sidebar */}
@@ -38,11 +69,15 @@ const ChatApp = () => {
           setCurrentView={(view) => {
             setCurrentView(view);
             setActiveChat(null);
+
           }}
           setActiveChat={(chat) => {
             setActiveChat(chat);
             if (isMobileView) setShowSidebar(false);
           }}
+          setProfileTab={setProfileTab}
+          setShowProfileSettings={setShowProfileSettings}
+          users={users}
         />
       </div>
 
@@ -61,10 +96,12 @@ const ChatApp = () => {
 
           </button>
         )}
+       
+      
         {activeChat === null && <WelcomeScreen />}
-        {activeChat === 'Math 101 Batch' && <BatchBroadcast />}
-        {activeChat === 'Sarah Johnson' && <PrivateChat />}
-        {activeChat === 'Community Announcements' && <AnnouncementsView />}
+        {activeChat && activeChat.type === 'batch' && <BatchBroadcast />}
+        {activeChat && activeChat.type === 'private' && <PrivateChat receiverId={activeChat.id} activeChat={activeChat.name} />}
+        {activeChat && activeChat.type === 'announcement' && <AnnouncementsView />}
       </main>
 
       {/* 🔔 Notification Icon */}
@@ -75,10 +112,11 @@ const ChatApp = () => {
       </div>
 
       {/* 🐝 Profile Icon */}
+      
       {!(isMobileView && activeChat) && (
         <div
           className="chat-profile"
-          onClick={() => setShowProfileSettings(true)}
+          // onClick={() => setShowProfileSettings(true)}
         >
           <span>🐝</span>
         </div>

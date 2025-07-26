@@ -222,7 +222,7 @@ const advancedCourses = [
 ];
 
 const Classes = () => {
-  const { user } = useAuth();
+  const { user, userName, currentUser } = useAuth();
   const { startPayment, loading } = usePayment();
   const [showLoginNeeded, setShowLoginNeeded] = useState(false);
   const [showEnquiryModal, setShowEnquiryModal] = useState(false);
@@ -300,6 +300,7 @@ const Classes = () => {
       
       </div>
       </div>
+      
       <EnquiryModal
         show={showEnquiryModal}
         onClose={handleCloseModal}
