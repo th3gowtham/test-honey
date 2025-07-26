@@ -4,22 +4,25 @@ import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import { collection, addDoc } from "firebase/firestore";
 import { db } from '../services/firebase';
+import emailjs from 'emailjs-com';
 
+const MEET_LINK = 'https://meet.google.com/your-static-link';
+const ADMIN_EMAIL = 'admin@example.com';
+
+// Define static available time slots (no teacher filtering)
 const TIME_SLOTS = [
-  '09:00 AM', '10:00 AM', '11:00 AM', '02:00 PM', '03:00 PM',
-  '04:00 PM', '05:00 PM', '06:00 PM', '07:00 PM', '08:00 PM',
-  '09:00 PM', '10:00 PM'
+  '09:00 AM', '10:00 AM', '11:00 AM',
+  '02:00 PM', '03:00 PM', '04:00 PM',
+  '05:00 PM', '06:00 PM',
 ];
-const UNAVAILABLE = ['12:00 PM'];
 
 const BookCallModal = ({ isOpen, onClose, onBooking, collectionName = "bookings" }) => {
-  const [callType, setCallType] = useState('video');
   const [date, setDate] = useState(null);
   const [time, setTime] = useState('');
   const [success, setSuccess] = useState(false);
 
   const handleTimeClick = (slot) => {
-    if (!UNAVAILABLE.includes(slot)) setTime(slot);
+    setTime(slot);
   };
 
   const handleSubmit = async (e) => {
@@ -27,15 +30,31 @@ const BookCallModal = ({ isOpen, onClose, onBooking, collectionName = "bookings"
     if (!date || !time) return;
 
     const booking = {
-      callType: callType,
-      date: date.toLocaleDateString('en-CA'), // ✅ Safe format: YYYY-MM-DD (no timezone issue)
+      date: date.toLocaleDateString('en-CA'),
       time: time,
+      meetLink: MEET_LINK,
       bookedAt: new Date().toISOString(),
     };
 
     try {
       await addDoc(collection(db, collectionName), booking);
-      console.log(`✅ Booking saved to Firebase collection '${collectionName}':`, booking);
+
+      const templateParams = {
+        admin_email: ADMIN_EMAIL,
+        student_date: booking.date,
+        student_time: booking.time,
+        meet_link: MEET_LINK,
+      };
+
+      emailjs.send(
+        'your_service_id',     // Replace with your EmailJS service ID
+        'your_template_id',    // Replace with your EmailJS template ID
+        templateParams,
+        'your_user_id'         // Replace with your EmailJS user/public key
+      )
+      .then(() => console.log('✅ Email sent!'))
+      .catch(err => console.error('❌ Email error:', err));
+
       if (onBooking) onBooking();
       setSuccess(true);
       setTimeout(() => {
@@ -53,32 +72,12 @@ const BookCallModal = ({ isOpen, onClose, onBooking, collectionName = "bookings"
     <div className="bookcall-modal-overlay">
       <div className="bookcall-modal">
         <button className="bookcall-close" onClick={onClose}>&times;</button>
-        <h2>📅 Book a Call</h2>
-        <p>Schedule a one-on-one session with your teacher</p>
-        <form onSubmit={handleSubmit} className="bookcall-form">
-          <div className="bookcall-type">
-            <label className={callType === 'video' ? 'selected' : ''}>
-              <input
-                type="radio"
-                name="callType"
-                value="video"
-                checked={callType === 'video'}
-                onChange={() => setCallType('video')}
-              />
-              <span>Video Call</span>
-            </label>
-            <label className={callType === 'audio' ? 'selected' : ''}>
-              <input
-                type="radio"
-                name="callType"
-                value="audio"
-                checked={callType === 'audio'}
-                onChange={() => setCallType('audio')}
-              />
-              <span>Audio Call</span>
-            </label>
-          </div>
+        <h2>📅 Book a Session</h2>
+        <p>Schedule your session via the Meet link below</p>
 
+        <form onSubmit={handleSubmit} className="bookcall-form">
+
+          {/* Date Picker */}
           <div className="bookcall-date">
             <label>Select Date</label>
             <DatePicker
@@ -91,6 +90,7 @@ const BookCallModal = ({ isOpen, onClose, onBooking, collectionName = "bookings"
             />
           </div>
 
+          {/* Time Slots */}
           <div className="bookcall-times">
             <label>Available Times</label>
             <div className="bookcall-times-list">
@@ -98,13 +98,8 @@ const BookCallModal = ({ isOpen, onClose, onBooking, collectionName = "bookings"
                 <button
                   type="button"
                   key={slot}
-                  className={
-                    'bookcall-time-pill' +
-                    (time === slot ? ' selected' : '') +
-                    (UNAVAILABLE.includes(slot) ? ' unavailable' : '')
-                  }
+                  className={'bookcall-time-pill' + (time === slot ? ' selected' : '')}
                   onClick={() => handleTimeClick(slot)}
-                  disabled={UNAVAILABLE.includes(slot)}
                 >
                   <span className="bookcall-time-icon">🕒</span>
                   {slot}
@@ -113,6 +108,13 @@ const BookCallModal = ({ isOpen, onClose, onBooking, collectionName = "bookings"
             </div>
           </div>
 
+          {/* Static Meet Link */}
+          <div className="bookcall-meet-link" style={{ margin: '10px 0' }}>
+            <strong>Meet Link: </strong>
+            <a href={MEET_LINK} target="_blank" rel="noopener noreferrer">{MEET_LINK}</a>
+          </div>
+
+          {/* Summary */}
           <div className="bookcall-summary">
             <div className="summary-title">Booking Summary</div>
             <div className="summary-row">
@@ -124,15 +126,16 @@ const BookCallModal = ({ isOpen, onClose, onBooking, collectionName = "bookings"
               {time || '--:--'}
             </div>
             <div className="summary-row">
-              <span role="img" aria-label="call">
-                {callType === 'video' ? '🎥' : '🎤'}
-              </span>
-              {callType === 'video' ? 'Video Call' : 'Audio Call'}
+              <span role="img" aria-label="link">🔗</span>
+              <a href={MEET_LINK} target="_blank" rel="noopener noreferrer">
+                Join Meet
+              </a>
             </div>
           </div>
 
           {success && <div className="bookcall-success">Booking Successful!</div>}
 
+          {/* Actions */}
           <div className="bookcall-actions">
             <button type="button" className="bookcall-cancel" onClick={onClose}>Cancel</button>
             <button
@@ -140,7 +143,7 @@ const BookCallModal = ({ isOpen, onClose, onBooking, collectionName = "bookings"
               className="bookcall-submit"
               disabled={!date || !time}
             >
-              Book Call
+              Book Session
             </button>
           </div>
         </form>
