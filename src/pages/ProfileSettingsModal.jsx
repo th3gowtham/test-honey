@@ -3,9 +3,10 @@ import ProfileTab from "./ProfileTab";
 import SettingsTab from "./SettingsTab";
 import AccountTab from "./AccountTab";
 import "../styles/ProfileSettingsModal.css"
+import SlotBooking from "./SlotBooking";
 
 const ProfileSettingsModal = ({ onClose, activeTab, setActiveTab }) => {
-  const tabs = ["Profile", "Settings", "Account"];
+  const tabs = ["Profile", "Settings", "Account","Slots"];
 
   return (
     <div className="modal-backdrop">
@@ -49,6 +50,7 @@ const ProfileSettingsModal = ({ onClose, activeTab, setActiveTab }) => {
           {activeTab === "Profile" && <ProfileTab />}
           {activeTab === "Settings" && <SettingsTab />}
           {activeTab === "Account" && <AccountTab />}
+          {activeTab === "Slots" && <SlotBooking />}
         </div>
       </div>
     </div>

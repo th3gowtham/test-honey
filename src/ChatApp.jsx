@@ -69,11 +69,11 @@ const ChatApp = () => {
       </main>
 
       {/* 🔔 Notification Icon */}
-      <div className="chat-notification" onClick={() => setShowNotifications(true)}>
-        <div>
-          <Bell />
-        </div>
+      {!activeChat && (
+        <div className="chat-notification" onClick={() => setShowNotifications(true)}>
+      <Bell />
       </div>
+      )}
       {/* Modals */}
       {showNotifications && <NotificationModal onClose={() => setShowNotifications(false)} />}
       {showProfileSettings && (

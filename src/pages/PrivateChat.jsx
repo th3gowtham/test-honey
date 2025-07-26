@@ -19,7 +19,7 @@ const PrivateChat = () => {
         <div className="private-actions">
           <button className="private-btn">
             <Calendar size={16} />
-            <span>Book Call</span>
+            <span>Book Session</span>
           </button>
         </div>
       </div>

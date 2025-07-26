@@ -16,7 +16,7 @@ const AnnouncementsView = () => {
         <div className="announcements-actions">
           <button className="announcements-btn">
             <Calendar size={16} />
-            <span>Book Call</span>
+            <span>Book Session</span>
           </button>
         </div>
       </div>
