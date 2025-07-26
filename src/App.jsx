@@ -10,30 +10,31 @@ import Teachers from "./pages/Teachers";
 import Product from "./pages/Product";
 import PlogDetails from "./pages/PlogDetails";
 import Login from "./components/Login";
-import ForgotPassword from "./components/ForgotPassword";
-import ChatApp from './ChatApp' // chat app
+import ForgotPassword from "./components/ForgotPassword"; // retained from your original
+import ChatApp from './ChatApp';
 import AOS from "aos";
 import "aos/dist/aos.css";
 import Header from "./components/Header";
-import { ToastContainer } from "react-toastify";
 import Footer from './components/Footer';
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
-// Import global styles if needed
-// import "./styles/main.css";
-
-function AppContent() {
-  const [showLogin, setShowLogin] = useState(false);
+// App inner content
+function AppContent({ showLogin, setShowLogin }) {
   const location = useLocation();
 
+  const showFooterPaths = [
+    "/", "/about", "/classes", "/contact", "/gallery",
+    "/pg", "/teachers", "/product", "/plog_details"
+  ];
+
+  const showFooter = showFooterPaths.includes(location.pathname);
   const isChatRoute = location.pathname.startsWith('/chat');
-  
-  useEffect(() => {
-    AOS.init({ once: true });
-  }, []);
-  
+
   return (
     <>
       <Header onLoginClick={() => setShowLogin(true)} />
+
       <ToastContainer
         position="top-right"
         autoClose={3000}
@@ -46,6 +47,7 @@ function AppContent() {
         pauseOnHover
         theme="light"
       />
+
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/about" element={<About />} />
@@ -56,15 +58,29 @@ function AppContent() {
         <Route path="/teachers" element={<Teachers />} />
         <Route path="/product" element={<Product />} />
         <Route path="/plog_details" element={<PlogDetails />} />
-        <Route path="/chat" element={<ChatApp />} />  // chat app
-      
+        <Route path="/chat" element={<ChatApp />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
       </Routes>
-      <Footer />
-      {showLogin && (
-        <Login onClose={() => setShowLogin(false)} />
-      )}
+
+      {!isChatRoute && showFooter && <Footer />}
+      {showLogin && <Login onClose={() => setShowLogin(false)} />}
+    </>
+  );
+}
+
+function App() {
+  const [showLogin, setShowLogin] = useState(false);
+
+  useEffect(() => {
+    AOS.init({ once: true });
+  }, []);
+
+  return (
+    <Router>
+      <AppContent showLogin={showLogin} setShowLogin={setShowLogin} />
     </Router>
   );
 }
 
 export default App;
+
