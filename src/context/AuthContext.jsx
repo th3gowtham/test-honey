@@ -36,7 +36,8 @@ export const AuthProvider = ({ children }) => {
   // Fetch user info from backend, return promise for awaiting
   const refreshUser = useCallback(() => {
     setLoading(true);
-    return axios.get('http://localhost:5000/api/auth/me', { withCredentials: true })
+    const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+    return axios.get(`${apiUrl}/api/auth/me`, { withCredentials: true })
       .then(res => {
         // Log what is received from the backend
         console.log("[AuthContext] /api/auth/me response:", res.data);

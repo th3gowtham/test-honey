@@ -239,8 +239,4 @@ input ,select ,textarea{
   pointer-events: auto; /* Allow clicking */
   cursor: pointer;
 }
-input:-internal-autofill-selected {   /* not applying */
- 
-  background-color: azure;
-  color:black;
-}
+/* Autofill styling is now handled globally in index.css */

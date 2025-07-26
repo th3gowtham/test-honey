@@ -59,7 +59,8 @@ const Header = ({ onLoginClick }) => {         // Main Header component that rec
 
   const handleLogout = async () => {
     try {
-      await axios.post('http://localhost:5000/api/auth/logout', {}, { withCredentials: true });
+      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+      await axios.post(`${apiUrl}/api/auth/logout`, {}, { withCredentials: true });
       await logout(); // <-- Wait for state to update!
       navigate('/');
     } catch (error) {

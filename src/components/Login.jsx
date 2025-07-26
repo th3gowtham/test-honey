@@ -15,13 +15,7 @@ import { useAuth } from '../context/AuthContext';
 import React from 'react';
 import ForgotPassword from './ForgotPassword';
 
-// Add global styles for autofill
-const globalStyles = `
-  input:-internal-autofill-selected { 
-    background-color: azure !important; 
-    color: black !important; 
-  }
-`;
+// Autofill styling is now handled in index.css
 
 
 const Login = ({ onClose }) => {
@@ -32,16 +26,7 @@ const Login = ({ onClose }) => {
   const [showForgotPassword, setShowForgotPassword] = useState(false);
   const [form, setForm] = useState({ email: "", password: "", name: "" });
   
-  // Apply global styles
-  React.useEffect(() => {
-    const styleElement = document.createElement('style');
-    styleElement.innerHTML = globalStyles;
-    document.head.appendChild(styleElement);
-    
-    return () => {
-      document.head.removeChild(styleElement);
-    };
-  }, []);
+  // Autofill styling is now handled globally in index.css
 
   const closeModal = () => {
     if (onClose) onClose();
@@ -49,13 +34,14 @@ const Login = ({ onClose }) => {
     else navigate('/');
   };
 
-  // Google login (unchanged)
+  // Google login
   const loginclick = async () => {
     try {
       await setPersistence(auth, rememberMe ? browserLocalPersistence : browserSessionPersistence);
       const result = await signInWithPopup(auth, googleprovider);
       const idToken = await result.user.getIdToken();
-      await axios.post('http://localhost:5000/api/auth/google-login', { idToken, rememberMe }, { withCredentials: true });
+      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+      await axios.post(`${apiUrl}/api/auth/google-login`, { idToken, rememberMe }, { withCredentials: true });
       await login();
       closeModal();
     } catch (err) {
@@ -75,7 +61,8 @@ const Login = ({ onClose }) => {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       await updateProfile(userCredential.user, { displayName: name });
       const idToken = await userCredential.user.getIdToken();
-      await axios.post('http://localhost:5000/api/auth/google-login', { idToken, rememberMe }, { withCredentials: true });
+      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+      await axios.post(`${apiUrl}/api/auth/google-login`, { idToken, rememberMe }, { withCredentials: true });
       await login();
       closeModal();
     } catch (err) {
@@ -101,7 +88,8 @@ const Login = ({ onClose }) => {
       }
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       const idToken = await userCredential.user.getIdToken();
-      await axios.post('http://localhost:5000/api/auth/google-login', { idToken, rememberMe }, { withCredentials: true });
+      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+      await axios.post(`${apiUrl}/api/auth/google-login`, { idToken, rememberMe }, { withCredentials: true });
       await login();
       closeModal();
     } catch (err) {
@@ -175,11 +163,11 @@ const Login = ({ onClose }) => {
         <form onSubmit={isRegister ? handleEmailRegister : handleEmailLogin}>
           {isRegister && (
             <div style={{ marginBottom: 16 }}>
-              <label style={{ display: 'block', marginBottom: 6, fontSize: '0.9rem', color: '#333', fontWeight: 500 }}>Institution / Organization</label>
+              <label style={{ display: 'block', marginBottom: 6, fontSize: '0.9rem', color: '#333', fontWeight: 500 }}>Username</label>
               <input
                 type="text"
                 name="name"
-                placeholder="Enter Institution / Organization name"
+                placeholder="name"
                 value={form.name}
                 onChange={handleChange}
                 style={{ width: "100%", padding: 10, borderRadius: 4, border: '1px solid #ddd', fontSize: '0.9rem' }}
@@ -188,11 +176,11 @@ const Login = ({ onClose }) => {
             </div>
           )}
           <div style={{ marginBottom: 16 }}>
-            <label style={{ display: 'block', marginBottom: 6, fontSize: '0.9rem', color: '#333', fontWeight: 500 }}>Username or Email</label>
+            <label style={{ display: 'block', marginBottom: 6, fontSize: '0.9rem', color: '#333', fontWeight: 500 }}>Email</label>
             <input
               type="email"
               name="email"
-              placeholder="Username or Email"
+              placeholder="Email"
               value={form.email}
               onChange={handleChange}
               style={{ width: "100%", padding: 10, borderRadius: 4, border: '1px solid #ddd', fontSize: '0.9rem' }}
@@ -252,11 +240,7 @@ const Login = ({ onClose }) => {
           </button>
         </form>
 
-        {isRegister && (
-          <div style={{ marginTop: 16, fontSize: '0.8rem', color: '#666', textAlign: 'center' }}>
-            By creating this account, you agree to our <a href="#" style={{ color: '#127d8e', textDecoration: 'none' }}>Privacy Policy</a> & <a href="#" style={{ color: '#127d8e', textDecoration: 'none' }}>Cookie Policy</a>.
-          </div>
-        )}
+      
       </div>
         </div>
       )}
