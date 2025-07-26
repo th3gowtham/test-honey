@@ -10,7 +10,7 @@ const PORT = process.env.PORT || 5000;
 
 // CORS Configuration
 app.use(cors({
-  origin: 'http://localhost:5173',
+  origin: process.env.CLIENT_URL || 'http://localhost:5173',
   credentials: true
 }));
 
@@ -95,5 +95,8 @@ app.use((err, req, res, next) => {
 
 // Start Server
 app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
+  const serverUrl = process.env.NODE_ENV === 'production' 
+    ? 'Production server running' 
+    : `Server running on http://localhost:${PORT}`;
+  console.log(serverUrl);
 });

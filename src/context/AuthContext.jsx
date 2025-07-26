@@ -1,18 +1,43 @@
-import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
+import React from 'react';
+import { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import axios from 'axios';
+import { auth, db } from '../services/firebase';
+import { onAuthStateChanged } from 'firebase/auth';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
+import { addCurrentUserToFirestore, initializeSampleUsers } from '../utils/initializeUsers';
 
 const AuthContext = createContext();
 
+export { AuthContext };
+
 export const AuthProvider = ({ children }) => {
+  const [currentUser, setCurrentUser] = useState(null);
   const [user, setUser] = useState(null);
   const [userRole, setUserRole] = useState(null);
   const [userName, setUserName] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  // Initialize Firebase Auth listener
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      setCurrentUser(user);
+      if (user) {
+        // Add user to Firestore
+        await addCurrentUserToFirestore();
+        // Initialize sample users for testing
+        await initializeSampleUsers();
+      }
+      setLoading(false);
+    });
+
+    return () => unsubscribe();
+  }, []);
+
   // Fetch user info from backend, return promise for awaiting
   const refreshUser = useCallback(() => {
     setLoading(true);
-    return axios.get('http://localhost:5000/api/auth/me', { withCredentials: true })
+    const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+    return axios.get(`${apiUrl}/api/auth/me`, { withCredentials: true })
       .then(res => {
         // Log what is received from the backend
         console.log("[AuthContext] /api/auth/me response:", res.data);
@@ -76,7 +101,8 @@ export const AuthProvider = ({ children }) => {
       login,
       logout,
       loading,
-      refreshUser
+      refreshUser,
+      currentUser // Add Firebase currentUser to context
     }}>
       {children}
     </AuthContext.Provider>

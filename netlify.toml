@@ -6,3 +6,13 @@
   from = "/*"
   to = "/index.html"
   status = 200
+
+# Production environment variables
+[context.production.environment]
+  VITE_API_URL = "https://your-backend-render-url.onrender.com"
+  VITE_CLIENT_URL = "https://your-frontend-netlify-url.netlify.app"
+
+# Branch deploy environment variables - useful for staging/testing
+[context.branch-deploy.environment]
+  VITE_API_URL = "https://your-staging-backend-url.onrender.com"
+  VITE_CLIENT_URL = "https://branch-deploy-preview.netlify.app"
