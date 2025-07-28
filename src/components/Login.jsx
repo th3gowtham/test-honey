@@ -15,7 +15,13 @@ import { useAuth } from '../context/AuthContext';
 import React from 'react';
 import ForgotPassword from './ForgotPassword';
 
-// Autofill styling is now handled in index.css
+// Add global styles for autofill
+const globalStyles = `
+  input:-internal-autofill-selected { 
+    background-color: azure !important; 
+    color: black !important; 
+  }
+`;
 
 
 const Login = ({ onClose }) => {
@@ -26,7 +32,16 @@ const Login = ({ onClose }) => {
   const [showForgotPassword, setShowForgotPassword] = useState(false);
   const [form, setForm] = useState({ email: "", password: "", name: "" });
   
-  // Autofill styling is now handled globally in index.css
+  // Apply global styles
+  React.useEffect(() => {
+    const styleElement = document.createElement('style');
+    styleElement.innerHTML = globalStyles;
+    document.head.appendChild(styleElement);
+    
+    return () => {
+      document.head.removeChild(styleElement);
+    };
+  }, []);
 
   const closeModal = () => {
     if (onClose) onClose();
@@ -40,7 +55,7 @@ const Login = ({ onClose }) => {
       await setPersistence(auth, rememberMe ? browserLocalPersistence : browserSessionPersistence);
       const result = await signInWithPopup(auth, googleprovider);
       const idToken = await result.user.getIdToken();
-      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+      const apiUrl = import.meta.env.VITE_API_URL;
       await axios.post(`${apiUrl}/api/auth/google-login`, { idToken, rememberMe }, { withCredentials: true });
       await login();
       closeModal();
@@ -88,7 +103,7 @@ const Login = ({ onClose }) => {
       }
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       const idToken = await userCredential.user.getIdToken();
-      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+      const apiUrl ='http://localhost:5000';
       await axios.post(`${apiUrl}/api/auth/google-login`, { idToken, rememberMe }, { withCredentials: true });
       await login();
       closeModal();
@@ -176,7 +191,7 @@ const Login = ({ onClose }) => {
             </div>
           )}
           <div style={{ marginBottom: 16 }}>
-            <label style={{ display: 'block', marginBottom: 6, fontSize: '0.9rem', color: '#333', fontWeight: 500 }}>Email</label>
+            <label style={{ display: 'block', marginBottom: 6, fontSize: '0.9rem', color: '#333', fontWeight: 500 }}>Username or Email</label>
             <input
               type="email"
               name="email"
@@ -240,7 +255,6 @@ const Login = ({ onClose }) => {
           </button>
         </form>
 
-      
       </div>
         </div>
       )}

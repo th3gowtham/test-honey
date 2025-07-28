@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "../styles/SettingsTab.css";
 import { toast } from "react-hot-toast";
-import { db } from '../firebaseprofile.js';
+import { db } from '../services/firebase.js';
 import { doc, setDoc, getDoc } from 'firebase/firestore';
 import { Save } from "lucide-react";
 
