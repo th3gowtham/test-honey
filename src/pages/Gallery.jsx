@@ -13,6 +13,7 @@ import img2r from "../assets/2r.png";
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
 import { FaFacebookF, FaInstagram, FaLinkedinIn } from "react-icons/fa6";
+import { useAuth } from "../context/AuthContext";
 
 const images = [
   { src: portfolio1, alt: "img", category: ["all", "playing"] },
@@ -24,6 +25,7 @@ const images = [
 ];
 
 const Gallery = () => {
+  const { user, userName, currentUser } = useAuth();
   const [modalImg, setModalImg] = useState(null);
   const [filter, setFilter] = useState("all");
 
@@ -174,8 +176,18 @@ const Gallery = () => {
               <div className="box">
                 <div className="title fw-bold h4">Newsletter</div>
                 <form onSubmit={e => e.preventDefault()}>
-                  <input type="text" placeholder="Your Name" className="form-control shadow-none fs-5 my-3" />
-                  <input type="email" placeholder="Your Email" className="form-control shadow-none fs-5 my-3" />
+                  <input 
+                    type="text" 
+                    placeholder="Your Name" 
+                    className="form-control shadow-none fs-5 my-3" 
+                    defaultValue={userName || currentUser?.displayName || ''}
+                  />
+                  <input 
+                    type="email" 
+                    placeholder="Your Email" 
+                    className="form-control shadow-none fs-5 my-3" 
+                    defaultValue={user?.email || currentUser?.email || ''}
+                  />
                   <input type="submit" value="Submit Now" className="form-control shadow-none fs-5 my-3 rounded-pill border-0 text-white" />
                 </form>
               </div>
@@ -194,4 +206,4 @@ const Gallery = () => {
   );
 };
 
-export default Gallery; 
+export default Gallery;

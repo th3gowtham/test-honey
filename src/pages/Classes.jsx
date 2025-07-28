@@ -1,16 +1,12 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import { toast } from "react-toastify";
 import CourseCard from "../components/CourseCard";
 import EnquiryModal from "../components/EnquiryModal";
-import { FaFacebookF, FaInstagram, FaLinkedinIn } from "react-icons/fa6";
 import "swiper/css";
 import "../styles/all.min.css";
 import "../styles/bootstrap.min.css";
 import "../styles/swiper-bundle.min.css";
 import "../styles/main.css";
-import img2r from "../assets/2r.png";
 import phoni from "../assets/phoni.jpeg";
 import gram from "../assets/gram.jpg";
 import ha from "../assets/ha.jpg";
@@ -64,7 +60,7 @@ const courses = [
     age: "3+ Years",
     seats: "Upto 5 Kids per Batch",
     duration: "4 Months",
-    fee :3999,
+    fee: 3999,
   },
   {
     imgSrc: math,
@@ -73,7 +69,7 @@ const courses = [
     age: "5+ Years",
     seats: "Upto 5 Kids per Batch",
     duration: "12 Months",
-    fee :3999,
+    fee: 3999,
   },
   {
     imgSrc: s,
@@ -82,7 +78,7 @@ const courses = [
     age: "5+ Years",
     seats: "Upto 5 Kids per Batch",
     duration: "5 Months",
-    fee :3999,
+    fee: 3999,
   },
   {
     imgSrc: portfolio3,
@@ -91,7 +87,7 @@ const courses = [
     age: "5+ Years",
     seats: "Upto 5 Kids per Batch",
     duration: "4 Months",
-    fee :3999,
+    fee: 3999,
   },
   {
     imgSrc: cod,
@@ -100,7 +96,7 @@ const courses = [
     age: "6+ Years",
     seats: "Upto 4 Kids per Batch",
     duration: "3 Months",
-    fee :3999,
+    fee: 3999,
   },
   {
     imgSrc: com,
@@ -109,7 +105,7 @@ const courses = [
     age: "8+ Years",
     seats: "Upto 4 Kids per Batch",
     duration: "6 Months",
-    fee :3999,
+    fee: 3999,
   },
   {
     imgSrc: art,
@@ -118,7 +114,7 @@ const courses = [
     age: "8+ Years",
     seats: "Upto 5 per Batch",
     duration: "3 Months",
-    fee :3999,
+    fee: 3999,
   },
 
 ];
@@ -226,7 +222,7 @@ const advancedCourses = [
 ];
 
 const Classes = () => {
-  const { user } = useAuth();
+  const { user, userName, currentUser } = useAuth();
   const { startPayment, loading } = usePayment();
   const [showLoginNeeded, setShowLoginNeeded] = useState(false);
   const [showEnquiryModal, setShowEnquiryModal] = useState(false);
@@ -283,6 +279,8 @@ const Classes = () => {
         </div>
       </div>
       {/* Advanced Courses Section */}
+      <div className="popular-classes">
+      <div className="container">
       <div className="main-heading text-center">
         <span className="text-uppercase position-relative d-inline-block px-2">Advanced Courses</span>
         <h2 className="fw-bold my-3">Technical & Non-Tech Classes </h2>
@@ -299,90 +297,10 @@ const Classes = () => {
           ))}
         </div>
       </div>
-      <footer>
-        <div className="container text-white">
-          <div className="row row-cols-1 row-cols-md-2 row-cols-lg-4">
-            <div className="col p-3">
-              <div className="box">
-                <Link className="display-5 fw-bold text-decoration-none text-white" to="/">The Honeybee Learning</Link>
-                <p className="my-3">
-                  Our team of passionate educators and experts are dedicated to crafting innovative and effective learning solutions that cater to the diverse needs of our students. We strive to create a warm, inclusive, and supportive community that encourages children to ask questions, think critically, and dream big.
-                </p>
-                <ul className="list-unstyled mb-0 p-0 d-flex gap-2">
-                  <li>
-                    <a href="https://www.facebook.com/share/1Fda1AeJ9o/" aria-label="facebook-icon">
-                      <FaFacebookF className="text-white border rounded-circle p-2" />
-                    </a>
-                  </li>
-                  <li>
-                    <a href="https://www.instagram.com/thehoneybeelearning?igsh=ZmhvNXFoeGtpNGV0" aria-label="instagram-icon">
-                      <FaInstagram className="text-white border rounded-circle p-2" />
-                    </a>
-                  </li>
-                  <li>
-                    <a href="https://www.linkedin.com/in/the-honey-bee-learning-006512370/" aria-label="linkedin-icon">
-                      <FaLinkedinIn className="text-white border rounded-circle p-2" />
-                    </a>
-                  </li>
-                </ul>
-              </div>
-            </div>
-            <div className="col p-3">
-              <div className="box">
-                <div className="title fw-bold h4">Get In Touch</div>
-                <div className="email d-flex mt-3 gap-3">
-                  <div className="flex-shrink-0">
-                    <i className="icon fa-solid fa-envelope fa-xl"></i>
-                  </div>
-                  <div className="flex-grow-1">
-                    <div className="h4">Email</div>
-                    <div>thehoneybeelearning@gmail.com</div>
-                  </div>
-                </div>
-                <div className="phone d-flex mt-3 gap-3">
-                  <div className="flex-shrink-0">
-                    <i className="icon fa-solid fa-phone fa-xl"></i>
-                  </div>
-                  <div className="flex-grow-1">
-                    <div className="h4">Phone</div>
-                    <div>+91 88704 01288</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div className="col p-3">
-              <div className="box">
-                <div className="title fw-bold h4">Quick Links</div>
-                <div className="links">
-                  <Link to="/" className="d-block text-decoration-none text-white mt-2 px-4 position-relative">Home</Link>
-                  <Link to="/about" className="d-block text-decoration-none text-white mt-2 px-4 position-relative">About Us</Link>
-                  <Link to="/classes" className="d-block text-decoration-none text-white mt-2 px-4 position-relative">Our Classes</Link>
-                  <Link to="/teachers" className="d-block text-decoration-none text-white mt-2 px-4 position-relative">Our Teachers</Link>
-                  <Link to="/product" className="d-block text-decoration-none text-white mt-2 px-4 position-relative">Products</Link>
-                  <Link to="/contact" className="d-block text-decoration-none text-white mt-2 px-4 position-relative">Contact Us</Link>
-                </div>
-              </div>
-            </div>
-            <div className="col p-3">
-              <div className="box">
-                <div className="title fw-bold h4">Newsletter</div>
-                <form onSubmit={e => e.preventDefault()}>
-                  <input type="text" placeholder="Your Name" className="form-control shadow-none fs-5 my-3" />
-                  <input type="email" placeholder="Your Email" className="form-control shadow-none fs-5 my-3" />
-                  <input type="submit" value="Submit Now" className="form-control shadow-none fs-5 my-3 rounded-pill border-0 text-white" />
-                </form>
-              </div>
-            </div>
-          </div>
-          <div className="copy-right text-center border-top">
-            &copy;{' '}
-            <a href="#" className="text-decoration-none">
-              <span>The Honeybee Learning</span>
-            </a>{' '}
-            All Rights Reserved
-          </div>
-        </div>
-      </footer>
+      
+      </div>
+      </div>
+      
       <EnquiryModal
         show={showEnquiryModal}
         onClose={handleCloseModal}

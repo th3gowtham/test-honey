@@ -48,6 +48,24 @@ button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
 }
 
+/* Override browser's default autofill styling */
+input:-webkit-autofill,
+input:-webkit-autofill:hover, 
+input:-webkit-autofill:focus, 
+input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 30px #f0ffff inset !important;
+  -webkit-text-fill-color: #000 !important;
+  transition: background-color 5000s ease-in-out 0s;
+}
+
+/* For Firefox and other browsers */
+input:-internal-autofill-selected {
+  appearance: none !important;
+  background-color: #f0ffff !important;
+  background-image: none !important;
+  color: #000 !important;
+}
+
 @media (prefers-color-scheme: light) {
   :root {
     color: #213547;

@@ -4,6 +4,8 @@
   height: 100vh;
   font-family: 'Segoe UI', sans-serif;
   background-color: #f9fafb;
+  overflow: hidden; /* prevent full-page scroll */
+  /* position: relative; */
 }
 
 /* Header */
@@ -15,6 +17,7 @@
   background-color: white;
   border-bottom: 1px solid #e5e7eb;
   flex-wrap: wrap;
+   flex-shrink: 0; /* prevent from shrinking */
 }
 
 .private-header-info {
@@ -81,12 +84,23 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
+  min-height: 0;
 }
 
 .private-message {
   display: flex;
   gap: 10px;
   align-items: flex-start;
+  margin-bottom: 16px;
+}
+
+.private-message.sent {
+  flex-direction: row-reverse;
+  align-self: flex-end;
+}
+
+.private-message.received {
+  align-self: flex-start;
 }
 
 .message-avatar {
@@ -102,6 +116,10 @@
   justify-content: center;
 }
 
+.private-message.sent .message-avatar {
+  background-color: #3b82f6; /* Blue for sent messages */
+}
+
 .message-meta {
   display: flex;
   align-items: center;
@@ -109,6 +127,10 @@
   font-size: 11px;
   color: #6b7280;
   margin-bottom: 4px;
+}
+
+.private-message.sent .message-meta {
+  flex-direction: row-reverse;
 }
 
 .message-bubble {
@@ -120,8 +142,31 @@
   color: #111827;
 }
 
+.private-message.sent .message-bubble {
+  background-color: #3b82f6; /* Blue for sent messages */
+  color: white;
+  border-top-right-radius: 0;
+}
+
+.private-message.received .message-bubble {
+  background-color: #e5e7eb;
+  border-top-left-radius: 0;
+}
+
+.no-messages {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  color: #6b7280;
+  font-style: italic;
+  text-align: center;
+  padding: 20px;
+}
+
 /* Input */
 .private-input {
+    flex-shrink: 0; /* don't grow or shrink */
   padding: 10px;
   background-color: white;
   border-top: 1px solid #e5e7eb;

@@ -23,7 +23,8 @@ export const PaymentProvider = ({ children }) => {
     }
     try {
       setLoading(true);
-      const response = await fetch("http://localhost:5000/api/payment/order", {
+      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+      const response = await fetch(`${apiUrl}/api/payment/order`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -47,7 +48,8 @@ export const PaymentProvider = ({ children }) => {
         order_id: orderId,
         handler: async function (razorpayResponse) {
           try {
-            const verifyResponse = await fetch("http://localhost:5000/api/payment/verify", {
+            const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+            const verifyResponse = await fetch(`${apiUrl}/api/payment/verify`, {
               method: "POST",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({
