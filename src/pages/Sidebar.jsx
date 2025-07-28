@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { getUserChats } from '../utils/chatUtils';
 
+
 const Sidebar = ({ currentView, setCurrentView, setActiveChat, setShowProfileSettings, setProfileTab, users }) => {
   const { currentUser } = useAuth();
   const [isMobile, setIsMobile] = useState(false);
@@ -78,7 +79,6 @@ const Sidebar = ({ currentView, setCurrentView, setActiveChat, setShowProfileSet
       </div>
     </div>
   );
-
   const BottomNav = () => (
     <div className="mobile-bottom-nav">
       <div className={`nav-item ${currentView === 'batch-broadcasts' ? 'active' : ''}`} onClick={() => setCurrentView('batch-broadcasts')}>
@@ -99,7 +99,6 @@ const Sidebar = ({ currentView, setCurrentView, setActiveChat, setShowProfileSet
       </div>
     </div>
   );
-
   const Header = () => (
     <div className="sidebar-user-info">
       <div className="sidebar-user-header">
@@ -116,12 +115,10 @@ const Sidebar = ({ currentView, setCurrentView, setActiveChat, setShowProfileSet
       </div>
     </div>
   );
-
   return (
     <div className="chat-layout">
       {/* ✅ Only for Desktop */}
       {!isMobile && <LeftNavBar />}
-
       <div className={`sidebar ${isMobile ? 'mobile-sidebar' : ''}`}>
         <Header />
         <div className="sidebar-search">
@@ -135,8 +132,8 @@ const Sidebar = ({ currentView, setCurrentView, setActiveChat, setShowProfileSet
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
+          {isMobile && currentView=="welcome" && <WelcomeScreen /> }
         </div>
-
         {/* ✅ Chat list based on view */}
         <div className="sidebar-chat-list">
           {currentView === 'batch-broadcasts' && (
@@ -148,7 +145,6 @@ const Sidebar = ({ currentView, setCurrentView, setActiveChat, setShowProfileSet
               <div className="chat-badge">3</div>
             </div>
           )}
-
           {currentView === 'private-chat' && (
             <>
               {/* Default chat option */}
@@ -175,7 +171,6 @@ const Sidebar = ({ currentView, setCurrentView, setActiveChat, setShowProfileSet
               ))}
             </>
           )}
-
           {currentView === 'announcements' && (
             <div className="chat-item" onClick={() => setActiveChat({ type: 'announcement', name: 'Community Announcements', id: 'community' })}>
               <div>
@@ -187,9 +182,8 @@ const Sidebar = ({ currentView, setCurrentView, setActiveChat, setShowProfileSet
           )}
         </div>
       </div>
-
       {/* ✅ Only for Mobile */}
-      {isMobile && <BottomNav />}
+      {isMobile && <BottomNav /> }
     </div>
   );
 };
