@@ -178,11 +178,11 @@ const Login = ({ onClose }) => {
         <form onSubmit={isRegister ? handleEmailRegister : handleEmailLogin}>
           {isRegister && (
             <div style={{ marginBottom: 16 }}>
-              <label style={{ display: 'block', marginBottom: 6, fontSize: '0.9rem', color: '#333', fontWeight: 500 }}>Institution / Organization</label>
+              <label style={{ display: 'block', marginBottom: 6, fontSize: '0.9rem', color: '#333', fontWeight: 500 }}>Username</label>
               <input
                 type="text"
                 name="name"
-                placeholder="Enter Institution / Organization name"
+                placeholder="name"
                 value={form.name}
                 onChange={handleChange}
                 style={{ width: "100%", padding: 10, borderRadius: 4, border: '1px solid #ddd', fontSize: '0.9rem' }}
@@ -255,11 +255,6 @@ const Login = ({ onClose }) => {
           </button>
         </form>
 
-        {isRegister && (
-          <div style={{ marginTop: 16, fontSize: '0.8rem', color: '#666', textAlign: 'center' }}>
-            By creating this account, you agree to our <a href="#" style={{ color: '#127d8e', textDecoration: 'none' }}>Privacy Policy</a> & <a href="#" style={{ color: '#127d8e', textDecoration: 'none' }}>Cookie Policy</a>.
-          </div>
-        )}
       </div>
         </div>
       )}
