@@ -24,9 +24,6 @@ const ChatApp = () => {
   const [isMobileView, setIsMobileView] = useState(false);
   const [showSidebar, setShowSidebar] = useState(true);
   const [users, setUsers] = useState([]);
-
- 
-
   useEffect(() => {
     const handleResize = () => {
       setIsMobileView(window.innerWidth < 768);
@@ -62,8 +59,6 @@ const ChatApp = () => {
     
     fetchUsers();
   }, [currentUser]);
-
-  
   return (
     <div className="chat-app">
       {/* Sidebar */}

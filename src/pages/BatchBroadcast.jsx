@@ -7,8 +7,7 @@ const BatchBroadcast = () => {
   const [showBookModal, setShowBookModal] = useState(false);
 
   return (
-    <div>
-      <div className="batch-broadcast">
+    <div className="batch-broadcast">
       {/* Header */}
       <div className="batch-header">
         <div className="batch-header-info">
@@ -74,7 +73,6 @@ const BatchBroadcast = () => {
         onClose={() => setShowBookModal(false)}
         collectionName="batchBroadcastBookings"
       />
-    </div>
     </div>
   );
 };
