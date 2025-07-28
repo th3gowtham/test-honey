@@ -47,7 +47,6 @@ button:focus,
 button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
 }
-
 /* Override browser's default autofill styling */
 input:-webkit-autofill,
 input:-webkit-autofill:hover, 

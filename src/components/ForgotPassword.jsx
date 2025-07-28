@@ -4,7 +4,13 @@ import { auth } from '../services/firebase';
 import { useNavigate } from 'react-router-dom';
 import React from 'react';
 
-// Autofill styling is now handled in index.css
+// Add global styles for autofill
+const globalStyles = `
+  input:-internal-autofill-selected { 
+    background-color: azure !important; 
+    color: black !important; 
+  }
+`;
 
 const ForgotPassword = ({ onClose }) => {
   const navigate = useNavigate();
@@ -12,7 +18,16 @@ const ForgotPassword = ({ onClose }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [message, setMessage] = useState({ text: '', type: '' });
   
-  // Autofill styling is now handled globally in index.css
+  // Apply global styles
+  React.useEffect(() => {
+    const styleElement = document.createElement('style');
+    styleElement.innerHTML = globalStyles;
+    document.head.appendChild(styleElement);
+    
+    return () => {
+      document.head.removeChild(styleElement);
+    };
+  }, []);
 
   const closeModal = () => {
     if (onClose) onClose();
