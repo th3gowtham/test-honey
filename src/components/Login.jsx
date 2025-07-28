@@ -195,7 +195,7 @@ const Login = ({ onClose }) => {
             <input
               type="email"
               name="email"
-              placeholder="Username or Email"
+              placeholder="Email"
               value={form.email}
               onChange={handleChange}
               style={{ width: "100%", padding: 10, borderRadius: 4, border: '1px solid #ddd', fontSize: '0.9rem' }}
