@@ -22,12 +22,9 @@ const BatchBroadcast = () => {
         <div className="batch-actions">
           <button className="batch-btn" onClick={() => setShowBookModal(true)}>
             <Calendar size={16} />
-            <span>Book Call</span>
+            <span>Book Session</span>
           </button>
           <div>
-            <button className="batch-more-btn">
-              <MoreVertical size={20} />
-            </button>
           </div>
           {/* Removed View Booked Calls button */}
           {/* <button className="view-bookings-btn" onClick={() => setShowBookingList(true)}>

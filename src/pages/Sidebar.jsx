@@ -3,6 +3,8 @@ import "../styles/Sidebar.css";
 import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { getUserChats } from '../utils/chatUtils';
+import WelcomeScreen from  "../pages/WelcomeScreen"
+
 
 
 const Sidebar = ({ currentView, setCurrentView, setActiveChat, setShowProfileSettings, setProfileTab, users }) => {
@@ -76,6 +78,7 @@ const Sidebar = ({ currentView, setCurrentView, setActiveChat, setShowProfileSet
         onClick={() => setShowProfileSettings(true)}
       >
         <User />
+        {currentView === ""}
       </div>
     </div>
   );
@@ -93,7 +96,12 @@ const Sidebar = ({ currentView, setCurrentView, setActiveChat, setShowProfileSet
         <Users2 />
         <span>Communities</span>
       </div>
-      <div className={`nav-item ${currentView === 'announcements' ? 'active' : ''}`} onClick={() => setShowProfileSettings(true)}>
+      <div className={`nav-item ${currentView === 'profile' ? 'active' : ''}`} onClick={() => {
+        setCurrentView('profile');
+        setShowProfileSettings(true);
+      }}>
+
+    
         <User />
         <span>Profile</span>
       </div>

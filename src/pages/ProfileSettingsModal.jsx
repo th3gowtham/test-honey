@@ -3,10 +3,14 @@ import ProfileTab from "./ProfileTab";
 import SettingsTab from "./SettingsTab";
 import AccountTab from "./AccountTab";
 import "../styles/ProfileSettingsModal.css"
+import SlotBooking from "./SlotBooking";
 
-const ProfileSettingsModal = ({ onClose, activeTab, setActiveTab }) => {
+
+const ProfileSettingsModal = ({ onClose, activeTab, setActiveTab, userRole }) => {
   const tabs = ["Profile", "Settings", "Account"];
-
+   if (userRole === "Teacher") {
+    tabs.push("Slots");
+  }
   return (
     <div className="modal-backdrop">
       {/* Modal Container */}
@@ -49,6 +53,8 @@ const ProfileSettingsModal = ({ onClose, activeTab, setActiveTab }) => {
           {activeTab === "Profile" && <ProfileTab />}
           {activeTab === "Settings" && <SettingsTab />}
           {activeTab === "Account" && <AccountTab />}
+          {activeTab === "Slots" && userRole === "Teacher" && <SlotBooking />}
+
         </div>
       </div>
     </div>

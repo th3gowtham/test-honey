@@ -16,6 +16,7 @@
   background-color: white;
   border-bottom: 1px solid #e5e7eb;
   flex-wrap: wrap;
+  border-radius: 40px;
 }
 
 .batch-header-info {
@@ -65,7 +66,7 @@
   align-items: center;
   font-size: 12px;
   gap: 4px;
-  margin-right: 60px;
+  margin-right: 10px;
 }
 
 .batch-more-btn {
