@@ -1,5 +1,5 @@
 /* Toggle checkbox styling (optional) */
-input[type="checkbox"] {
+.settings-toggle input[type="checkbox"] {
   width: 36px;
   height: 18px;
   appearance: none;
@@ -10,7 +10,7 @@ input[type="checkbox"] {
   transition: background 0.3s ease;
 }
 
-input[type="checkbox"]::before {
+.settings-toggle input[type="checkbox"]::before {
   content: "";
   width: 16px;
   height: 16px;
@@ -22,11 +22,11 @@ input[type="checkbox"]::before {
   transition: transform 0.3s ease;
 }
 
-input[type="checkbox"]:checked {
+.settings-toggle input[type="checkbox"]:checked {
   background: #10b981;
 }
 
-input[type="checkbox"]:checked::before {
+.settings-toggle input[type="checkbox"]:checked::before {
   transform: translateX(20px);
 }
 

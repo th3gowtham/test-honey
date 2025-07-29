@@ -13,8 +13,13 @@ const CourseCard = ({
 }) => (
   <div className="col p-3">
     <div className="class bg-light text-center rounded overflow-hidden border" data-aos="fade-up">
-      <div className="image">
-        <img src={imgSrc} className="img-fluid" alt="img" />
+      <div className="image d-flex justify-content-center align-items-center" style={{ width: '100%', height: 220, background: '#f8fcfd' }}>
+        <img
+          src={imgSrc}
+          className="img-fluid"
+          alt="img"
+          style={{ width: 420, height: 220, objectFit: 'cover', boxShadow: '0 2px 8px rgba(18,125,142,0.04)' }}
+        />
       </div>
       <div className="content p-4">
         <h3 className="m-0">{title}</h3>
