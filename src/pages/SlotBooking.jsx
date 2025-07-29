@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Calendar, Clock } from 'lucide-react';
+import { db } from '../services/firebase';
+import { collection, doc, setDoc, onSnapshot } from 'firebase/firestore';
 import '../styles/SlotBooking.css';
 
 const SlotBooking = () => {
@@ -10,11 +12,43 @@ const SlotBooking = () => {
     { id: 3, date: '', fromTime: '', toTime: '', fromPeriod: 'AM', toPeriod: 'AM' }
   ]);
 
+
+
+  // 🔄 Listen to real-time updates from Firestore
+  useEffect(() => {
+    const unsubscribe = onSnapshot(collection(db, 'teacherSlots'), (snapshot) => {
+      const fetched = snapshot.docs.map(doc => doc.data());
+
+      setSlots(prev =>
+        prev.map(slot =>
+          fetched.find(s => s.id === slot.id) || slot
+        )
+      );
+    });
+
+    return () => unsubscribe();
+  }, []);
+
   useEffect(() => {
     const handleResize = () => setWindowWidth(window.innerWidth);
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
+
+
+  const handleSave = async () => {
+    try {
+      for (const slot of slots) {
+        if (slot.date && slot.fromTime && slot.toTime) {
+          const docRef = doc(db, 'teacherSlots', `slot-${slot.id}`);
+          await setDoc(docRef, slot);
+        }
+      }
+      alert("Slots saved successfully!");
+    } catch (error) {
+      console.error("Error saving slots:", error);
+    }
+  };
 
   const updateSlot = (slotId, field, value) => {
     setSlots(prev => prev.map(slot => slot.id === slotId ? { ...slot, [field]: value } : slot));
@@ -27,28 +61,43 @@ const SlotBooking = () => {
         prev.map(slot =>
           slot.id === targetSlotId
             ? {
-                ...slot,
-                date: sourceSlot.date,
-                fromTime: sourceSlot.fromTime,
-                toTime: sourceSlot.toTime,
-                fromPeriod: sourceSlot.fromPeriod,
-                toPeriod: sourceSlot.toPeriod
-              }
+              ...slot,
+              date: sourceSlot.date,
+              fromTime: sourceSlot.fromTime,
+              toTime: sourceSlot.toTime,
+              fromPeriod: sourceSlot.fromPeriod,
+              toPeriod: sourceSlot.toPeriod
+            }
             : slot
         )
       );
     }
   };
 
-  const clearSlot = (slotId) => {
-    setSlots(prev =>
-      prev.map(slot =>
-        slot.id === slotId
-          ? { ...slot, date: '', fromTime: '', toTime: '', fromPeriod: 'AM', toPeriod: 'AM' }
-          : slot
-      )
-    );
+  const clearSlot = async (slotId) => {
+  const clearedSlot = {
+    id: slotId,
+    date: '',
+    fromTime: '',
+    toTime: '',
+    fromPeriod: 'AM',
+    toPeriod: 'AM',
   };
+
+  setSlots(prev =>
+    prev.map(slot =>
+      slot.id === slotId ? clearedSlot : slot
+    )
+  );
+
+  try {
+    const docRef = doc(db, 'teacherSlots', `slot-${slotId}`);
+    await setDoc(docRef, clearedSlot);
+  } catch (error) {
+    console.error("Error clearing slot:", error);
+  }
+};
+
 
   const generateTimeOptions = () => {
     const times = [];
@@ -68,7 +117,7 @@ const SlotBooking = () => {
   return (
     <div className={`booking-wrapper ${isMobile ? 'mobile' : isTablet ? 'tablet' : 'desktop'}`}>
       <div className="booking-card">
-        <h2 className="booking-title">Student Availability Booking</h2>
+        <h2 className="booking-title">Teacher Availability Booking</h2>
 
         {slots.map((slot, index) => (
           <div key={slot.id} className="slot-card">
@@ -151,7 +200,8 @@ const SlotBooking = () => {
             )}
           </div>
         ))}
-        <button className="submit-btn">
+
+        <button className="submit-btn" onClick={handleSave}>
           Save Slot
         </button>
       </div>

@@ -78,7 +78,6 @@ const Sidebar = ({ currentView, setCurrentView, setActiveChat, setShowProfileSet
         onClick={() => setShowProfileSettings(true)}
       >
         <User />
-        {currentView === ""}
       </div>
     </div>
   );

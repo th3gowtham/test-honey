@@ -40,11 +40,6 @@ const AccountTab = () => {
 
       {/* Danger Zone Section */}
       <div className="danger-zone">
-        <h3 className="danger-zone-title">Danger Zone</h3>
-        <p className="danger-zone-text">
-          These actions cannot be undone
-        </p>
-
         <button onClick={Signout} className="sign-out-button">
           <span className="sign-out-icon">▷</span>
           Sign Out
