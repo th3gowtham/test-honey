@@ -4,6 +4,8 @@
   height: 100vh;
   font-family: 'Segoe UI', sans-serif;
   background-color: #f9fafb;
+  position: relative;
+  z-index: 10;
 }
 
 /* Header */
@@ -141,6 +143,7 @@
 
 /* 🔧 Mobile responsiveness */
 @media (max-width: 420px) {
+  
    .announcements-header-info {
   padding-left: 0; /* remove extra left padding */
   margin-left: -15px; /* pull slightly left towards back button */
@@ -200,7 +203,7 @@
     padding-left: 15px; /* Slight left padding for avatar & text */
   }
   .announcements-btn{
-     transform: translateY(-15px);
+    margin-bottom: 5px;
    
   }
   
@@ -225,5 +228,12 @@
 
   .announcements-header-info {
     padding-left: 15px;
+  }
+}
+@media (max-width : 768px){
+  .announcements-container{
+    position: fixed;
+    width: 100%;
+    /* background-color: red; */
   }
 }
