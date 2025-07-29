@@ -29,12 +29,17 @@ function AppContent({ showLogin, setShowLogin }) {
     "/pg", "/teachers", "/product", "/plog_details"
   ];
 
+  const showHeaderPaths = [
+    "/", "/about", "/classes", "/contact", "/gallery",
+    "/pg", "/teachers", "/product", "/plog_details"
+  ];
+
   const showFooter = showFooterPaths.includes(location.pathname);
   const isChatRoute = location.pathname.startsWith('/chat');
 
   return (
     <>
-      <Header onLoginClick={() => setShowLogin(true)} />
+      {showHeaderPaths.includes(location.pathname) && <Header onLoginClick={() => setShowLogin(true)} />} 
 
       <ToastContainer
         position="top-right"

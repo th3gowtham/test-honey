@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { auth } from '../services/firebase';
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
+import { useAuth } from '../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 const eyeIcons = {
   open: (
@@ -42,6 +44,8 @@ const TeacherLogin = () => {
   const [success, setSuccess] = useState(false);
 
   const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+  const { login } = useAuth();
+  const navigate = useNavigate();
 
   // On mount, check if email exists in Teacher collection
   useEffect(() => {
@@ -76,15 +80,25 @@ const TeacherLogin = () => {
     setMessage('');
     try {
       const lowerEmail = email.trim().toLowerCase();
-      // Register teacher in Firebase Auth
+      // Register in Firebase Auth
       await createUserWithEmailAndPassword(auth, lowerEmail, password);
       setMessage('Registration successful! Logging you in...');
-      // Log in the teacher (optional, but usually automatic after registration)
+      // Log in the teacher
       await signInWithEmailAndPassword(auth, lowerEmail, password);
+
+      // --- THIS IS THE CRITICAL PART ---
+      // Set session cookie by calling backend login endpoint
+      const idToken = await auth.currentUser.getIdToken();
+      await axios.post(`${apiUrl}/api/auth/google-login`, { idToken, rememberMe: true }, { withCredentials: true });
+
+      // Update global auth state
+      await login();
+
       setSuccess(true);
       setMessage('Welcome! Redirecting to your dashboard...');
-      // Optionally, redirect after a delay
-      // setTimeout(() => window.location.href = '/teacher-dashboard', 2000);
+      setTimeout(() => {
+        navigate('/chat');
+      }, 1000);
     } catch (err) {
       if (err.code === 'auth/email-already-in-use') {
         setMessage('This email is already registered. Please try logging in.');
