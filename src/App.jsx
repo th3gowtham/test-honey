@@ -5,6 +5,7 @@ import About from "./pages/About";
 import Classes from "./pages/Classes";
 import Contact from "./pages/Contact";
 import Gallery from "./pages/Gallery";
+import TeacherLogin from "./pages/TeacherLogin";
 import Pg from "./pages/Pg";
 import Teachers from "./pages/Teachers";
 import Product from "./pages/Product";
@@ -28,12 +29,17 @@ function AppContent({ showLogin, setShowLogin }) {
     "/pg", "/teachers", "/product", "/plog_details"
   ];
 
+  const showHeaderPaths = [
+    "/", "/about", "/classes", "/contact", "/gallery",
+    "/pg", "/teachers", "/product", "/plog_details"
+  ];
+
   const showFooter = showFooterPaths.includes(location.pathname);
   const isChatRoute = location.pathname.startsWith('/chat');
 
   return (
     <>
-      <Header onLoginClick={() => setShowLogin(true)} />
+      {showHeaderPaths.includes(location.pathname) && <Header onLoginClick={() => setShowLogin(true)} />} 
 
       <ToastContainer
         position="top-right"
@@ -60,6 +66,7 @@ function AppContent({ showLogin, setShowLogin }) {
         <Route path="/plog_details" element={<PlogDetails />} />
         <Route path="/chat" element={<ChatApp />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/teacher-login" element={<TeacherLogin />} />
       </Routes>
 
       {!isChatRoute && showFooter && <Footer />}

@@ -2,10 +2,14 @@
 // This gives us access to Firebase Authentication and Firestore database
 const { auth, db } = require('../config/firebaseAdmin');  
 
+// At the top, add bcrypt for password hashing
+const bcrypt = require('bcryptjs');
+
 // Helper: assign role (reuse your logic)
 // This helper function now correctly checks for Admins and Teachers
 // and returns the name stored in the database for them.
 async function getUserRoleAndName(email, nameFromToken) {
+  email = email.trim().toLowerCase();
   // 1. Check for Admin
   const adminSnapshot = await db.collection('Admin').where('Gmail', '==', email).get();
   if (!adminSnapshot.empty) {
@@ -86,7 +90,7 @@ const handleGoogleLogin = async (req, res) => {
   const { idToken, rememberMe } = req.body;
   try {
     const decoded = await auth.verifyIdToken(idToken);
-    const email = decoded.email.toLowerCase();
+    const email = decoded.email.trim().toLowerCase();
     // Pass the name from the token to the helper function.
     // It will only be used if a NEW student is being created.
     const nameFromToken = decoded.name || decoded.displayName;
@@ -116,10 +120,89 @@ const handleGoogleLogin = async (req, res) => {
   }
 };
 
+// Teacher password setup endpoint
+const setTeacherPassword = async (req, res) => {
+  const { email, password } = req.body;
+  if (!email || !password) return res.status(400).json({ error: 'Email and password required' });
+  const lowerEmail = email.trim().toLowerCase();
+  try {
+    // Check if email is in Teacher collection
+    const teacherSnap = await db.collection('Teacher').where('Gmail', '==', lowerEmail).get();
+    if (teacherSnap.empty) {
+      return res.status(403).json({ error: 'Access denied: Not a teacher' });
+    }
+
+    // Hash the password
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Update the teacher document with the hashed password
+    const teacherDocId = teacherSnap.docs[0].id;
+    await db.collection('Teacher').doc(teacherDocId).update({ password: hashedPassword });
+
+    res.json({ message: 'Password set successfully' });
+  } catch (err) {
+    console.error("[setTeacherPassword] Error:", err);
+    res.status(500).json({ error: 'Failed to set password' });
+  }
+};
+
+// Teacher login endpoint
+const teacherLogin = async (req, res) => {
+  const { email, password } = req.body;
+  if (!email || !password) return res.status(400).json({ error: 'Email and password required' });
+  const lowerEmail = email.trim().toLowerCase();
+  try {
+    // Check if email is in Teacher collection
+    const teacherSnap = await db.collection('Teacher').where('Gmail', '==', lowerEmail).get();
+    if (teacherSnap.empty) {
+      return res.status(403).json({ error: 'Access denied: Not a teacher' });
+    }
+
+    const teacherData = teacherSnap.docs[0].data();
+    if (!teacherData.password) {
+      return res.status(403).json({ error: 'Password not set. Please set your password first.' });
+    }
+
+    // Compare password
+    const isMatch = await bcrypt.compare(password, teacherData.password);
+    if (!isMatch) {
+      return res.status(401).json({ error: 'Invalid password' });
+    }
+
+    // You can generate a session/token here if needed
+    res.json({ message: 'Login successful', role: 'Teacher', name: teacherData.name });
+  } catch (err) {
+    console.error("[teacherLogin] Error:", err);
+    res.status(500).json({ error: 'Login failed' });
+  }
+};
+
 const logout = (req, res) => {
   res.clearCookie('session', { path: '/' });
   res.json({ message: 'Logged out' });
 };
 
-module.exports = { handleGoogleLogin, logout, getUserRoleAndName, handleEmailRegister };
+// Check if teacher exists endpoint
+const teacherExists = async (req, res) => {
+  const email = (req.query.email || '').trim().toLowerCase();
+  console.log('[teacherExists] Received email:', email);
+  if (!email) return res.status(400).json({ exists: false });
+  try {
+    console.log('[teacherExists] Querying Teacher collection for Gmail ==', email);
+    const teacherSnap = await db.collection('Teacher').where('Gmail', '==', email).get();
+    console.log('[teacherExists] Query result empty:', teacherSnap.empty, 'Count:', teacherSnap.size);
+    if (!teacherSnap.empty) {
+      console.log('[teacherExists] Teacher found for email:', email);
+      return res.json({ exists: true });
+    } else {
+      console.log('[teacherExists] Teacher NOT found for email:', email);
+      return res.json({ exists: false });
+    }
+  } catch (err) {
+    console.error('[teacherExists] Error:', err);
+    return res.status(500).json({ exists: false });
+  }
+};
+
+module.exports = { handleGoogleLogin, logout, getUserRoleAndName, handleEmailRegister, setTeacherPassword, teacherLogin, teacherExists };
 

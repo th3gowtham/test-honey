@@ -68,6 +68,7 @@ const SettingsTab = () => {
           </div>
           <input
             type="checkbox"
+            className="settings-toggle"
             checked={preferences.message}
             onChange={() => handleToggle("message")}
           />
@@ -80,6 +81,7 @@ const SettingsTab = () => {
           </div>
           <input
             type="checkbox"
+            className="settings-toggle"
             checked={preferences.booking}
             onChange={() => handleToggle("booking")}
           />
@@ -92,6 +94,7 @@ const SettingsTab = () => {
           </div>
           <input
             type="checkbox"
+            className="settings-toggle"
             checked={preferences.announcement}
             onChange={() => handleToggle("announcement")}
           />
@@ -104,6 +107,7 @@ const SettingsTab = () => {
           </div>
           <input
             type="checkbox"
+            className="settings-toggle"
             checked={preferences.email}
             onChange={() => handleToggle("email")}
           />
@@ -122,6 +126,7 @@ const SettingsTab = () => {
           </div>
           <input
             type="checkbox"
+            className="settings-toggle"
             checked={preferences.darkMode}
             onChange={() => handleToggle("darkMode")}
           />
@@ -134,6 +139,7 @@ const SettingsTab = () => {
           </div>
           <input
             type="checkbox"
+            className="settings-toggle"
             checked={preferences.soundEffects}
             onChange={() => handleToggle("soundEffects")}
           />

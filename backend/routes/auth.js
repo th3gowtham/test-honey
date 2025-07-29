@@ -4,7 +4,7 @@ const express = require('express');
 
 // Import our authentication controller functions
 // Controllers contain the actual logic for handling requests (like login processing)
-const { handleGoogleLogin, logout, getUserRoleAndName, handleEmailRegister } = require('../controllers/authController');
+const { handleGoogleLogin, logout, getUserRoleAndName, handleEmailRegister, setTeacherPassword, teacherLogin, teacherExists } = require('../controllers/authController');
 
 // Import middleware for session verification
 const verifySessionCookie = require('../middleware/authMiddleware');
@@ -38,6 +38,13 @@ router.get('/me', verifySessionCookie, async (req, res) => {
 
 // Registration endpoint (for email/password)
 router.post('/register', handleEmailRegister);
+
+// Teacher exists endpoint
+router.get('/teachers/exists', teacherExists);
+
+// Teacher password setup endpoint
+router.post('/teachers/set-password', setTeacherPassword);
+router.post('/teachers/login', teacherLogin);
 
 // Export the router so it can be used in our main server file
 // This connects our routes to the main Express application
