@@ -9,7 +9,7 @@ import ChatAssignment from "../admin/components/chat-assignment";
 import BatchAssignment from "../admin/components/batch-assignment";
 import EventsManagement from "../admin/components/events-management";
 import Settings from "../admin/components/settings";
-import "../admin/globals.css";
+import "../admin/admin_globals.css";
 
 export default function AdminDashboard() {
   const [activeRoute, setActiveRoute] = useState("dashboard");

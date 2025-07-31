@@ -36,7 +36,7 @@ export default function Sidebar({ activeRoute, setActiveRoute, collapsed, setCol
           {collapsed ? <FiMenu /> : <FiX />}
         </button>
       )}
-      <div className={`sidebar ${collapsed ? "collapsed" : ""} ${isMobile ? "mobile" : ""} ${!collapsed && isMobile ? "mobile-open" : ""}`}>
+      <div className={`admin-sidebar ${collapsed ? "collapsed" : ""} ${isMobile ? "mobile" : ""} ${!collapsed && isMobile ? "mobile-open" : ""}`}>
         <div className="sidebar-header">
           <div className="logo">{!collapsed && <span>EduAdmin</span>}</div>
           <button 
