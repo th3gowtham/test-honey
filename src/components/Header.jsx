@@ -58,10 +58,11 @@ const Header = ({ onLoginClick }) => {         // Main Header component that rec
 
 
   const handleLogout = async () => {
+   
     try {
       const apiUrl = import.meta.env.VITE_API_URL;
       await axios.post(`${apiUrl}/api/auth/logout`, {}, { withCredentials: true });
-      await logout(); // <-- Wait for state to update!
+      await logout(); // <-- Wait for state to update!  
       navigate('/');
     } catch (error) {
       console.error('Logout failed:', error);
@@ -71,7 +72,7 @@ const Header = ({ onLoginClick }) => {         // Main Header component that rec
 
 
   return (
-    // Main navigation bar with light background and shadow, sticky positioning
+    // Main navigation bar with light background and shadow, sticky positioning  `${apiUrl}/api/auth/logout`
     <nav className="navbar navbar-expand-lg bg-light shadow-lg sticky-top custom-navbar">
       <div className="container-fluid px-3">
         {/* Logo and brand section */}

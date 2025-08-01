@@ -23,7 +23,7 @@ export const PaymentProvider = ({ children }) => {
     }
     try {
       setLoading(true);
-      const apiUrl = 'http://localhost:5000';
+      const apiUrl = import.meta.env.VITE_API_URL;
       const response = await fetch(`${apiUrl}/api/payment/order`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
