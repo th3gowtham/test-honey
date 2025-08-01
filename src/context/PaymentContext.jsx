@@ -23,7 +23,7 @@ export const PaymentProvider = ({ children }) => {
     }
     try {
       setLoading(true);
-      const apiUrl = import.meta.env.VITE_API_URL;
+      const apiUrl = 'https://thehoneybee-gl4r.onrender.com';
       const response = await fetch(`${apiUrl}/api/payment/order`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -48,7 +48,7 @@ export const PaymentProvider = ({ children }) => {
         order_id: orderId,
         handler: async function (razorpayResponse) {
           try {
-            const apiUrl = import.meta.env.VITE_API_URL;
+            const apiUrl = 'https://thehoneybee-gl4r.onrender.com';
             const verifyResponse = await fetch(`${apiUrl}/api/payment/verify`, {
               method: "POST",
               headers: { "Content-Type": "application/json" },
