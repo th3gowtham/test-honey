@@ -66,12 +66,15 @@ const SettingsTab = () => {
             <h4>Message Notifications</h4>
             <p>Get notified about new messages</p>
           </div>
-          <input
-            type="checkbox"
-            className="settings-toggle"
-            checked={preferences.message}
-            onChange={() => handleToggle("message")}
-          />
+          <label className="settings-toggle-switch">
+            <input
+              type="checkbox"
+              className="settings-toggle-checkbox"
+              checked={preferences.message}
+              onChange={() => handleToggle("message")}
+            />
+            <span className="settings-toggle-slider"></span>
+          </label>
         </div>
 
         <div className="preference-item">
@@ -79,12 +82,15 @@ const SettingsTab = () => {
             <h4>Booking Notifications</h4>
             <p>Get notified about booking requests and updates</p>
           </div>
-          <input
-            type="checkbox"
-            className="settings-toggle"
-            checked={preferences.booking}
-            onChange={() => handleToggle("booking")}
-          />
+          <label className="settings-toggle-switch">
+            <input
+              type="checkbox"
+              className="settings-toggle-checkbox"
+              checked={preferences.booking}
+              onChange={() => handleToggle("booking")}
+            />
+            <span className="settings-toggle-slider"></span>
+          </label>
         </div>
 
         <div className="preference-item">
@@ -92,12 +98,15 @@ const SettingsTab = () => {
             <h4>Announcement Notifications</h4>
             <p>Get notified about community announcements</p>
           </div>
-          <input
-            type="checkbox"
-            className="settings-toggle"
-            checked={preferences.announcement}
-            onChange={() => handleToggle("announcement")}
-          />
+          <label className="settings-toggle-switch">
+            <input
+              type="checkbox"
+              className="settings-toggle-checkbox"
+              checked={preferences.announcement}
+              onChange={() => handleToggle("announcement")}
+            />
+            <span className="settings-toggle-slider"></span>
+          </label>
         </div>
 
         <div className="preference-item">
@@ -105,12 +114,15 @@ const SettingsTab = () => {
             <h4>Email Notifications</h4>
             <p>Receive notifications via email</p>
           </div>
-          <input
-            type="checkbox"
-            className="settings-toggle"
-            checked={preferences.email}
-            onChange={() => handleToggle("email")}
-          />
+          <label className="settings-toggle-switch">
+            <input
+              type="checkbox"
+              className="settings-toggle-checkbox"
+              checked={preferences.email}
+              onChange={() => handleToggle("email")}
+            />
+            <span className="settings-toggle-slider"></span>
+          </label>
         </div>
       </div>
 
@@ -124,12 +136,15 @@ const SettingsTab = () => {
             <h4>Dark Mode</h4>
             <p>Switch to dark theme</p>
           </div>
-          <input
-            type="checkbox"
-            className="settings-toggle"
-            checked={preferences.darkMode}
-            onChange={() => handleToggle("darkMode")}
-          />
+          <label className="settings-toggle-switch">
+            <input
+              type="checkbox"
+              className="settings-toggle-checkbox"
+              checked={preferences.darkMode}
+              onChange={() => handleToggle("darkMode")}
+            />
+            <span className="settings-toggle-slider"></span>
+          </label>
         </div>
 
         <div className="preference-item">
@@ -137,12 +152,15 @@ const SettingsTab = () => {
             <h4>Sound Effects</h4>
             <p>Play sounds for notifications</p>
           </div>
-          <input
-            type="checkbox"
-            className="settings-toggle"
-            checked={preferences.soundEffects}
-            onChange={() => handleToggle("soundEffects")}
-          />
+          <label className="settings-toggle-switch">
+            <input
+              type="checkbox"
+              className="settings-toggle-checkbox"
+              checked={preferences.soundEffects}
+              onChange={() => handleToggle("soundEffects")}
+            />
+            <span className="settings-toggle-slider"></span>
+          </label>
         </div>
 
         <div style={{ display: "flex", justifyContent: "center", alignItems: "center", width: "100%", marginTop: "1.5rem" }}>

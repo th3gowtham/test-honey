@@ -43,7 +43,7 @@ const TeacherLogin = () => {
   const [accessAllowed, setAccessAllowed] = useState(false);
   const [success, setSuccess] = useState(false);
 
-  const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+  const apiUrl = import.meta.env.VITE_API_URL;
   const { login } = useAuth();
   const navigate = useNavigate();
 
@@ -80,18 +80,35 @@ const TeacherLogin = () => {
     setMessage('');
     try {
       const lowerEmail = email.trim().toLowerCase();
-      // Register in Firebase Auth
-      await createUserWithEmailAndPassword(auth, lowerEmail, password);
-      setMessage('Registration successful! Logging you in...');
-      // Log in the teacher
+      
+      // Step 1: Set password in Teacher collection
+      await axios.post(`${apiUrl}/api/auth/teachers/set-password`, {
+        email: lowerEmail,
+        password: password
+      }, { withCredentials: true });
+
+      setMessage('Password set successfully! Creating account...');
+
+      // Step 2: Create Firebase Auth user (like registration)
+      try {
+        await createUserWithEmailAndPassword(auth, lowerEmail, password);
+        setMessage('Account created! Logging you in...');
+      } catch (firebaseErr) {
+        // If user already exists in Firebase Auth, that's fine - continue with login
+        if (firebaseErr.code !== 'auth/email-already-in-use') {
+          throw firebaseErr;
+        }
+        setMessage('Account exists! Logging you in...');
+      }
+
+      // Step 3: Sign in with Firebase Auth to get ID token
       await signInWithEmailAndPassword(auth, lowerEmail, password);
-
-      // --- THIS IS THE CRITICAL PART ---
-      // Set session cookie by calling backend login endpoint
       const idToken = await auth.currentUser.getIdToken();
-      await axios.post(`${apiUrl}/api/auth/google-login`, { idToken, rememberMe: true }, { withCredentials: true });
 
-      // Update global auth state
+      // Step 4: Create session using the ID token (like regular login)
+      await axios.post(`${apiUrl}/api/auth/google-login`, { idToken }, { withCredentials: true });
+
+      // Step 5: Update global auth state
       await login();
 
       setSuccess(true);
@@ -100,8 +117,10 @@ const TeacherLogin = () => {
         navigate('/chat');
       }, 1000);
     } catch (err) {
-      if (err.code === 'auth/email-already-in-use') {
-        setMessage('This email is already registered. Please try logging in.');
+      if (err.response?.data?.error) {
+        setMessage(err.response.data.error);
+      } else if (err.code === 'auth/email-already-in-use') {
+        setMessage('This email is already registered. Please try logging in with the main login form.');
       } else {
         setMessage(err.message || 'An error occurred');
       }
@@ -124,7 +143,7 @@ const TeacherLogin = () => {
   return (
     <div style={{
       minHeight: '100vh',
-      background: 'linear-gradient(135deg, #eaf6fa 0%, #f7fbfc 100%)',
+      backgroundColor: '#f7fbfc',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
@@ -144,7 +163,7 @@ const TeacherLogin = () => {
         transition: 'box-shadow 0.2s',
       }}>
         <h2 style={{
-          color: '#127d8e',
+          color: '#333333',
           fontWeight: 700,
           marginBottom: 18,
           fontSize: '1.7rem',
@@ -271,9 +290,9 @@ const TeacherLogin = () => {
               <div
                 style={{
                   marginTop: 20,
-                  color: message.startsWith('Welcome') || message.startsWith('Registration successful') ? '#127d8e' : '#d32f2f',
-                  background: message.startsWith('Welcome') || message.startsWith('Registration successful') ? '#eaf6fa' : '#fff6f6',
-                  border: message.startsWith('Welcome') || message.startsWith('Registration successful') ? '1.5px solid #127d8e33' : '1.5px solid #d32f2f33',
+                  color: message.startsWith('Welcome') || message.startsWith('Password set successfully') || message.startsWith('Account created') || message.startsWith('Account exists') ? '#127d8e' : '#d32f2f',
+                  background: message.startsWith('Welcome') || message.startsWith('Password set successfully') || message.startsWith('Account created') || message.startsWith('Account exists') ? '#eaf6fa' : '#fff6f6',
+                  border: message.startsWith('Welcome') || message.startsWith('Password set successfully') || message.startsWith('Account created') || message.startsWith('Account exists') ? '1.5px solid #127d8e33' : '1.5px solid #d32f2f33',
                   borderRadius: 6,
                   padding: '12px 10px',
                   fontWeight: 500,

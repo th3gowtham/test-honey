@@ -54,7 +54,7 @@ const WelcomeScreen = () => {
             fontSize: "1.25rem",
             color: "#111827",
             marginBottom: "0.5rem",
-            fontWeight: "bold"
+           
           }}
         >
           Welcome to HoneyBee Chat
@@ -65,7 +65,7 @@ const WelcomeScreen = () => {
             fontSize: "0.875rem",
             color: "#4b5563",
             lineHeight: "1.5rem",
-            fontWeight: "bold"
+           
           }}
         >
           Select a chat from the sidebar to start messaging
