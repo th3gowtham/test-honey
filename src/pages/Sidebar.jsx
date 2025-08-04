@@ -109,17 +109,15 @@ const Sidebar = ({ currentView, setCurrentView, setActiveChat, setShowProfileSet
   const Header = () => (
     <div className="sidebar-user-info">
       <div className="sidebar-user-header">
-        <div>
-          <h1 className="sidebar-title">HoneyBee Learning</h1>
-        </div>
+        <h1 className="sidebar-title">HoneyBee Learning</h1>
       </div>
-      <div className="sidebar-user-details">
+      {/* <div className="sidebar-user-details">
         <div className="sidebar-user-tags">
           <span className="user-name">John Doe</span>
           <span className="user-role">Student</span>
         </div>
         <p className="user-email">john@honeybee.com</p>
-      </div>
+      </div> */}
     </div>
   );
   return (
