@@ -37,7 +37,7 @@ export const AuthProvider = ({ children }) => {
   // Fetch user info from backend, return promise for awaiting
   const refreshUser = useCallback(() => {
     
-    const apiUrl = import.meta.env.VITE_API_URL;
+    const apiUrl = 'https://thehoneybee-gl4r.onrender.com';
     return axios.get(`${apiUrl}/api/auth/me`, { withCredentials: true })
       .then(res => {
         // Log what is received from the backend
@@ -100,7 +100,7 @@ export const AuthProvider = ({ children }) => {
       await signOut(auth);
 
       // 2. Backend logout
-      const apiUrl = import.meta.env.VITE_API_URL;
+      const apiUrl = 'https://thehoneybee-gl4r.onrender.com';
       await axios.post(`${apiUrl}/api/auth/logout`, {}, { withCredentials: true });
 
       // 3. Reset user state

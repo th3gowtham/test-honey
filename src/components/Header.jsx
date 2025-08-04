@@ -60,7 +60,7 @@ const Header = ({ onLoginClick }) => {         // Main Header component that rec
   const handleLogout = async () => {
    
     try {
-      const apiUrl = import.meta.env.VITE_API_URL;
+      const apiUrl = 'https://thehoneybee-gl4r.onrender.com';
       await axios.post(`${apiUrl}/api/auth/logout`, {}, { withCredentials: true });
       await logout(); // <-- Wait for state to update!  
       navigate('/');

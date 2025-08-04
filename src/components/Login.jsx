@@ -80,7 +80,7 @@ const Login = ({ onClose }) => {
     try {
       const result = await signInWithPopup(auth, googleprovider);
       const idToken = await result.user.getIdToken();
-      const apiUrl = import.meta.env.VITE_API_URL;
+      const apiUrl = 'https://thehoneybee-gl4r.onrender.com';
       await axios.post(`${apiUrl}/api/auth/google-login`, { idToken }, { withCredentials: true });
       await login();
       closeModal();
@@ -102,7 +102,7 @@ const Login = ({ onClose }) => {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       await updateProfile(userCredential.user, { displayName: name });
       const idToken = await userCredential.user.getIdToken();
-      const apiUrl = import.meta.env.VITE_API_URL;
+      const apiUrl = 'https://thehoneybee-gl4r.onrender.com';
       await axios.post(`${apiUrl}/api/auth/google-login`, { idToken, name }, { withCredentials: true });
       await login();
       closeModal();
@@ -130,7 +130,7 @@ const Login = ({ onClose }) => {
       }
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       const idToken = await userCredential.user.getIdToken();
-      const apiUrl =import.meta.env.VITE_API_URL;
+      const apiUrl ='https://thehoneybee-gl4r.onrender.com';
       await axios.post(`${apiUrl}/api/auth/google-login`, { idToken }, { withCredentials: true });
       await login();
       closeModal();
