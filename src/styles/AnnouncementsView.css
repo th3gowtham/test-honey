@@ -18,8 +18,8 @@
   background-color: white;
   border-bottom: 1px solid #e5e7eb;
   flex-wrap: wrap;
-  border-radius: 40px;
   flex-shrink: 0;
+  background-color: lightgray;
 }
 
 .announcements-header-info {
@@ -148,6 +148,9 @@
   font-size: 0.875rem;
   color: #1f2937;
 }
+.announcements-footer{
+  background-color: lightgray;
+}
 
 /* 🔧 Mobile responsiveness */
 @media (max-width: 420px) {
@@ -272,25 +275,70 @@
     width: 100%;
   }
 }
-@media (max-width: 492px){
-    .announcements-header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 8px;
-  }
+/* Drop down container */
 
-  .announcements-actions {
-    width: 100%;
-    justify-content: flex-start;
-    margin-top: 8px;
-  }
-
-  .announcements-btn {
-    transform: translateY(0);
-    margin-right: 0;
-  }
-
-  .announcements-header-info {
-    padding-left: 15px;
-  }
+.session-btn-dropdown-container {
+  position: relative;
+  display: inline-block;
 }
+
+/* Icon button */
+.session-btn-dropdown-toggle {
+  all: unset; /* resets everything */
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 50%;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  color: inherit;
+  font: inherit;
+  line-height: normal;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.session-btn-dropdown-toggle:hover {
+  background-color: #f0f0f0;
+}
+
+/* Dropdown menu */
+.session-btn-dropdown-menu {
+  position: absolute;
+  right: 0;
+  margin-top: 8px;
+  background-color: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  width: 160px;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+}
+.session-btn-dropdown-toggle::after {
+  content: none !important; /* ensures arrow is never generated */
+}
+
+/* Each item */
+.session-btn-dropdown-item {
+  padding: 10px 16px;
+  background: none;
+  border: none;
+  text-align: left;
+  width: 100%;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.session-btn-dropdown-item:hover {
+  background-color: #f5f5f5;
+}
+
+
+
+
+

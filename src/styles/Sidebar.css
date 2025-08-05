@@ -66,7 +66,7 @@
   width: 400px;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 769px) {
   .sidebar {
     position: fixed;
     top: 0;
@@ -291,7 +291,7 @@
   color: #10b981;
 }
 
-@media (min-width: 768px) {
+@media (min-width: 769px) {
   .mobile-bottom-nav {
     display: none;
   }

@@ -1,10 +1,23 @@
 import { Calendar, MoreVertical, Send } from 'lucide-react';
 import "../styles/BatchBroadcast.css";
 import BookCallModal from '../components/BookCallModal';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useRef } from "react";
+
 
 const BatchBroadcast = () => {
   const [showBookModal, setShowBookModal] = useState(false);
+  const [showMenu, setShowMenu] = useState(false);
+  const menuRef = useRef(null);
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (menuRef.current && !menuRef.current.contains(event.target)) {
+        setShowMenu(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   return (
     <div className="batch-broadcast">
@@ -19,17 +32,35 @@ const BatchBroadcast = () => {
             <p>📢 Broadcast • 25 students</p>
           </div>
         </div>
-        <div className="batch-actions">
-          <button className="batch-btn" onClick={() => setShowBookModal(true)}>
-            <Calendar size={16} />
-            <span>Book Session</span>
+        
+        <div className="session-btn-dropdown-container" ref={menuRef}>
+          <button 
+          className="session-btn-dropdown-toggle"
+          onClick={() => setShowMenu((prev) => !prev)}
+          role='button'
+          tabIndex={0}
+          >
+            <MoreVertical size={23} />
           </button>
-          <div>
-          </div>
-          {/* Removed View Booked Calls button */}
-          {/* <button className="view-bookings-btn" onClick={() => setShowBookingList(true)}>
-            View Booked Calls
-          </button> */}
+          {showMenu && (
+            <div className="session-btn-dropdown-menu">
+              <button
+                className="session-btn-dropdown-item"
+                onClick={() => setShowBookModal(true)}
+              >
+                Book Session
+              </button>
+              <button
+                className="session-btn-dropdown-item"
+                onClick={() => {
+                  console.log("View File clicked");
+                  setShowMenu(false);
+                }}
+              >
+                View File
+              </button>
+            </div>
+          )}
         </div>
       </div>
 

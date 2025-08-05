@@ -4,7 +4,7 @@
   align-items: center;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 769px) {
   .chat-sidebar {
     position: absolute;
     left: 0;
@@ -35,6 +35,7 @@
     background: none;
     border: none;
     cursor: pointer;
+    position: fixed;
   }
 
   .chat-notification {
