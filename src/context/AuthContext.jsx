@@ -5,6 +5,7 @@ import { auth, db } from '../services/firebase';
 import { onAuthStateChanged } from 'firebase/auth';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { addCurrentUserToFirestore, initializeSampleUsers } from '../utils/initializeUsers';
+import { signOut } from "firebase/auth";
 
 const AuthContext = createContext();
 
@@ -35,8 +36,8 @@ export const AuthProvider = ({ children }) => {
 
   // Fetch user info from backend, return promise for awaiting
   const refreshUser = useCallback(() => {
-    setLoading(true);
-    const apiUrl = import.meta.env.VITE_API_URL;
+    
+    const apiUrl = 'https://thehoneybee-gl4r.onrender.com';
     return axios.get(`${apiUrl}/api/auth/me`, { withCredentials: true })
       .then(res => {
         // Log what is received from the backend
@@ -85,10 +86,30 @@ export const AuthProvider = ({ children }) => {
     broadcastAuthEvent();
     return p;
   };
-  const logout = () => {
-    const p = refreshUser();
-    broadcastAuthEvent();
-    return p;
+
+  const logout = async () => {
+    setLoading(true);
+    try {
+      // 1. Firebase sign out
+      await signOut(auth);
+
+      // 2. Backend logout
+      const apiUrl = import.meta.env.VITE_API_URL;
+      await axios.post(`${apiUrl}/api/auth/logout`, {}, { withCredentials: true });
+
+      // 3. Reset user state
+      setUser(null);
+      setUserRole(null);
+      setUserName(null);
+      setCurrentUser && setCurrentUser(null); // Only if you have this
+
+      // 4. Broadcast event (optional)
+      broadcastAuthEvent && broadcastAuthEvent();
+    } catch (err) {
+      console.error('Logout failed:', err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
