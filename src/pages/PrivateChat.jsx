@@ -82,7 +82,7 @@ const PrivateChat = ({ activeChat, receiverId: propReceiverId }) => {
         <div className="private-actions">
           <button className="private-btn" onClick={() => setShowBookModal(true)}>
             <Calendar size={16} />
-            <span>Book Call</span>
+            <span>Book Session</span>
           </button>
         </div>
       </div>

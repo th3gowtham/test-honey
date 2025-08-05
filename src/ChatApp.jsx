@@ -11,10 +11,11 @@ import AnnouncementsView from './pages/AnnouncementsView';
 import NotificationModal from "./pages/NotificationModal";
 import ProfileSettingsModal from './pages/ProfileSettingsModal';
 import BatchBroadcast from "./pages/BatchBroadcast";
+import SlotBooking from './pages/SlotBooking';
 import "./styles/ChatApp.css"
-
 const ChatApp = () => {
-  const { currentUser } = useAuth();
+  const { currentUser, userRole} = useAuth();
+   
   const [currentView, setCurrentView] = useState('welcome');
   const [activeChat, setActiveChat] = useState(null);
   const [showNotifications, setShowNotifications] = useState(false);
@@ -23,7 +24,6 @@ const ChatApp = () => {
   const [isMobileView, setIsMobileView] = useState(false);
   const [showSidebar, setShowSidebar] = useState(true);
   const [users, setUsers] = useState([]);
-
   useEffect(() => {
     const handleResize = () => {
       setIsMobileView(window.innerWidth < 768);
@@ -59,7 +59,6 @@ const ChatApp = () => {
     
     fetchUsers();
   }, [currentUser]);
-  
   return (
     <div className="chat-app">
       {/* Sidebar */}
@@ -102,27 +101,15 @@ const ChatApp = () => {
         {activeChat && activeChat.type === 'batch' && <BatchBroadcast activeChat={activeChat} />}
         {activeChat && activeChat.type === 'private' && <PrivateChat receiverId={activeChat.id} activeChat={activeChat.name} />}
         {activeChat && activeChat.type === 'announcement' && <AnnouncementsView />}
+        
       </main>
 
       {/* 🔔 Notification Icon */}
-      <div className="chat-notification" onClick={() => setShowNotifications(true)}>
-        <div>
-          <Bell />
-        </div>
+      {!activeChat && (
+        <div className="chat-notification" onClick={() => setShowNotifications(true)}>
+      <Bell />
       </div>
-
-      {/* 🐝 Profile Icon */}
-      
-      {!(isMobileView && activeChat) && (
-        <div
-          className="chat-profile"
-          // onClick={() => setShowProfileSettings(true)}
-        >
-          <span>🐝</span>
-        </div>
       )}
-
-
       {/* Modals */}
       {showNotifications && <NotificationModal onClose={() => setShowNotifications(false)} />}
       {showProfileSettings && (
@@ -130,6 +117,7 @@ const ChatApp = () => {
           onClose={() => setShowProfileSettings(false)}
           activeTab={profileTab}
           setActiveTab={setProfileTab}
+            userRole={userRole} // ✅ Add this
         />
       )}
     </div>

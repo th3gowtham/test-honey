@@ -103,12 +103,9 @@ const BatchBroadcast = ({ activeChat }) => {
           
           <button className="batch-btn" onClick={() => setShowBookModal(true)}>
             <Calendar size={16} />
-            <span>Book Call</span>
+            <span>Book Session</span>
           </button>
           <div>
-            <button className="batch-more-btn">
-              <MoreVertical size={20} />
-            </button>
           </div>
         </div>
       </div>

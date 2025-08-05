@@ -4,6 +4,8 @@
   height: 100vh;
   font-family: 'Segoe UI', sans-serif;
   background-color: #f9fafb;
+  position: relative;
+  z-index: 10;
 }
 
 /* Header */
@@ -15,6 +17,7 @@
   background-color: white;
   border-bottom: 1px solid #e5e7eb;
   flex-wrap: wrap;
+  border-radius: 40px;
 }
 
 .announcements-header-info {
@@ -65,7 +68,7 @@
   align-items: center;
   font-size: 12px;
   gap: 4px;
-  margin-right: 60px;
+  margin-right: 10px;
 }
 
 .announcements-more-btn {
@@ -140,6 +143,7 @@
 
 /* 🔧 Mobile responsiveness */
 @media (max-width: 420px) {
+  
    .announcements-header-info {
   padding-left: 0; /* remove extra left padding */
   margin-left: -15px; /* pull slightly left towards back button */
@@ -199,7 +203,7 @@
     padding-left: 15px; /* Slight left padding for avatar & text */
   }
   .announcements-btn{
-     transform: translateY(-15px);
+    margin-bottom: 5px;
    
   }
   
@@ -224,5 +228,12 @@
 
   .announcements-header-info {
     padding-left: 15px;
+  }
+}
+@media (max-width : 768px){
+  .announcements-container{
+    position: fixed;
+    width: 100%;
+    /* background-color: red; */
   }
 }
