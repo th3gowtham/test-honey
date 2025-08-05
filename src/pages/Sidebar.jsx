@@ -13,6 +13,42 @@ const Sidebar = ({ currentView, setCurrentView, setActiveChat, setShowProfileSet
   const [searchTerm, setSearchTerm] = useState('');
   const [chats, setChats] = useState([]);
 
+  // Batches array - component-based mapping
+  const batches = [
+    {
+      id: 'Math101',
+      name: 'Math 101 Batch',
+      students: 25,
+      unread: 3,
+      teacher: 'Sarah Johnson',
+      subject: 'Mathematics'
+    },
+    {
+      id: 'Science101',
+      name: 'Science 101 Batch',
+      students: 22,
+      unread: 1,
+      teacher: 'Dr. Smith',
+      subject: 'Science'
+    },
+    {
+      id: 'English101',
+      name: 'English 101 Batch',
+      students: 28,
+      unread: 0,
+      teacher: 'Ms. Davis',
+      subject: 'English'
+    },
+    {
+      id: 'History101',
+      name: 'History 101 Batch',
+      students: 20,
+      unread: 2,
+      teacher: 'Prof. Wilson',
+      subject: 'History'
+    }
+  ];
+
   useEffect(() => {
     const handleResize = () => {
       setIsMobile(window.innerWidth <= 768);
@@ -61,7 +97,17 @@ const Sidebar = ({ currentView, setCurrentView, setActiveChat, setShowProfileSet
   
   console.log('[DEBUG] Sidebar: Filtered group chats:', filteredGroupChats);
 
-
+  // Handle batch click
+  const handleBatchClick = (batch) => {
+    setActiveChat({
+      type: 'batch',
+      name: batch.name,
+      id: batch.id,
+      students: batch.students,
+      teacher: batch.teacher,
+      subject: batch.subject
+    });
+  };
 
   const LeftNavBar = () => (
     <div className="left-nav-icons">
@@ -157,13 +203,23 @@ const Sidebar = ({ currentView, setCurrentView, setActiveChat, setShowProfileSet
         {/* ✅ Chat list based on view */}
         <div className="sidebar-chat-list">
           {currentView === 'batch-broadcasts' && (
-            <div className="chat-item" onClick={() => setActiveChat({ type: 'batch', name: 'Math 101 Batch', id: 'math101' })}>
-              <div>
-                <h3 className="chat-title">Math 101 Batch</h3>
-                <p className="chat-subtitle">25 students</p>
-              </div>
-              <div className="chat-badge">3</div>
-            </div>
+            <>
+              {batches.map((batch) => (
+                <div 
+                  key={batch.id} 
+                  className="chat-item" 
+                  onClick={() => handleBatchClick(batch)}
+                >
+                  <div>
+                    <h3 className="chat-title">{batch.name}</h3>
+                    <p className="chat-subtitle">{batch.students} students • {batch.subject}</p>
+                  </div>
+                  {batch.unread > 0 && (
+                    <div className="chat-badge">{batch.unread}</div>
+                  )}
+                </div>
+              ))}
+            </>
           )}
           {currentView === 'private-chat' && (
             <>
