@@ -19,6 +19,7 @@ import Header from "./components/Header";
 import Footer from './components/Footer';
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { Toaster } from "react-hot-toast";
 
 // App inner content
 function AppContent({ showLogin, setShowLogin }) {
@@ -52,6 +53,29 @@ function AppContent({ showLogin, setShowLogin }) {
         draggable
         pauseOnHover
         theme="light"
+      />
+      
+      <Toaster
+        position="top-right"
+        toastOptions={{
+          duration: 3000,
+          style: {
+            background: '#363636',
+            color: '#fff',
+          },
+          success: {
+            duration: 3000,
+            style: {
+              background: '#14b8a6',
+            },
+          },
+          error: {
+            duration: 4000,
+            style: {
+              background: '#ef4444',
+            },
+          },
+        }}
       />
 
       <Routes>

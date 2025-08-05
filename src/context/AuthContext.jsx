@@ -109,7 +109,10 @@ export const AuthProvider = ({ children }) => {
       setUserName(null);
       setCurrentUser && setCurrentUser(null); // Only if you have this
 
-      // 4. Broadcast event (optional)
+      // 4. Clear localStorage flag
+      localStorage.removeItem('isLoggedIn');
+
+      // 5. Broadcast event (optional)
       broadcastAuthEvent && broadcastAuthEvent();
     } catch (err) {
       console.error('Logout failed:', err);

@@ -9,10 +9,10 @@
 
 # Production environment variables
 [context.production.environment]
-  VITE_API_URL = "https://your-backend-render-url.onrender.com"
-  VITE_CLIENT_URL = "https://your-frontend-netlify-url.netlify.app"
+  VITE_API_URL = "https://thehoneybee-gl4r.onrender.com"
+  VITE_CLIENT_URL = "https://thehoneybee.netlify.app"
 
 # Branch deploy environment variables - useful for staging/testing
 [context.branch-deploy.environment]
-  VITE_API_URL = "https://your-staging-backend-url.onrender.com"
-  VITE_CLIENT_URL = "https://branch-deploy-preview.netlify.app"
+  VITE_API_URL = "https://thehoneybee-gl4r.onrender.com"
+  VITE_CLIENT_URL = "https://thehoneybee.netlify.app"
