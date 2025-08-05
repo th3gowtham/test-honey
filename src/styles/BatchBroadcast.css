@@ -275,7 +275,9 @@
   .batch-actions {
     width: 100%;
     justify-content: flex-start;
-    margin-top: 8px;
+    margin-top: 4px;
+    margin-left: 65%;
+    position: absolute;
   }
 
   .batch-btn {
@@ -295,3 +297,4 @@
     /* background-color: red; */
   }
 }
+
