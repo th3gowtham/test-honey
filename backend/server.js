@@ -10,7 +10,8 @@ const PORT = process.env.PORT || 5000;
 
 // CORS Configuration
 app.use(cors({
-  origin:'https://thehoneybee.netlify.app' ,
+
+  origin: process.env.CLIENT_URL ,
   credentials: true
 }));
 
