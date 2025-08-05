@@ -2,18 +2,22 @@ import { User, X } from "lucide-react";
 import ProfileTab from "./ProfileTab";
 import SettingsTab from "./SettingsTab";
 import AccountTab from "./AccountTab";
-import "../styles/ProfileSettingsModal.css"
-import SlotBooking from "./SlotBooking";
-
+import SlotBooking from "./SlotBooking"; // Only needed for Teacher
+import "../styles/ProfileSettingsModal.css";
 
 const ProfileSettingsModal = ({ onClose, activeTab, setActiveTab, userRole }) => {
+  // Base tabs for everyone
   const tabs = ["Profile", "Settings", "Account"];
-   if (userRole === "Teacher") {
+
+  // --- MODIFICATION START ---
+  // Add "Slots" tab only for Teacher
+  if (userRole === "Teacher") {
     tabs.push("Slots");
   }
+  // --- MODIFICATION END ---
+
   return (
     <div className="modal-backdrop">
-      {/* Modal Container */}
       <div className="modal-container">
         {/* Header */}
         <div className="modal-header">
@@ -54,7 +58,6 @@ const ProfileSettingsModal = ({ onClose, activeTab, setActiveTab, userRole }) =>
           {activeTab === "Settings" && <SettingsTab />}
           {activeTab === "Account" && <AccountTab />}
           {activeTab === "Slots" && userRole === "Teacher" && <SlotBooking />}
-
         </div>
       </div>
     </div>
