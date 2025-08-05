@@ -314,7 +314,12 @@ const Home = () => {
                   <div className="item py-2 px-4 position-relative d-flex align-items-center border-top justify-content-center justify-content-md-start">Creativity and Innovation</div>
                 </div>
               </div>
-              <Link to="/classes" className="main-link mb-2 mb-lg-0 d-inline-block text-decoration-none text-white py-2 px-4 rounded-pill">Join Class</Link>
+             <div className="d-flex flex-column align-items-center">
+  <Link to="/classes" className="d-flex flex-column align-items-center main-link mb-2 text-decoration-none text-white py-2 px-4 rounded-pill">
+    Join Class
+  </Link>
+</div>
+
             </div>
           </div>
         </div>
@@ -362,7 +367,7 @@ const Home = () => {
                     Commitment to Inclusivity
                   </li>
                 </ul>
-                <a href="https://wa.me/message/BITGLQYLAPJRO1" className="main-link mb-2 mb-lg-0 d-inline-block text-decoration-none text-white py-2 px-4 rounded-pill">Join Class</a>
+                <a href="https://wa.me/message/BITGLQYLAPJRO1" className=" flex-column align-items-center main-link mb-2 text-decoration-none text-white py-2 px-4 rounded-pill">Join Class</a>
               </div>
             </div>
           </div>
