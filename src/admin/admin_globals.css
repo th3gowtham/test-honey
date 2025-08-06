@@ -1220,10 +1220,10 @@ body {
 
 /* Common Styles */
 .btn {
-  padding: 12px 24px;
+
   border: none;
   border-radius: 8px;
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;

@@ -5,7 +5,7 @@ import { toast } from "react-toastify";
 const PaymentContext = createContext();
 
 export const PaymentProvider = ({ children }) => {
-  const { user, userRole ,userName } = useAuth();
+  const { user, userRole, userName } = useAuth();
   const [loading, setLoading] = useState(false);
 
   const startPayment = async (course) => {
@@ -23,7 +23,7 @@ export const PaymentProvider = ({ children }) => {
     }
     try {
       setLoading(true);
-      const apiUrl = 'https://thehoneybee-gl4r.onrender.com';
+      const apiUrl = import.meta.env.VITE_API_URL;
       const response = await fetch(`${apiUrl}/api/payment/order`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -48,7 +48,7 @@ export const PaymentProvider = ({ children }) => {
         order_id: orderId,
         handler: async function (razorpayResponse) {
           try {
-            const apiUrl = 'https://thehoneybee-gl4r.onrender.com';
+            const apiUrl = import.meta.env.VITE_API_URL;
             const verifyResponse = await fetch(`${apiUrl}/api/payment/verify`, {
               method: "POST",
               headers: { "Content-Type": "application/json" },

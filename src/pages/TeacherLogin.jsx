@@ -43,9 +43,7 @@ const TeacherLogin = () => {
   const [accessAllowed, setAccessAllowed] = useState(false);
   const [success, setSuccess] = useState(false);
 
-
-  const apiUrl = 'https://thehoneybee-gl4r.onrender.com';
-
+  const apiUrl = import.meta.env.VITE_API_URL;
   const { login } = useAuth();
   const navigate = useNavigate();
 
@@ -82,7 +80,7 @@ const TeacherLogin = () => {
     setMessage('');
     try {
       const lowerEmail = email.trim().toLowerCase();
-      
+
       // Step 1: Set password in Teacher collection
       await axios.post(`${apiUrl}/api/auth/teachers/set-password`, {
         email: lowerEmail,
@@ -232,7 +230,7 @@ const TeacherLogin = () => {
               border: '2px solid #d32f2f'
             }}>
               <svg width="24" height="24" viewBox="0 0 24 24" fill="#d32f2f">
-                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
               </svg>
             </div>
             <div style={{
@@ -295,7 +293,7 @@ const TeacherLogin = () => {
               border: '2px solid #d32f2f'
             }}>
               <svg width="24" height="24" viewBox="0 0 24 24" fill="#d32f2f">
-                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
               </svg>
             </div>
             <div style={{
