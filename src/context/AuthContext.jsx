@@ -49,7 +49,6 @@ export const AuthProvider = ({ children }) => {
         setLoading(false);
       })
       .catch((err) => {
-        // 401 means "not logged in" and is expected on initial load if no session exists.
         if (err.response && err.response.status !== 401) {
           // Only log unexpected errors, not 401
           console.error("[AuthContext] /api/auth/me error:", err);
@@ -61,13 +60,8 @@ export const AuthProvider = ({ children }) => {
       });
   }, []);
 
-  // Only check /api/auth/me if we think the user might be logged in
   useEffect(() => {
-    if (localStorage.getItem('isLoggedIn') === 'true') {
-      refreshUser();
-    } else {
-      setLoading(false); // Not loading, not logged in
-    }
+    refreshUser();
   }, [refreshUser]);
 
   // Listen for cross-tab auth events
@@ -88,11 +82,11 @@ export const AuthProvider = ({ children }) => {
 
   // Call this after login/logout/role change, return promise for awaiting
   const login = () => {
-    localStorage.setItem('isLoggedIn', 'true'); // Set flag on login
     const p = refreshUser();
     broadcastAuthEvent();
     return p;
   };
+
   const logout = async () => {
     setLoading(true);
     try {
@@ -100,7 +94,7 @@ export const AuthProvider = ({ children }) => {
       await signOut(auth);
 
       // 2. Backend logout
-      const apiUrl = 'https://thehoneybee-gl4r.onrender.com';
+      const apiUrl = import.meta.env.VITE_API_URL;
       await axios.post(`${apiUrl}/api/auth/logout`, {}, { withCredentials: true });
 
       // 3. Reset user state
@@ -109,7 +103,10 @@ export const AuthProvider = ({ children }) => {
       setUserName(null);
       setCurrentUser && setCurrentUser(null); // Only if you have this
 
-      // 4. Broadcast event (optional)
+      // 4. Clear localStorage flag
+      localStorage.removeItem('isLoggedIn');
+
+      // 5. Broadcast event (optional)
       broadcastAuthEvent && broadcastAuthEvent();
     } catch (err) {
       console.error('Logout failed:', err);

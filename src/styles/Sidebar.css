@@ -251,7 +251,7 @@
 }
 
 /* Bottom Navigation (Mobile) */
-.mobile-bottom-nav {
+.chatapp-mobile-bottom-nav {
   position: fixed;
   bottom: 0;
   left: 0;
@@ -265,7 +265,7 @@
   padding: 0.5rem 0;
 }
 
-.nav-item {
+.chatapp-nav-item {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -292,7 +292,7 @@
 }
 
 @media (min-width: 769px) {
-  .mobile-bottom-nav {
+  .chatapp-mobile-bottom-nav {
     display: none;
   }
   

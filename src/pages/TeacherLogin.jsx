@@ -129,15 +129,192 @@ const TeacherLogin = () => {
   };
 
   if (checking) {
-    return <div style={{ color: '#127d8e', fontWeight: 500, textAlign: 'center', marginTop: 60 }}>Checking access...</div>;
+    return (
+      <div style={{
+        minHeight: '100vh',
+        backgroundColor: '#f7fbfc',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        fontFamily: 'Segoe UI, Arial, sans-serif',
+      }}>
+        <div style={{
+          background: '#fff',
+          borderRadius: 12,
+          boxShadow: '0 8px 32px rgba(18, 125, 142, 0.12)',
+          padding: '2.5rem 2rem 2rem 2rem',
+          minWidth: 340,
+          maxWidth: 400,
+          width: '100%',
+          position: 'relative',
+          textAlign: 'center',
+          border: '1.5px solid #e3e8ee',
+        }}>
+          <div style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: '20px'
+          }}>
+            <div style={{
+              width: '40px',
+              height: '40px',
+              border: '3px solid #e3e8ee',
+              borderTop: '3px solid #127d8e',
+              borderRadius: '50%',
+              animation: 'spin 1s linear infinite'
+            }}></div>
+            <div style={{
+              color: '#127d8e',
+              fontWeight: 600,
+              fontSize: '1.1rem',
+              letterSpacing: 0.2
+            }}>
+              Checking access...
+            </div>
+            <div style={{
+              color: '#666',
+              fontSize: '0.9rem',
+              fontWeight: 400
+            }}>
+              Verifying your teacher credentials
+            </div>
+          </div>
+        </div>
+        <style>{`
+          @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+          }
+        `}</style>
+      </div>
+    );
   }
 
   if (!email) {
-    return <div style={{ color: '#d32f2f', fontWeight: 500, textAlign: 'center', marginTop: 60 }}>No email provided in the link.</div>;
+    return (
+      <div style={{
+        minHeight: '100vh',
+        backgroundColor: '#f7fbfc',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        fontFamily: 'Segoe UI, Arial, sans-serif',
+      }}>
+        <div style={{
+          background: '#fff',
+          borderRadius: 12,
+          boxShadow: '0 8px 32px rgba(18, 125, 142, 0.12)',
+          padding: '2.5rem 2rem 2rem 2rem',
+          minWidth: 340,
+          maxWidth: 400,
+          width: '100%',
+          position: 'relative',
+          textAlign: 'center',
+          border: '1.5px solid #e3e8ee',
+        }}>
+          <div style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: '15px'
+          }}>
+            <div style={{
+              width: '48px',
+              height: '48px',
+              borderRadius: '50%',
+              background: '#fff6f6',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              border: '2px solid #d32f2f'
+            }}>
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="#d32f2f">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+              </svg>
+            </div>
+            <div style={{
+              color: '#d32f2f',
+              fontWeight: 600,
+              fontSize: '1.1rem',
+              letterSpacing: 0.2
+            }}>
+              No Email Provided
+            </div>
+            <div style={{
+              color: '#666',
+              fontSize: '0.9rem',
+              fontWeight: 400
+            }}>
+              Please use the correct link to access this page
+            </div>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   if (!accessAllowed) {
-    return <div style={{ color: '#d32f2f', fontWeight: 500, textAlign: 'center', marginTop: 60 }}>{message || 'Access denied: Only teachers can access this page.'}</div>;
+    return (
+      <div style={{
+        minHeight: '100vh',
+        backgroundColor: '#f7fbfc',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        fontFamily: 'Segoe UI, Arial, sans-serif',
+      }}>
+        <div style={{
+          background: '#fff',
+          borderRadius: 12,
+          boxShadow: '0 8px 32px rgba(18, 125, 142, 0.12)',
+          padding: '2.5rem 2rem 2rem 2rem',
+          minWidth: 340,
+          maxWidth: 400,
+          width: '100%',
+          position: 'relative',
+          textAlign: 'center',
+          border: '1.5px solid #e3e8ee',
+        }}>
+          <div style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: '15px'
+          }}>
+            <div style={{
+              width: '48px',
+              height: '48px',
+              borderRadius: '50%',
+              background: '#fff6f6',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              border: '2px solid #d32f2f'
+            }}>
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="#d32f2f">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+              </svg>
+            </div>
+            <div style={{
+              color: '#d32f2f',
+              fontWeight: 600,
+              fontSize: '1.1rem',
+              letterSpacing: 0.2
+            }}>
+              Access Denied
+            </div>
+            <div style={{
+              color: '#666',
+              fontSize: '0.9rem',
+              fontWeight: 400
+            }}>
+              {message || 'Only teachers can access this page.'}
+            </div>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   return (

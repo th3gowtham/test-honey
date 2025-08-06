@@ -98,7 +98,7 @@ const ChatApp = () => {
        
       
         {activeChat === null && <WelcomeScreen />}
-        {activeChat && activeChat.type === 'batch' && <BatchBroadcast />}
+        {activeChat && activeChat.type === 'batch' && <BatchBroadcast activeChat={activeChat} />}
         {activeChat && activeChat.type === 'private' && <PrivateChat receiverId={activeChat.id} activeChat={activeChat.name} />}
         {activeChat && activeChat.type === 'announcement' && <AnnouncementsView />}
         
