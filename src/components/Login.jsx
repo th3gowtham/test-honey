@@ -57,13 +57,13 @@ const Login = ({ onClose }) => {
   const [showForgotPassword, setShowForgotPassword] = useState(false);
   const [form, setForm] = useState({ email: "", password: "", name: "" });
   const [showPassword, setShowPassword] = useState(false);
-  
+
   // Apply global styles
   React.useEffect(() => {
     const styleElement = document.createElement('style');
     styleElement.innerHTML = globalStyles;
     document.head.appendChild(styleElement);
-    
+
     return () => {
       document.head.removeChild(styleElement);
     };
@@ -80,7 +80,7 @@ const Login = ({ onClose }) => {
     try {
       const result = await signInWithPopup(auth, googleprovider);
       const idToken = await result.user.getIdToken();
-      const apiUrl = 'https://thehoneybee-gl4r.onrender.com';
+      const apiUrl = import.meta.env.VITE_API_URL;
       await axios.post(`${apiUrl}/api/auth/google-login`, { idToken }, { withCredentials: true });
       await login();
       closeModal();
@@ -102,7 +102,7 @@ const Login = ({ onClose }) => {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       await updateProfile(userCredential.user, { displayName: name });
       const idToken = await userCredential.user.getIdToken();
-      const apiUrl = 'https://thehoneybee-gl4r.onrender.com';
+      const apiUrl = import.meta.env.VITE_API_URL;
       await axios.post(`${apiUrl}/api/auth/google-login`, { idToken, name }, { withCredentials: true });
       await login();
       closeModal();
@@ -130,7 +130,7 @@ const Login = ({ onClose }) => {
       }
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       const idToken = await userCredential.user.getIdToken();
-      const apiUrl ='https://thehoneybee-gl4r.onrender.com';
+      const apiUrl =import.meta.env.VITE_API_URL;
       await axios.post(`${apiUrl}/api/auth/google-login`, { idToken }, { withCredentials: true });
       await login();
       closeModal();
@@ -147,131 +147,131 @@ const Login = ({ onClose }) => {
         <ForgotPassword onClose={() => setShowForgotPassword(false)} />
       ) : (
         <div className="login-modal-overlay">
-      <div className="login-modal-container">
-        <button
-          onClick={closeModal}
-          className="login-close-btn"
-          aria-label="Close"
-        >×</button>
-        <h1 className="login-title">{isRegister ? "Create Account" : "Log in"}</h1>
-        
-        {isRegister ? (
-          <p style={{ marginBottom: 16, fontSize: '0.9rem', color: '#666' }}>
-            Already have an account ? <span style={{ color: "#127d8e", cursor: "pointer", fontWeight: 500 }} onClick={() => setIsRegister(false)}>Log in</span>
-          </p>
-        ) : (
-          <p style={{ marginBottom: 16, fontSize: '0.9rem', color: '#666' }}>
-            New user ? <span style={{ color: "#127d8e", cursor: "pointer", fontWeight: 500 }} onClick={() => setIsRegister(true)}>Register Now</span>
-          </p>
-        )}
-
-        {!isRegister && (
-          <div style={{ marginBottom: 24 }}>
+          <div className="login-modal-container">
             <button
-              onClick={loginclick}
-              className="login-google-btn"
-            >
-              <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" className="login-google-icon" />
-              Continue with Google
-            </button>
-          </div>
-        )}
+              onClick={closeModal}
+              className="login-close-btn"
+              aria-label="Close"
+            >×</button>
+            <h1 className="login-title">{isRegister ? "Create Account" : "Log in"}</h1>
 
-        <div className="login-divider">
-          <hr className="login-divider-hr" />
-          <span className="login-divider-span">
-            or
-          </span>
-        </div>
-
-        <form onSubmit={isRegister ? handleEmailRegister : handleEmailLogin}>
-          {isRegister && (
-            <div style={{ marginBottom: 16 }}>
-              <label style={{ display: 'block', marginBottom: 6, fontSize: '0.9rem', color: '#333', fontWeight: 500 }}>Username</label>
-              <input
-                type="text"
-                name="name"
-                placeholder="name"
-                value={form.name}
-                onChange={handleChange}
-                className="login-input"
-                required
-              />
-            </div>
-          )}
-          <div style={{ marginBottom: 16 }}>
-            <label style={{ display: 'block', marginBottom: 6, fontSize: '0.9rem', color: '#333', fontWeight: 500 }}>Username or Email</label>
-            <input
-              type="email"
-              name="email"
-              placeholder="Email"
-              value={form.email}
-              onChange={handleChange}
-              className="login-input"
-              required
-            />
-          </div>
-          <div style={{ marginBottom: 16, position: 'relative' }}>
-            <label style={{ display: 'block', marginBottom: 6, fontSize: '0.9rem', color: '#333', fontWeight: 500 }}>Password</label>
-            <input
-              type={showPassword ? 'text' : 'password'}
-              name="password"
-              placeholder="Enter password"
-              value={form.password}
-              onChange={handleChange}
-              className="login-password-input"
-              required
-            />
-            <button
-              type="button"
-              className={"checkbox-button" + (showPassword ? " open" : "")}
-              aria-label={showPassword ? 'Hide password' : 'Show password'}
-              tabIndex={0}
-              onClick={() => setShowPassword(v => !v)}
-              style={{
-                display: 'inline-flex',
-                position: 'absolute',
-                top: '50%',
-                right: 12,
-                transform: 'translateY(-50%)',
-                cursor: 'pointer',
-                background: 'rgb(111, 16, 16)',
-                border: 'none',
-                padding: 0,
-                margin: 0,
-                outline: 'none',
-                alignItems: 'center',
-                zIndex: 2,
-              }}
-            >
-              {showPassword ? eyeIcons.closed : eyeIcons.open}
-            </button>
-          </div>
-
-          <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', marginBottom: 16 }}>
-            {!isRegister && (
-              <a 
-                href="#" 
-                onClick={(e) => {
-                  e.preventDefault();
-                  setShowForgotPassword(true);
-                }}
-                className="login-forgot-link"
-              >
-                Forgot password ?
-              </a>
+            {isRegister ? (
+              <p style={{ marginBottom: 16, fontSize: '0.9rem', color: '#666' }}>
+                Already have an account ? <span style={{ color: "#127d8e", cursor: "pointer", fontWeight: 500 }} onClick={() => setIsRegister(false)}>Log in</span>
+              </p>
+            ) : (
+              <p style={{ marginBottom: 16, fontSize: '0.9rem', color: '#666' }}>
+                New user ? <span style={{ color: "#127d8e", cursor: "pointer", fontWeight: 500 }} onClick={() => setIsRegister(true)}>Register Now</span>
+              </p>
             )}
+
+            {!isRegister && (
+              <div style={{ marginBottom: 24 }}>
+                <button
+                  onClick={loginclick}
+                  className="login-google-btn"
+                >
+                  <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" className="login-google-icon" />
+                  Continue with Google
+                </button>
+              </div>
+            )}
+
+            <div className="login-divider">
+              <hr className="login-divider-hr" />
+              <span className="login-divider-span">
+                or
+              </span>
+            </div>
+
+            <form onSubmit={isRegister ? handleEmailRegister : handleEmailLogin}>
+              {isRegister && (
+                <div style={{ marginBottom: 16 }}>
+                  <label style={{ display: 'block', marginBottom: 6, fontSize: '0.9rem', color: '#333', fontWeight: 500 }}>Username</label>
+                  <input
+                    type="text"
+                    name="name"
+                    placeholder="name"
+                    value={form.name}
+                    onChange={handleChange}
+                    className="login-input"
+                    required
+                  />
+                </div>
+              )}
+              <div style={{ marginBottom: 16 }}>
+                <label style={{ display: 'block', marginBottom: 6, fontSize: '0.9rem', color: '#333', fontWeight: 500 }}>Username or Email</label>
+                <input
+                  type="email"
+                  name="email"
+                  placeholder="Email"
+                  value={form.email}
+                  onChange={handleChange}
+                  className="login-input"
+                  required
+                />
+              </div>
+              <div style={{ marginBottom: 16, position: 'relative' }}>
+                <label style={{ display: 'block', marginBottom: 6, fontSize: '0.9rem', color: '#333', fontWeight: 500 }}>Password</label>
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  name="password"
+                  placeholder="Enter password"
+                  value={form.password}
+                  onChange={handleChange}
+                  className="login-password-input"
+                  required
+                />
+                <button
+                  type="button"
+                  className={"checkbox-button" + (showPassword ? " open" : "")}
+                  aria-label={showPassword ? 'Hide password' : 'Show password'}
+                  tabIndex={0}
+                  onClick={() => setShowPassword(v => !v)}
+                  style={{
+                    display: 'inline-flex',
+                    position: 'absolute',
+                    top: '50%',
+                    right: 12,
+                    transform: 'translateY(-50%)',
+                    cursor: 'pointer',
+                    background: 'rgb(111, 16, 16)',
+                    border: 'none',
+                    padding: 0,
+                    margin: 0,
+                    outline: 'none',
+                    alignItems: 'center',
+                    zIndex: 2,
+                  }}
+                >
+                  {showPassword ? eyeIcons.closed : eyeIcons.open}
+                </button>
+              </div>
+
+              <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', marginBottom: 16 }}>
+                {!isRegister && (
+                  <a
+                    href="#"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setShowForgotPassword(true);
+                    }}
+                    className="login-forgot-link"
+                  >
+                    Forgot password ?
+                  </a>
+                )}
+              </div>
+
+              <button
+                type="submit"
+                className="login-submit-btn"
+              >
+                {isRegister ? "Sign Up" : "Sign In"}
+              </button>
+            </form>
+
           </div>
-
-          <button
-            type="submit"
-            className="login-submit-btn"
-          >
-            {isRegister ? "Sign Up" : "Sign In"}
-          </button>
-        </form>
-
-      </div>
         </div>
       )}
     </>

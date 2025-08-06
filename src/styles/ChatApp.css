@@ -222,14 +222,11 @@
 }
 
 
+
 .chat-main {
-  overflow-y: auto;
   flex: 1;
+  overflow-y: auto;
   min-height: 100vh;
-}
-.chat-main {
-  flex: 1;
-  overflow-y: auto;
 }
 
 @media (max-width: 768px) {

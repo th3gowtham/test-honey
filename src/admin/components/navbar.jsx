@@ -1,4 +1,4 @@
-"use client"
+
 
 import { FiBell, FiUser, FiChevronDown, FiLogOut, FiSettings, FiActivity, FiUsers, FiBookOpen } from "react-icons/fi"
 import { useState, useRef, useEffect } from "react"
@@ -148,7 +148,7 @@ export default function Navbar() {
 
   return (
     <>
-      <nav className="navbar">
+      <nav className="Admin-navbar">
         <div className="navbar-left">
           <h1 className="page-title">Admin Dashboard</h1>
         </div>

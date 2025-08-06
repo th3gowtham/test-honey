@@ -5,7 +5,7 @@
 }
 
 body {
-  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-family: "nunito";
   font-size: 16px;
   line-height: 1.5;
   color: #2d3748;
@@ -108,7 +108,7 @@ body {
   border: 2px solid #f7fafc;
 }
 
-.nav-item {
+.Admin-nav-item {
   width: 100%;
   display: flex;
   align-items: center;
@@ -124,18 +124,18 @@ body {
   font-weight: 500;
 }
 
-.nav-item:hover {
+.Admin-nav-item:hover {
   background-color: #f7fafc;
   color: #2d3748;
 }
 
-.nav-item.active {
+.Admin-nav-item.active {
   background-color: #e6f7f9;
   color: #127d8e;
   border-right: 3px solid #127d8e;
 }
 
-.nav-icon {
+.Admin-nav-icon {
   font-size: 20px;
   flex-shrink: 0;
 }
@@ -146,7 +146,7 @@ body {
   text-overflow: ellipsis;
 }
 
-.admin-sidebar.collapsed .nav-item {
+.admin-sidebar.collapsed .Admin-nav-item {
   justify-content: center;
   padding: 16px;
 }
@@ -196,7 +196,7 @@ body {
     width: 100% !important;
   }
   
-  .navbar {
+  .Admin-navbar {
     padding: 0 16px 0 72px;
   }
   
@@ -245,7 +245,7 @@ body {
 }
 
 body {
-  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-family: "nunito";
   font-size: 16px;
   line-height: 1.5;
   color: #2d3748;
@@ -343,7 +343,7 @@ body {
   border: 2px solid #f7fafc;
 }
 
-.nav-item {
+.Admin-nav-item {
   width: 100%;
   display: flex;
   align-items: center;
@@ -359,18 +359,18 @@ body {
   font-weight: 500;
 }
 
-.nav-item:hover {
+.Admin-nav-item:hover {
   background-color: #f7fafc;
   color: #2d3748;
 }
 
-.nav-item.active {
+.Admin-nav-item.active {
   background-color: #e6f7f9;
   color: #127d8e;
   border-right: 3px solid #127d8e;
 }
 
-.nav-icon {
+.Admin-nav-icon {
   font-size: 20px;
   flex-shrink: 0;
 }
@@ -381,7 +381,7 @@ body {
   text-overflow: ellipsis;
 }
 
-.admin-sidebar.collapsed .nav-item {
+.admin-sidebar.collapsed .Admin-nav-item {
   justify-content: center;
   padding: 16px;
 }
@@ -396,8 +396,8 @@ body {
   }
 }
 
-/* Navbar Styles */
-.navbar {
+/* Admin-navbar Styles */
+.Admin-navbar {
   height: 80px;
   background: white;
   border-bottom: 1px solid #e2e8f0;
@@ -666,7 +666,7 @@ body {
 }
 
 @media (max-width: 768px) {
-  .navbar {
+  .Admin-navbar {
     padding: 0 16px;
   }
   
@@ -1220,10 +1220,10 @@ body {
 
 /* Common Styles */
 .btn {
-  padding: 12px 24px;
+
   border: none;
   border-radius: 8px;
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -1484,7 +1484,7 @@ body {
   }
 }
 
-.nav-item.active {
+.Admin-nav-item.active {
   background-color: #e6f7f9;
   color: #127d8e;
   border-right: 3px solid #127d8e;
