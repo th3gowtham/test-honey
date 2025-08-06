@@ -26,7 +26,7 @@ const Product = () => {
           {/* <h2 className="text-center display-3 text-white">Page Under Construction</h2> */}
           <button
             onClick={handleApp}
-            className="bg-cyan-700 text-white px-6 py-2 rounded-full text-lg font-medium shadow-md hover:bg-cyan-500 hover:scale-105 transition-all duration-300"
+            className="bg-black text-white px-6 py-2 rounded-full text-lg font-medium shadow-md hover:bg-cyan-500 hover:scale-105 transition-all duration-300"
           >
             Chat App
           </button>

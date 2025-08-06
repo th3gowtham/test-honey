@@ -136,7 +136,7 @@ const ProfileTab = () => {
       )}
 
       <div className="profile-overview">
-        <div className="profile-avatar">
+        <div className="chat-profile-avatar">
           {avatarImage ? (
             <img 
               src={avatarImage} 

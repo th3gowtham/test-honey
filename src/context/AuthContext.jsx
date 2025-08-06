@@ -36,13 +36,11 @@ export const AuthProvider = ({ children }) => {
 
   // Fetch user info from backend, return promise for awaiting
   const refreshUser = useCallback(() => {
-    
-    const apiUrl = 'https://thehoneybee-gl4r.onrender.com';
+
+    const apiUrl = import.meta.env.VITE_API_URL;
     return axios.get(`${apiUrl}/api/auth/me`, { withCredentials: true })
       .then(res => {
         // Log what is received from the backend
-        console.log("[AuthContext] /api/auth/me response:", res.data);
-
         setUserRole(res.data.role);
         setUserName(res.data.name);
         setUser(res.data.user);

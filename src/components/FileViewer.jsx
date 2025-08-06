@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Download, File, FileText, Image, Video, Archive, FileX, Trash2, Edit } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import { useAuth } from '../context/AuthContext';
@@ -12,6 +12,7 @@ const FileViewer = ({ batchId, onFileDeleted, onFileCountUpdate }) => {
   const [error, setError] = useState(null);
   const [editingFile, setEditingFile] = useState(null);
   const [editDescription, setEditDescription] = useState('');
+  const toastShownRef = useRef({});
 
   const apiUrl = import.meta.env.VITE_API_URL;
 
@@ -19,6 +20,8 @@ const FileViewer = ({ batchId, onFileDeleted, onFileCountUpdate }) => {
     if (batchId) {
       fetchFiles();
     }
+    // Reset toast shown for new batch
+    toastShownRef.current[batchId] = false;
   }, [batchId]);
 
   const fetchFiles = async () => {
@@ -35,20 +38,21 @@ const FileViewer = ({ batchId, onFileDeleted, onFileCountUpdate }) => {
       const data = await response.json();
       const fileList = data.files || [];
       setFiles(fileList);
-      
-      // Show success toast if files are loaded
-      if (fileList.length > 0) {
+
+      // Show toast only if not shown for this batchId yet
+      if (fileList.length > 0 && !toastShownRef.current[batchId]) {
         toast.success(`${fileList.length} file(s) loaded successfully!`, {
           duration: 2000,
           style: {
-            background: "#14b8a6",
-            color: "#fff",
+            background: "#fff",
+            color: "#000",
             fontWeight: 600,
             fontSize: "0.9rem"
           }
         });
+        toastShownRef.current[batchId] = true;
       }
-      
+
       // Notify parent component about file count
       if (onFileCountUpdate) {
         onFileCountUpdate(fileList.length);
@@ -80,7 +84,7 @@ const FileViewer = ({ batchId, onFileDeleted, onFileCountUpdate }) => {
       a.click();
       window.URL.revokeObjectURL(url);
       document.body.removeChild(a);
-      
+
       toast.success(`File "${filename}" downloaded successfully!`, {
         duration: 2000,
         style: {
@@ -166,7 +170,7 @@ const FileViewer = ({ batchId, onFileDeleted, onFileCountUpdate }) => {
       // Remove file from local state
       const updatedFiles = files.filter(file => file.fileId !== fileId);
       setFiles(updatedFiles);
-      
+
       // Show success toast
       toast.success(`File "${filename}" deleted successfully!`, {
         duration: 3000,
@@ -177,12 +181,12 @@ const FileViewer = ({ batchId, onFileDeleted, onFileCountUpdate }) => {
           fontSize: "1rem"
         }
       });
-      
+
       // Notify parent component about file count
       if (onFileCountUpdate) {
         onFileCountUpdate(updatedFiles.length);
       }
-      
+
       // Notify parent component
       if (onFileDeleted) {
         onFileDeleted(fileId);
@@ -230,15 +234,15 @@ const FileViewer = ({ batchId, onFileDeleted, onFileCountUpdate }) => {
       }
 
       // Update file in local state
-      setFiles(files.map(file => 
-        file.fileId === fileId 
+      setFiles(files.map(file =>
+        file.fileId === fileId
           ? { ...file, description: editDescription }
           : file
       ));
 
       setEditingFile(null);
       setEditDescription('');
-      
+
       // Show success toast
       toast.success('File description updated successfully!', {
         duration: 3000,
@@ -330,11 +334,11 @@ const FileViewer = ({ batchId, onFileDeleted, onFileCountUpdate }) => {
                     <div className="file-name">{file.originalName || file.filename}</div>
                     <div className="file-meta">
                       <span>{formatFileSize(file.fileSize)}</span>
-                      
+
                       <span>• {formatDate(file.uploadDate)}</span>
                       {(userRole === 'Admin' || userRole === 'Teacher') && (
                 <>
-                     
+
                       <span>• By {file.uploadedByRole}</span>
                       </>
                       )}
@@ -344,11 +348,11 @@ const FileViewer = ({ batchId, onFileDeleted, onFileCountUpdate }) => {
                     )}
                   </div>
                 </div>
-                
+
                 <div className="file-actions">
                 {(userRole === 'Admin' || userRole === 'Student') && (
                 <>
-                  <button 
+                  <button
                     className="action-btn download-btn"
                     onClick={() => handleDownload(file.fileId, file.originalName || file.filename)}
                     title="Download file"
@@ -357,13 +361,13 @@ const FileViewer = ({ batchId, onFileDeleted, onFileCountUpdate }) => {
                   </button>
                   </>
                   )}
-                  
+
                   {/* Show edit and delete buttons for admin and teacher roles */}
-                  
-                    
+
+
                   {(userRole === 'Admin') && (
-                <>  
-                      <button 
+                <>
+                      <button
                         className="action-btn delete-btn"
                         onClick={() => handleDelete(file.fileId, file.originalName || file.filename)}
                         title="Delete file"
@@ -391,7 +395,7 @@ const FileViewer = ({ batchId, onFileDeleted, onFileCountUpdate }) => {
               rows={3}
             />
             <div className="edit-actions">
-              <button 
+              <button
                 className="cancel-btn"
                 onClick={() => {
                   setEditingFile(null);
@@ -400,7 +404,7 @@ const FileViewer = ({ batchId, onFileDeleted, onFileCountUpdate }) => {
               >
                 Cancel
               </button>
-              <button 
+              <button
                 className="save-btn"
                 onClick={() => handleEdit(editingFile)}
               >
