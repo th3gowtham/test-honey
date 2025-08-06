@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Calendar, Send, Bell } from "lucide-react";
+import { Calendar, Send, Bell, MoreVertical } from "lucide-react";
 import { useAuth } from '../context/AuthContext';
 import { generateChatId, createChatDocument, sendMessage, subscribeToMessages } from '../utils/chatUtils';
 import "../styles/PrivateChat.css";
@@ -13,6 +13,17 @@ const PrivateChat = ({ activeChat, receiverId: propReceiverId }) => {
   const [chatId, setChatId] = useState(null);
   const messagesEndRef = useRef(null);
   const [showBookModal, setShowBookModal] = useState(false);
+  const [showMenu, setShowMenu] = useState(false);
+    const menuRef = useRef(null);
+    useEffect(() => {
+      const handleClickOutside = (event) => {
+        if (menuRef.current && !menuRef.current.contains(event.target)) {
+          setShowMenu(false);
+        }
+      };
+      document.addEventListener("mousedown", handleClickOutside);
+      return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, []);
 
   useEffect(() => {
     if (!currentUser) return;
@@ -79,11 +90,34 @@ const PrivateChat = ({ activeChat, receiverId: propReceiverId }) => {
             <p>Private Chat</p>
           </div>
         </div>
-        <div className="private-actions">
-          <button className="private-btn" onClick={() => setShowBookModal(true)}>
-            <Calendar size={16} />
-            <span>Book Session</span>
+        <div className="session-btn-dropdown-container" ref={menuRef}>
+          <button 
+          className="session-btn-dropdown-toggle"
+          onClick={() => setShowMenu((prev) => !prev)}
+          role='button'
+          tabIndex={0}
+          >
+            <MoreVertical size={23} />
           </button>
+          {showMenu && (
+            <div className="session-btn-dropdown-menu">
+              <button
+                className="session-btn-dropdown-item"
+                onClick={() => setShowBookModal(true)}
+              >
+                Book Session
+              </button>
+              <button
+                className="session-btn-dropdown-item"
+                onClick={() => {
+                  console.log("View File clicked");
+                  setShowMenu(false);
+                }}
+              >
+                View File
+              </button>
+            </div>
+          )}
         </div>
       </div>
 

@@ -141,20 +141,20 @@ const Sidebar = ({ currentView, setCurrentView, setActiveChat, setShowProfileSet
     </div>
   );
   const BottomNav = () => (
-    <div className="mobile-bottom-nav">
-      <div className={`nav-item ${currentView === 'batch-broadcasts' ? 'active' : ''}`} onClick={() => setCurrentView('batch-broadcasts')}>
+    <div className="chatapp-mobile-bottom-nav">
+      <div className={`chatapp-nav-item ${currentView === 'batch-broadcasts' ? 'active' : ''}`} onClick={() => setCurrentView('batch-broadcasts')}>
         <MessageSquare />
         <span>Chats</span>
       </div>
-      <div className={`nav-item ${currentView === 'private-chat' ? 'active' : ''}`} onClick={() => setCurrentView('private-chat')}>
+      <div className={`chatapp-nav-item ${currentView === 'private-chat' ? 'active' : ''}`} onClick={() => setCurrentView('private-chat')}>
         <BellDot />
         <span>Private</span>
       </div>
-      <div className={`nav-item ${currentView === 'announcements' ? 'active' : ''}`} onClick={() => setCurrentView('announcements')}>
+      <div className={`chatapp-nav-item ${currentView === 'announcements' ? 'active' : ''}`} onClick={() => setCurrentView('announcements')}>
         <Users2 />
         <span>Communities</span>
       </div>
-      <div className={`nav-item ${currentView === 'profile' ? 'active' : ''}`} onClick={() => {
+      <div className={`chatapp-nav-item ${currentView === 'profile' ? 'active' : ''}`} onClick={() => {
         setCurrentView('profile');
         setShowProfileSettings(true);
       }}>
@@ -168,17 +168,15 @@ const Sidebar = ({ currentView, setCurrentView, setActiveChat, setShowProfileSet
   const Header = () => (
     <div className="sidebar-user-info">
       <div className="sidebar-user-header">
-        <div>
-          <h1 className="sidebar-title">HoneyBee Learning</h1>
-        </div>
+        <h1 className="sidebar-title">HoneyBee Learning</h1>
       </div>
-      <div className="sidebar-user-details">
+      {/* <div className="sidebar-user-details">
         <div className="sidebar-user-tags">
           <span className="user-name">{currentUser?.displayName || 'User'}</span>
           <span className="user-role">{currentUser?.role || 'User'}</span>
         </div>
-        <p className="user-email">{currentUser?.email || 'user@honeybee.com'}</p>
-      </div>
+        <p className="user-email">john@honeybee.com</p>
+      </div> */}
     </div>
   );
   return (

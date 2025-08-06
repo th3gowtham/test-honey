@@ -48,7 +48,7 @@ const BatchBroadcast = ({ activeChat }) => {
   // Handle attach button click
   const handleAttachClick = () => {
     console.log('Attach button clicked, userRole:', userRole);
-    
+
     // Only allow teachers and admins to upload files
     if (userRole?.toLowerCase() === 'teacher' || userRole?.toLowerCase() === 'admin') {
       setShowUploadModal(true);
@@ -74,6 +74,19 @@ const BatchBroadcast = ({ activeChat }) => {
     }
   };
 
+  // three dot click to show session button and view file
+  const [showMenu, setShowMenu] = useState(false);
+  const menuRef = useRef(null);
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (menuRef.current && !menuRef.current.contains(event.target)) {
+        setShowMenu(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
   return (
     <div className="batch-broadcast">
       {/* Header */}
@@ -87,26 +100,34 @@ const BatchBroadcast = ({ activeChat }) => {
             <p>📢 Broadcast • {studentCount} students • {subject}</p>
           </div>
         </div>
-        <div className="batch-actions">
-          <div>
-            
-          </div>
-
-          {/* View Files Button */}
-          <button 
-            className="batch-btn" 
-            onClick={() => setShowFiles(true)}
+        <div className="session-btn-dropdown-container" ref={menuRef}>
+          <button
+            className="session-btn-dropdown-toggle"
+            onClick={() => setShowMenu((prev) => !prev)}
+            role='button'
+            tabIndex={0}
           >
-            <FolderOpen size={16} />
-            <span>View Files</span>
+            <MoreVertical size={23} />
           </button>
-          
-          <button className="batch-btn" onClick={() => setShowBookModal(true)}>
-            <Calendar size={16} />
-            <span>Book Session</span>
-          </button>
-          <div>
-          </div>
+          {showMenu && (
+            <div className="session-btn-dropdown-menu">
+              <button
+                className="session-btn-dropdown-item"
+                onClick={() => setShowBookModal(true)}
+              >
+                Book Session
+              </button>
+              <button
+                className="session-btn-dropdown-item"
+                onClick={() => {
+                  setShowFiles(true)
+                  setShowMenu(false);
+                }}
+              >
+                View File
+              </button>
+            </div>
+          )}
         </div>
       </div>
 
@@ -134,8 +155,8 @@ const BatchBroadcast = ({ activeChat }) => {
         <div className="batch-input-wrapper">
           {/* Attach button - Only for teachers and admins */}
           {(userRole?.toLowerCase() === 'teacher' || userRole?.toLowerCase() === 'admin') && (
-            <button 
-              className="batch-attach-btn" 
+            <button
+              className="batch-attach-btn"
               onClick={handleAttachClick}
               title="Upload File"
             >
@@ -174,9 +195,9 @@ const BatchBroadcast = ({ activeChat }) => {
           <div className="modal-content file-viewer-modal">
             <div className="modal-header">
               <h3 data-file-count={`${fileCount} file${fileCount !== 1 ? 's' : ''}`}>
-                Files - {batchName} 
+                Files - {batchName}
               </h3>
-              <button 
+              <button
                 className="modal-close-btn"
                 onClick={() => setShowFiles(false)}
               >
@@ -184,7 +205,7 @@ const BatchBroadcast = ({ activeChat }) => {
               </button>
             </div>
             <div className="modal-body">
-              <FileViewer 
+              <FileViewer
                 batchId={batchId}
                 userRole={userRole}
                 onFileDeleted={handleFileDeleted}
