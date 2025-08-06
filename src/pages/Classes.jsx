@@ -24,7 +24,6 @@ import des from "../assets/des.png";
 import ani from "../assets/ani.png";
 import { usePayment } from "../context/PaymentContext";
 
-
 const courses = [
   {
     imgSrc: phoni,
@@ -116,7 +115,6 @@ const courses = [
     duration: "3 Months",
     fee: 3999,
   },
-
 ];
 
 const advancedCourses = [
@@ -222,13 +220,12 @@ const advancedCourses = [
 ];
 
 const Classes = () => {
-  const { user, userName, currentUser } = useAuth();
+  const { user } = useAuth();
   const { startPayment, loading } = usePayment();
   const [showLoginNeeded, setShowLoginNeeded] = useState(false);
   const [showEnquiryModal, setShowEnquiryModal] = useState(false);
   const [selectedCourse, setSelectedCourse] = useState(null);
 
-  // Handler for "Enroll Now" button
   const handleApply = (course) => {
     if (!user || !user.email) {
       setShowLoginNeeded(true);
@@ -239,15 +236,16 @@ const Classes = () => {
     setShowEnquiryModal(true);
   };
 
-  // Modal handlers
   const handleEnquirySubmit = () => {
     setShowEnquiryModal(false);
     if (selectedCourse) startPayment(selectedCourse);
   };
+
   const handleSkipEnquiry = () => {
     setShowEnquiryModal(false);
     if (selectedCourse) startPayment(selectedCourse);
   };
+
   const handleCloseModal = () => {
     setShowEnquiryModal(false);
     setSelectedCourse(null);
@@ -255,52 +253,50 @@ const Classes = () => {
 
   return (
     <>
-      <nav aria-label="breadcrumb" className="breadcrumb-section position-relative">
+      <nav className="breadcrumb-section position-relative">
         <div className="position-absolute top-50 start-50 translate-middle">
           <h2 className="text-center display-3 text-white">Our Classes</h2>
         </div>
       </nav>
+
       <div className="popular-classes">
         <div className="container">
           <div className="main-heading text-center">
             <span className="text-uppercase position-relative d-inline-block px-2">Popular Classes</span>
             <h2 className="fw-bold my-3">Classes We Provide</h2>
           </div>
-          <div className="row row-cols-1 row-cols-md-2 row-cols-lg-3">
+          <div className="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 align-items-stretch">
             {courses.map((course, idx) => (
               <CourseCard
                 key={idx}
                 {...course}
                 onApply={() => handleApply(course)}
-                loading={loading && selectedCourse && selectedCourse.title === course.title}
+                loading={loading && selectedCourse?.title === course.title}
               />
             ))}
           </div>
         </div>
       </div>
-      {/* Advanced Courses Section */}
+
       <div className="popular-classes">
-      <div className="container">
-      <div className="main-heading text-center">
-        <span className="text-uppercase position-relative d-inline-block px-2">Advanced Courses</span>
-        <h2 className="fw-bold my-3">Technical & Non-Tech Classes </h2>
-      </div>
-      <div className="container mb-5">
-        <div className="row row-cols-1 row-cols-md-2 row-cols-lg-3">
-          {advancedCourses.map((course, idx) => (
-            <CourseCard
-              key={idx}
-              {...course}
-              onApply={() => handleApply(course)}
-              loading={loading && selectedCourse && selectedCourse.title === course.title}
-            />
-          ))}
+        <div className="container">
+          <div className="main-heading text-center">
+            <span className="text-uppercase position-relative d-inline-block px-2">Advanced Courses</span>
+            <h2 className="fw-bold my-3">Technical & Non-Tech Classes</h2>
+          </div>
+          <div className="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 align-items-stretch">
+            {advancedCourses.map((course, idx) => (
+              <CourseCard
+                key={idx}
+                {...course}
+                onApply={() => handleApply(course)}
+                loading={loading && selectedCourse?.title === course.title}
+              />
+            ))}
+          </div>
         </div>
       </div>
-      
-      </div>
-      </div>
-      
+
       <EnquiryModal
         show={showEnquiryModal}
         onClose={handleCloseModal}
@@ -308,6 +304,7 @@ const Classes = () => {
         onSkip={handleSkipEnquiry}
         selectedCourse={selectedCourse?.title}
       />
+
       {showLoginNeeded && (
         <div
           style={{
@@ -321,7 +318,7 @@ const Classes = () => {
             padding: '1rem 2rem',
             zIndex: 2000,
             fontWeight: 600,
-            boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
+            boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
           }}
         >
           Please login to enroll in the course

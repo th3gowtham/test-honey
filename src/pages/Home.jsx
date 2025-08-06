@@ -176,15 +176,25 @@ const Home = () => {
 
   return(
   <div style={{ overflowX: 'hidden' }}>
-    <style>{`
-     .quote-icon {
-  color: #127d8e;
-  font-size: 3rem;        
-  vertical-align: -0.4em;    
-  margin-right: 0.1em;       
-  line-height: 0;
-}
-    `}</style>
+ <style>{`
+  .quote-icon {
+    color: #127d8e;
+    font-size: 3rem;        
+    vertical-align: -0.4em;    
+    margin-right: 0.1em;       
+    line-height: 0;
+  }
+
+  .col.p-3 .item {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .col.p-3 .item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+  }
+`}</style>
+
     <section className="landing text-white" data-aos="fade-in">
       <div className="container mh-100 d-flex align-items-center">
         <div className="row align-items-center">
