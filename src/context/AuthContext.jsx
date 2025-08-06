@@ -40,8 +40,7 @@ export const AuthProvider = ({ children }) => {
     const apiUrl = 'https://thehoneybee-gl4r.onrender.com';
     return axios.get(`${apiUrl}/api/auth/me`, { withCredentials: true })
       .then(res => {
-        // Log what is received from the backend
-        console.log("[AuthContext] /api/auth/me response:", res.data);
+
 
         setUserRole(res.data.role);
         setUserName(res.data.name);

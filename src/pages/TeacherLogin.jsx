@@ -43,7 +43,9 @@ const TeacherLogin = () => {
   const [accessAllowed, setAccessAllowed] = useState(false);
   const [success, setSuccess] = useState(false);
 
+
   const apiUrl = 'https://thehoneybee-gl4r.onrender.com';
+
   const { login } = useAuth();
   const navigate = useNavigate();
 

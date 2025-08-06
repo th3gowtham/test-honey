@@ -54,12 +54,12 @@ export default function Sidebar({ activeRoute, setActiveRoute, collapsed, setCol
             return (
               <button
                 key={item.id}
-                className={`nav-item ${activeRoute === item.id ? "active" : ""}`}
+                className={`Admin-nav-item ${activeRoute === item.id ? "active" : ""}`}
                 onClick={() => setActiveRoute(item.id)}
                 title={collapsed ? item.label : ""}
               >
-                <Icon className="nav-icon" />
-                {!collapsed && <span className="nav-label">{item.label}</span>}
+                <Icon className="Admin-nav-icon" />
+                {!collapsed && <span className="Admin-nav-label">{item.label}</span>}
               </button>
             )
           })}
