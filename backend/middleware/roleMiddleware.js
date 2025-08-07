@@ -37,8 +37,8 @@ const requireRole = (allowedRoles) => {
       }
 
       // Check for Student
-      const studentDoc = await db.collection('Students').doc(email).get();
-      if (studentDoc.exists) {
+      const studentSnapshot = await db.collection('Students').where('Gmail', '==', email).get();
+      if (!studentSnapshot.empty) {
         const userRole = 'student';
         if (!allowedRoles.includes(userRole)) {
           return res.status(403).json({ 
@@ -81,9 +81,9 @@ const requireBatchAccess = () => {
       }
       
       // Check for Student
-      const studentDoc = await db.collection('Students').doc(email).get();
-      if (studentDoc.exists) {
-        const userData = studentDoc.data();
+      const studentSnapshot = await db.collection('Students').where('Gmail', '==', email).get();
+      if (!studentSnapshot.empty) {
+        const userData = studentSnapshot.docs[0].data();
         const userBatches = userData.batches || [];
         
         // Students can only access their assigned batches
