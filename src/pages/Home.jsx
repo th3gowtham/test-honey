@@ -176,15 +176,25 @@ const Home = () => {
 
   return(
   <div style={{ overflowX: 'hidden' }}>
-    <style>{`
-     .quote-icon {
-  color: #127d8e;
-  font-size: 3rem;        
-  vertical-align: -0.4em;    
-  margin-right: 0.1em;       
-  line-height: 0;
-}
-    `}</style>
+ <style>{`
+  .quote-icon {
+    color: #127d8e;
+    font-size: 3rem;        
+    vertical-align: -0.4em;    
+    margin-right: 0.1em;       
+    line-height: 0;
+  }
+
+  .col.p-3 .item {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .col.p-3 .item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+  }
+`}</style>
+
     <section className="landing text-white" data-aos="fade-in">
       <div className="container mh-100 d-flex align-items-center">
         <div className="row align-items-center">
@@ -314,7 +324,12 @@ const Home = () => {
                   <div className="item py-2 px-4 position-relative d-flex align-items-center border-top justify-content-center justify-content-md-start">Creativity and Innovation</div>
                 </div>
               </div>
-              <Link to="/classes" className="main-link mb-2 mb-lg-0 d-inline-block text-decoration-none text-white py-2 px-4 rounded-pill">Join Class</Link>
+             <div className="d-flex flex-column align-items-center">
+  <Link to="/classes" className="d-flex flex-column align-items-center main-link mb-2 text-decoration-none text-white py-2 px-4 rounded-pill">
+    Join Class
+  </Link>
+</div>
+
             </div>
           </div>
         </div>
@@ -362,7 +377,7 @@ const Home = () => {
                     Commitment to Inclusivity
                   </li>
                 </ul>
-                <a href="https://wa.me/message/BITGLQYLAPJRO1" className="main-link mb-2 mb-lg-0 d-inline-block text-decoration-none text-white py-2 px-4 rounded-pill">Join Class</a>
+                <a href="https://wa.me/message/BITGLQYLAPJRO1" className=" flex-column align-items-center main-link mb-2 text-decoration-none text-white py-2 px-4 rounded-pill">Join Class</a>
               </div>
             </div>
           </div>

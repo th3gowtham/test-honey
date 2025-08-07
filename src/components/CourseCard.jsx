@@ -9,58 +9,55 @@ const CourseCard = ({
   duration,
   fee,
   onApply,
-  loading
-}) => (
-  <div className="col p-3">
-    <div className="class bg-light text-center rounded overflow-hidden border" data-aos="fade-up">
-      <div className="image d-flex justify-content-center align-items-center" style={{ width: '100%', height: 220, background: '#f8fcfd' }}>
+  loading,
+}) => {
+  return (
+    <div className="col mb-4 d-flex">
+      <div className="card h-100 w-100 course-card p-3">
         <img
           src={imgSrc}
-          className="img-fluid"
-          alt="img"
-          style={{ width: 420, height: 220, objectFit: 'cover', boxShadow: '0 2px 8px rgba(18,125,142,0.04)' }}
+          className="card-img-top"
+          alt={title}
+          style={{ height: "200px", objectFit: "cover", borderRadius: "10px" }}
         />
-      </div>
-      <div className="content p-4">
-        <h3 className="m-0">{title}</h3>
-        <p className="py-4 text-muted border-bottom">{description}</p>
-        <div className="list mb-3">
-          <div className="item border-bottom d-flex">
-            <span className="fw-bold py-2">Age of Kids</span>
-            <span className="py-2">{age}</span>
-          </div>
-          <div className="item border-bottom d-flex">
-            <span className="fw-bold py-2">Total Seats</span>
-            <span className="py-2">{seats}</span>
-          </div>
-          <div className="item border-bottom d-flex">
-            <span className="fw-bold py-2">Duration</span>
-            <span className="py-2">{duration}</span>
-          </div>
-          {fee && (
-            <div className="item border-bottom d-flex">
-              <span className="fw-bold py-2">Fee</span>
-              <span className="py-2">₹{fee}</span>
-            </div>
-          )}
-        </div>
-        {onApply && (
+        <div className="card-body d-flex flex-column">
+          <h5 className="card-title fw-bold text-center">{title}</h5>
+          <p className="card-text course-description text-center">{description}</p>
+
+          {/* Tabular Info Section */}
+  <table className="table table-bordered text-center course-info-table mt-3">
+  <tbody>
+    <tr>
+      <td className="fw-semibold">Age of Kids</td>
+      <td>{age}</td>
+    </tr>
+    <tr>
+      <td className="fw-semibold">Total Seats</td>
+      <td>{seats}</td>
+    </tr>
+    <tr>
+      <td className="fw-semibold">Duration</td>
+      <td>{duration}</td>
+    </tr>
+    <tr>
+      <td className="fw-semibold">Fee</td>
+      <td>₹{fee}</td>
+    </tr>
+  </tbody>
+</table>
+
+
           <button
-            onClick={() => {
-              console.log("Enroll Now clicked for:", title);
-              onApply();
-            }}
+            className="enroll-btn mt-auto mx-auto"
+            onClick={onApply}
             disabled={loading}
-            className="main-link mb-2 mb-lg-0 d-inline-block text-decoration-none text-white py-2 px-4 rounded-pill"
-            style={{ border: 'none', cursor: loading ? 'not-allowed' : 'pointer' }}
           >
-            {loading ? 'Processing...' : 'Enroll Now'}
+            {loading ? "Processing..." : "Enroll Now"}
           </button>
-        )}
+        </div>
       </div>
     </div>
-  </div>
-);
+  );
+};
 
 export default CourseCard;
-                                  
