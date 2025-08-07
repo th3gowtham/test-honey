@@ -74,11 +74,11 @@
   border: none;
 }
 
-.form-group {
+.booking-form-group {
   margin-bottom: 16px;
 }
 
-.form-group label {
+.booking-form-group label {
   display: block;
   color: #475569;
   font-size: 14px;
@@ -86,7 +86,7 @@
   margin-bottom: 6px;
 }
 
-.form-group input {
+.booking-form-group input {
   width: 100%;
   padding: 10px;
   border-radius: 6px;

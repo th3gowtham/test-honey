@@ -420,7 +420,8 @@ export default function ChatAssignment() {
         }
 
         .assign-btn {
-          height: fit-content;
+             position: relative;
+            top: -25px;
           white-space: nowrap;
         }
 

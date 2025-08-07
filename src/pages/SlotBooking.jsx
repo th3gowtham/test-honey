@@ -145,7 +145,7 @@ const SlotBooking = () => {
               </div>
             </div>
 
-            <div className="form-group">
+            <div className="booking-form-group">
               <label>Select Date</label>
               <input
                 type="date"

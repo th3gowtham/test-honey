@@ -736,7 +736,8 @@ export default function BatchAssignment() {
         }
 
         .student-checkbox input[type="checkbox"] {
-          margin: 0;
+          position:relative;
+          top:-9px
         }
 
         .loading-state, .error-state, .empty-state {
