@@ -5,7 +5,7 @@ import { toast } from "react-toastify";
 const PaymentContext = createContext();
 
 export const PaymentProvider = ({ children }) => {
-  const { user, userRole ,userName } = useAuth();
+  const { user, userRole, userName } = useAuth();
   const [loading, setLoading] = useState(false);
 
   const startPayment = async (course) => {
@@ -23,7 +23,7 @@ export const PaymentProvider = ({ children }) => {
     }
     try {
       setLoading(true);
-      const apiUrl = 'http://localhost:5000';
+      const apiUrl = import.meta.env.VITE_API_URL;
       const response = await fetch(`${apiUrl}/api/payment/order`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },

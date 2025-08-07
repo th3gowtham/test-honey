@@ -22,7 +22,7 @@ const WelcomeScreen = () => {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        backgroundColor: "#f9fafb", // Tailwind's bg-gray-50
+       
         padding: "1.5rem", // px-6
         minHeight: isMobile ? " " : "calc(100vh - 4rem)", // Full height for small screens
         boxSizing: "border-box",
@@ -36,15 +36,20 @@ const WelcomeScreen = () => {
           margin: "0 auto",
         }}
       >
-        <div>
+        <div style={{
+          marginTop: "50px"
+        }
+        }>
           <img
             src={logoImg}
             alt="Logo"
             style={{
-              width: "150px",
-              height: "150px",
+              width: "170px",
+              height: "170px",
               objectFit: "contain",
-              margin: "0 auto 1rem",
+              marginTop: "80px",
+              marginBottom: "20px"
+              
             }}
           />
         </div>
@@ -52,9 +57,10 @@ const WelcomeScreen = () => {
         <h1
           style={{
             fontSize: "1.25rem",
+            fontWeight: 600,
             color: "#111827",
             marginBottom: "0.5rem",
-            fontWeight: "bold"
+           
           }}
         >
           Welcome to HoneyBee Chat
@@ -65,10 +71,10 @@ const WelcomeScreen = () => {
             fontSize: "0.875rem",
             color: "#4b5563",
             lineHeight: "1.5rem",
-            fontWeight: "bold"
+           
           }}
         >
-          Select a chat from the sidebar to start messaging
+          {isMobile ? "Choose a chat on the bottom to begin chatting." : "Choose a chat on the left to begin chatting." }
         </p>
       </div>
     </div>

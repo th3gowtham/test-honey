@@ -7,7 +7,8 @@ import img2r from "../assets/2r.png";
 import EnquiryModal from './EnquiryModal';
 import "./Header.css"
 import React, { useEffect, useRef, useState } from 'react';
-import axios from 'axios';
+
+
 
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 
@@ -59,9 +60,7 @@ const Header = ({ onLoginClick }) => {         // Main Header component that rec
 
   const handleLogout = async () => {
     try {
-      const apiUrl = import.meta.env.VITE_API_URL;
-      await axios.post(`${apiUrl}/api/auth/logout`, {}, { withCredentials: true });
-      await logout(); // <-- Wait for state to update!
+      await logout(); // The logout function in AuthContext handles everything
       navigate('/');
     } catch (error) {
       console.error('Logout failed:', error);
@@ -71,7 +70,7 @@ const Header = ({ onLoginClick }) => {         // Main Header component that rec
 
 
   return (
-    // Main navigation bar with light background and shadow, sticky positioning
+    // Main navigation bar with light background and shadow, sticky positioning  `${apiUrl}/api/auth/logout`
     <nav className="navbar navbar-expand-lg bg-light shadow-lg sticky-top custom-navbar">
       <div className="container-fluid px-3">
         {/* Logo and brand section */}
@@ -82,9 +81,9 @@ const Header = ({ onLoginClick }) => {         // Main Header component that rec
 
           </Link>
           {/* Welcome message for logged in users - hidden on mobile */}
-          <span className=" ms-3 d-none d-lg-inline">
+       {  /* <span className=" ms-3 d-none d-lg-inline">
             {userRole ? `Welcome ${userRole}, ${userName}` : ''}
-          </span>
+          </span>*/ }
         </div>
         {/* Mobile hamburger menu button */}
         <button
@@ -148,9 +147,9 @@ const Header = ({ onLoginClick }) => {         // Main Header component that rec
         </div>
 
         {/* Welcome message for mobile users - shown below the navbar */}
-        <span className=" d-lg-none mt-2 ms-2">
-          {userRole ? `Welcome ${userRole}, ${userName}` : ''}
-        </span>
+            {/* <span className=" d-lg-none mt-2 ms-2">
+              {userRole ? `Welcome ${userRole}, ${userName}` : ''}
+            </span>*/ }
 
         {/* Temporary notification that appears when login is required */}
         {showLoginNeeded && (

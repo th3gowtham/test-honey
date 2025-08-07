@@ -43,7 +43,7 @@ const TeacherLogin = () => {
   const [accessAllowed, setAccessAllowed] = useState(false);
   const [success, setSuccess] = useState(false);
 
-  const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+  const apiUrl = import.meta.env.VITE_API_URL;
   const { login } = useAuth();
   const navigate = useNavigate();
 
@@ -80,18 +80,35 @@ const TeacherLogin = () => {
     setMessage('');
     try {
       const lowerEmail = email.trim().toLowerCase();
-      // Register in Firebase Auth
-      await createUserWithEmailAndPassword(auth, lowerEmail, password);
-      setMessage('Registration successful! Logging you in...');
-      // Log in the teacher
+
+      // Step 1: Set password in Teacher collection
+      await axios.post(`${apiUrl}/api/auth/teachers/set-password`, {
+        email: lowerEmail,
+        password: password
+      }, { withCredentials: true });
+
+      setMessage('Password set successfully! Creating account...');
+
+      // Step 2: Create Firebase Auth user (like registration)
+      try {
+        await createUserWithEmailAndPassword(auth, lowerEmail, password);
+        setMessage('Account created! Logging you in...');
+      } catch (firebaseErr) {
+        // If user already exists in Firebase Auth, that's fine - continue with login
+        if (firebaseErr.code !== 'auth/email-already-in-use') {
+          throw firebaseErr;
+        }
+        setMessage('Account exists! Logging you in...');
+      }
+
+      // Step 3: Sign in with Firebase Auth to get ID token
       await signInWithEmailAndPassword(auth, lowerEmail, password);
-
-      // --- THIS IS THE CRITICAL PART ---
-      // Set session cookie by calling backend login endpoint
       const idToken = await auth.currentUser.getIdToken();
-      await axios.post(`${apiUrl}/api/auth/google-login`, { idToken, rememberMe: true }, { withCredentials: true });
 
-      // Update global auth state
+      // Step 4: Create session using the ID token (like regular login)
+      await axios.post(`${apiUrl}/api/auth/google-login`, { idToken }, { withCredentials: true });
+
+      // Step 5: Update global auth state
       await login();
 
       setSuccess(true);
@@ -100,8 +117,10 @@ const TeacherLogin = () => {
         navigate('/chat');
       }, 1000);
     } catch (err) {
-      if (err.code === 'auth/email-already-in-use') {
-        setMessage('This email is already registered. Please try logging in.');
+      if (err.response?.data?.error) {
+        setMessage(err.response.data.error);
+      } else if (err.code === 'auth/email-already-in-use') {
+        setMessage('This email is already registered. Please try logging in with the main login form.');
       } else {
         setMessage(err.message || 'An error occurred');
       }
@@ -110,21 +129,198 @@ const TeacherLogin = () => {
   };
 
   if (checking) {
-    return <div style={{ color: '#127d8e', fontWeight: 500, textAlign: 'center', marginTop: 60 }}>Checking access...</div>;
+    return (
+      <div style={{
+        minHeight: '100vh',
+        backgroundColor: '#f7fbfc',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        fontFamily: 'Segoe UI, Arial, sans-serif',
+      }}>
+        <div style={{
+          background: '#fff',
+          borderRadius: 12,
+          boxShadow: '0 8px 32px rgba(18, 125, 142, 0.12)',
+          padding: '2.5rem 2rem 2rem 2rem',
+          minWidth: 340,
+          maxWidth: 400,
+          width: '100%',
+          position: 'relative',
+          textAlign: 'center',
+          border: '1.5px solid #e3e8ee',
+        }}>
+          <div style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: '20px'
+          }}>
+            <div style={{
+              width: '40px',
+              height: '40px',
+              border: '3px solid #e3e8ee',
+              borderTop: '3px solid #127d8e',
+              borderRadius: '50%',
+              animation: 'spin 1s linear infinite'
+            }}></div>
+            <div style={{
+              color: '#127d8e',
+              fontWeight: 600,
+              fontSize: '1.1rem',
+              letterSpacing: 0.2
+            }}>
+              Checking access...
+            </div>
+            <div style={{
+              color: '#666',
+              fontSize: '0.9rem',
+              fontWeight: 400
+            }}>
+              Verifying your teacher credentials
+            </div>
+          </div>
+        </div>
+        <style>{`
+          @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+          }
+        `}</style>
+      </div>
+    );
   }
 
   if (!email) {
-    return <div style={{ color: '#d32f2f', fontWeight: 500, textAlign: 'center', marginTop: 60 }}>No email provided in the link.</div>;
+    return (
+      <div style={{
+        minHeight: '100vh',
+        backgroundColor: '#f7fbfc',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        fontFamily: 'Segoe UI, Arial, sans-serif',
+      }}>
+        <div style={{
+          background: '#fff',
+          borderRadius: 12,
+          boxShadow: '0 8px 32px rgba(18, 125, 142, 0.12)',
+          padding: '2.5rem 2rem 2rem 2rem',
+          minWidth: 340,
+          maxWidth: 400,
+          width: '100%',
+          position: 'relative',
+          textAlign: 'center',
+          border: '1.5px solid #e3e8ee',
+        }}>
+          <div style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: '15px'
+          }}>
+            <div style={{
+              width: '48px',
+              height: '48px',
+              borderRadius: '50%',
+              background: '#fff6f6',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              border: '2px solid #d32f2f'
+            }}>
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="#d32f2f">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
+              </svg>
+            </div>
+            <div style={{
+              color: '#d32f2f',
+              fontWeight: 600,
+              fontSize: '1.1rem',
+              letterSpacing: 0.2
+            }}>
+              No Email Provided
+            </div>
+            <div style={{
+              color: '#666',
+              fontSize: '0.9rem',
+              fontWeight: 400
+            }}>
+              Please use the correct link to access this page
+            </div>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   if (!accessAllowed) {
-    return <div style={{ color: '#d32f2f', fontWeight: 500, textAlign: 'center', marginTop: 60 }}>{message || 'Access denied: Only teachers can access this page.'}</div>;
+    return (
+      <div style={{
+        minHeight: '100vh',
+        backgroundColor: '#f7fbfc',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        fontFamily: 'Segoe UI, Arial, sans-serif',
+      }}>
+        <div style={{
+          background: '#fff',
+          borderRadius: 12,
+          boxShadow: '0 8px 32px rgba(18, 125, 142, 0.12)',
+          padding: '2.5rem 2rem 2rem 2rem',
+          minWidth: 340,
+          maxWidth: 400,
+          width: '100%',
+          position: 'relative',
+          textAlign: 'center',
+          border: '1.5px solid #e3e8ee',
+        }}>
+          <div style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: '15px'
+          }}>
+            <div style={{
+              width: '48px',
+              height: '48px',
+              borderRadius: '50%',
+              background: '#fff6f6',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              border: '2px solid #d32f2f'
+            }}>
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="#d32f2f">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
+              </svg>
+            </div>
+            <div style={{
+              color: '#d32f2f',
+              fontWeight: 600,
+              fontSize: '1.1rem',
+              letterSpacing: 0.2
+            }}>
+              Access Denied
+            </div>
+            <div style={{
+              color: '#666',
+              fontSize: '0.9rem',
+              fontWeight: 400
+            }}>
+              {message || 'Only teachers can access this page.'}
+            </div>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   return (
     <div style={{
       minHeight: '100vh',
-      background: 'linear-gradient(135deg, #eaf6fa 0%, #f7fbfc 100%)',
+      backgroundColor: '#f7fbfc',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
@@ -144,7 +340,7 @@ const TeacherLogin = () => {
         transition: 'box-shadow 0.2s',
       }}>
         <h2 style={{
-          color: '#127d8e',
+          color: '#333333',
           fontWeight: 700,
           marginBottom: 18,
           fontSize: '1.7rem',
@@ -271,9 +467,9 @@ const TeacherLogin = () => {
               <div
                 style={{
                   marginTop: 20,
-                  color: message.startsWith('Welcome') || message.startsWith('Registration successful') ? '#127d8e' : '#d32f2f',
-                  background: message.startsWith('Welcome') || message.startsWith('Registration successful') ? '#eaf6fa' : '#fff6f6',
-                  border: message.startsWith('Welcome') || message.startsWith('Registration successful') ? '1.5px solid #127d8e33' : '1.5px solid #d32f2f33',
+                  color: message.startsWith('Welcome') || message.startsWith('Password set successfully') || message.startsWith('Account created') || message.startsWith('Account exists') ? '#127d8e' : '#d32f2f',
+                  background: message.startsWith('Welcome') || message.startsWith('Password set successfully') || message.startsWith('Account created') || message.startsWith('Account exists') ? '#eaf6fa' : '#fff6f6',
+                  border: message.startsWith('Welcome') || message.startsWith('Password set successfully') || message.startsWith('Account created') || message.startsWith('Account exists') ? '1.5px solid #127d8e33' : '1.5px solid #d32f2f33',
                   borderRadius: 6,
                   padding: '12px 10px',
                   fontWeight: 500,

@@ -1,7 +1,19 @@
 import { Calendar, MoreVertical, Bell } from "lucide-react";
 import "../styles/AnnouncementsView.css";
-
+import { useState, useEffect, useRef } from "react";
+import BookCallModal from '../components/BookCallModal';
 const AnnouncementsView = () => {
+    const [showMenu, setShowMenu] = useState(false);
+    const menuRef = useRef(null);
+      useEffect(() => {
+        const handleClickOutside = (event) => {
+          if (menuRef.current && !menuRef.current.contains(event.target)) {
+            setShowMenu(false);
+          }
+        };
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+      }, []);
   return (
     <div className="announcements-container">
       {/* Header */}
@@ -13,11 +25,33 @@ const AnnouncementsView = () => {
             <p>🔔 Stay updated with the latest updates</p>
           </div>
         </div>
-        <div className="announcements-actions">
-          <button className="announcements-btn">
-            <Calendar size={16} />
-            <span>Book Session</span>
+        <div className="session-btn-dropdown-container" ref={menuRef}>
+          <button
+            className="session-btn-dropdown-toggle"
+            onClick={() => setShowMenu((prev) => !prev)}
+            role='button'
+            tabIndex={0}
+          >
+            <MoreVertical size={23} />
           </button>
+          {showMenu && (
+            <div className="session-btn-dropdown-menu">
+              <button
+                className="session-btn-dropdown-item"
+              >
+                Book Session
+              </button>
+              <button
+                className="session-btn-dropdown-item"
+                onClick={() => {
+                  console.log("View File clicked");
+                  setShowMenu(false);
+                }}
+              >
+                View File
+              </button>
+            </div>
+          )}
         </div>
       </div>
       <div className="announcements-list">

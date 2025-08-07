@@ -5,6 +5,7 @@ import { auth, db } from '../services/firebase';
 import { onAuthStateChanged } from 'firebase/auth';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { addCurrentUserToFirestore, initializeSampleUsers } from '../utils/initializeUsers';
+import { signOut } from "firebase/auth";
 
 const AuthContext = createContext();
 
@@ -35,20 +36,17 @@ export const AuthProvider = ({ children }) => {
 
   // Fetch user info from backend, return promise for awaiting
   const refreshUser = useCallback(() => {
-    setLoading(true);
+
     const apiUrl = import.meta.env.VITE_API_URL;
     return axios.get(`${apiUrl}/api/auth/me`, { withCredentials: true })
       .then(res => {
         // Log what is received from the backend
-        console.log("[AuthContext] /api/auth/me response:", res.data);
-
         setUserRole(res.data.role);
         setUserName(res.data.name);
         setUser(res.data.user);
         setLoading(false);
       })
       .catch((err) => {
-        // 401 means "not logged in" and is expected on initial load if no session exists.
         if (err.response && err.response.status !== 401) {
           // Only log unexpected errors, not 401
           console.error("[AuthContext] /api/auth/me error:", err);
@@ -60,13 +58,8 @@ export const AuthProvider = ({ children }) => {
       });
   }, []);
 
-  // Only check /api/auth/me if we think the user might be logged in
   useEffect(() => {
-    if (localStorage.getItem('isLoggedIn') === 'true') {
-      refreshUser();
-    } else {
-      setLoading(false); // Not loading, not logged in
-    }
+    refreshUser();
   }, [refreshUser]);
 
   // Listen for cross-tab auth events
@@ -87,19 +80,37 @@ export const AuthProvider = ({ children }) => {
 
   // Call this after login/logout/role change, return promise for awaiting
   const login = () => {
-    localStorage.setItem('isLoggedIn', 'true'); // Set flag on login
     const p = refreshUser();
     broadcastAuthEvent();
     return p;
   };
-  const logout = () => {
-    localStorage.removeItem('isLoggedIn'); // Remove flag on logout
-    setUser(null);
-    setUserRole(null);
-    setUserName(null);
-    setLoading(false);
-    broadcastAuthEvent();
-    return Promise.resolve();
+
+  const logout = async () => {
+    setLoading(true);
+    try {
+      // 1. Firebase sign out
+      await signOut(auth);
+
+      // 2. Backend logout
+      const apiUrl = import.meta.env.VITE_API_URL;
+      await axios.post(`${apiUrl}/api/auth/logout`, {}, { withCredentials: true });
+
+      // 3. Reset user state
+      setUser(null);
+      setUserRole(null);
+      setUserName(null);
+      setCurrentUser && setCurrentUser(null); // Only if you have this
+
+      // 4. Clear localStorage flag
+      localStorage.removeItem('isLoggedIn');
+
+      // 5. Broadcast event (optional)
+      broadcastAuthEvent && broadcastAuthEvent();
+    } catch (err) {
+      console.error('Logout failed:', err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (

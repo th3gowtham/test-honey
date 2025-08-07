@@ -6,6 +6,7 @@
   background-color: #f9fafb;
   position: relative;
   z-index: 10;
+   overflow: hidden;
 }
 
 /* Header */
@@ -17,7 +18,8 @@
   background-color: white;
   border-bottom: 1px solid #e5e7eb;
   flex-wrap: wrap;
-  border-radius: 40px;
+  flex-shrink: 0;
+  background-color: lightgray;
 }
 
 .announcements-header-info {
@@ -27,7 +29,7 @@
 }
 
 .announcements-avatar {
-  background-color: #f97316; /* orange-500 */
+  background-color: #14b8a6;
   color: white;
   border-radius: 9999px;
   width: 40px;
@@ -56,10 +58,12 @@
   gap: 10px;
   align-items: center;
   margin-top: 8px;
+   justify-content: flex-end;
+  flex-wrap: nowrap;
 }
 
 .announcements-btn {
-  background-color: #f97316; /* orange-500 */
+  background-color: #14b8a6; 
   color: white;
   border: none;
   border-radius: 6px;
@@ -69,7 +73,11 @@
   font-size: 12px;
   gap: 4px;
   margin-right: 10px;
+  z-index: 30;
+  white-space: nowrap;
+  
 }
+
 
 .announcements-more-btn {
   background: none;
@@ -140,6 +148,9 @@
   font-size: 0.875rem;
   color: #1f2937;
 }
+.announcements-footer{
+  background-color: lightgray;
+}
 
 /* 🔧 Mobile responsiveness */
 @media (max-width: 420px) {
@@ -188,7 +199,7 @@
   color: #6b7280; /* gray-500 */
 }
 /* tablet view */
-@media (min-width: 420px) and (max-width: 768px) {
+@media (min-width: 421px) and (max-width: 768px) {
   .announcements-header {
     display: flex;
     justify-content: space-between; /* Left side info & right side actions */
@@ -208,20 +219,24 @@
   }
   
 }
-@media (min-width: 420px) and (max-width: 492px) {
+@media (min-width: 420px) and (max-width: 491px) {
   .announcements-header {
-    flex-direction: column;
+    flex-direction: row;
     align-items: flex-start;
+    flex-wrap: wrap;
     gap: 8px;
   }
 
   .announcements-actions {
     width: 100%;
-    justify-content: flex-start;
-    margin-top: 8px;
+    flex-wrap: nowrap;
+    justify-content: flex-end;
+
   }
 
   .announcements-btn {
+          margin-right: 0;
+    white-space: nowrap;
     transform: translateY(0); /* Reset */
     margin-right: 0;
     margin-left: 70%;
@@ -237,6 +252,98 @@
   .announcements-container{
     position: fixed;
     width: 100%;
-    /* background-color: red; */
   }
+}
+
+@media (max-width: 492px) {
+  .announcements-header {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    /* margin: 0; */
+    margin-top: 0;
+
+  }
+
+  .announcements-btn {
+    color: white;
+    border-radius: 6px;
+    margin-top: 0;
+  }
+
+  .announcements-actions {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    margin-top: 8px;
+    justify-content: flex-end;
+    flex-wrap: nowrap;
+    width: 100%;
+  }
+}
+/* Drop down container */
+
+/* Container */
+.session-btn-dropdown-container {
+  position: relative;
+  display: inline-block;
+}
+
+/* Button (3-dot icon) */
+.session-btn-dropdown-toggle {
+  all: unset;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: inherit;
+  font: inherit;
+  line-height: normal;
+}
+
+.session-btn-dropdown-toggle:hover {
+  background-color: #f0f0f0; /* subtle hover for icon */
+}
+
+/* Dropdown menu */
+.session-btn-dropdown-menu {
+  position: absolute;
+  right: 0;
+  margin-top: 8px;
+  background-color: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  width: 160px;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Each dropdown item */
+.session-btn-dropdown-item {
+  padding: 10px 16px;
+  background: none;
+  border: none;
+  text-align: left;
+  width: 100%;
+  font-size: 14px;
+  cursor: pointer;
+  color: #111827; /* dark text */
+  background-color: white;
+}
+
+.session-btn-dropdown-item:hover {
+  background-color: #f9fafb; /* subtle hover */
+}
+
+/* Optional: disabled state */
+.session-btn-dropdown-item:disabled {
+  color: #d1d5db; /* gray text */
+  cursor: not-allowed;
+  background-color: #ffffff;
 }

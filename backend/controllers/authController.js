@@ -30,21 +30,24 @@ async function getUserRoleAndName(email, nameFromToken) {
     return { role: 'Teacher', name: dbName };
   }
 
-  // 3. Handle Student (existing or new)
-  const studentRef = db.collection('Students').doc(email);
-  const studentSnap = await studentRef.get();
+  // 3. Handle Student (existing or new) - Updated to use where query and auto-generated IDs
+  const studentSnapshot = await db.collection('Students').where('Gmail', '==', email).get();
 
-  if (studentSnap.exists) {
+  if (!studentSnapshot.empty) {
     // For existing students, use their name from the database
-    const studentData = studentSnap.data();
+    const studentData = studentSnapshot.docs[0].data();
     const dbName = studentData.name || email.split('@')[0];
     console.log(`[getUserRoleAndName] Found existing Student. Email: ${email}, Name from DB: ${dbName}`);
     return { role: 'Student', name: dbName };
   } else {
-    // For NEW students, use the name from the token (e.g., from Google or registration form)
-    const newStudentName = nameFromToken || email.split('@')[0];
+    // For NEW students, use auto-generated ID and the name from the token
+    const newStudentName = nameFromToken; // Always use the provided name
     console.log(`[getUserRoleAndName] Creating new Student. Email: ${email}, Name: ${newStudentName}`);
-    await studentRef.set({ Gmail: email, name: newStudentName, createdAt: new Date() });
+    const newStudentRef = await db.collection('Students').add({ 
+      Gmail: email, 
+      name: newStudentName, 
+      createdAt: new Date() 
+    });
     return { role: 'Student', name: newStudentName };
   }
 }
@@ -55,8 +58,8 @@ async function emailExistsInAnyCollection(email) {
   if (!adminSnap.empty) return true;
   const teacherSnap = await db.collection('Teacher').where('Gmail', '==', email).get();
   if (!teacherSnap.empty) return true;
-  const studentSnap = await db.collection('Students').doc(email).get();
-  if (studentSnap.exists) return true;
+  const studentSnap = await db.collection('Students').where('Gmail', '==', email).get();
+  if (!studentSnap.empty) return true;
   return false;
 }
 
@@ -70,8 +73,8 @@ const handleEmailRegister = async (req, res) => {
       return res.status(400).json({ error: 'Email already exists in the system' });
     }
     // At this point, Firebase Auth user is already created on frontend
-    // Create Student record in Firestore
-    await db.collection('Students').doc(userEmail).set({
+    // Create Student record in Firestore with auto-generated ID
+    await db.collection('Students').add({
       Gmail: userEmail,
       name,
       createdAt: new Date()
@@ -87,25 +90,24 @@ const handleEmailRegister = async (req, res) => {
 
 // Main function that handles Google login authentication
 const handleGoogleLogin = async (req, res) => {
-  const { idToken, rememberMe } = req.body;
+  const { idToken, name: nameFromFrontend } = req.body;
   try {
     const decoded = await auth.verifyIdToken(idToken);
     const email = decoded.email.trim().toLowerCase();
-    // Pass the name from the token to the helper function.
-    // It will only be used if a NEW student is being created.
-    const nameFromToken = decoded.name || decoded.displayName;
-
+    // Prefer name from frontend, fallback to token/displayName
+    const name = nameFromFrontend || decoded.name || decoded.displayName;
     // This now returns the role and the CORRECT name (from DB for existing users)
-    const { role, name } = await getUserRoleAndName(email, nameFromToken);
+    const { role, name: dbName } = await getUserRoleAndName(email, name);
 
-    const expiresIn = rememberMe ? 7 * 24 * 60 * 60 * 1000 : 30 * 60 * 1000;
+    // Set session to 30 days (30 * 24 * 60 * 60 * 1000 milliseconds)
+    const expiresIn = 12 * 24 * 60 * 60 * 1000; // 30 days
     const sessionCookie = await auth.createSessionCookie(idToken, { expiresIn });
 
     res.cookie('session', sessionCookie, {
       maxAge: expiresIn,
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
+      secure: true,
+      sameSite: 'none',
       path: '/',
     });
 
@@ -120,7 +122,7 @@ const handleGoogleLogin = async (req, res) => {
   }
 };
 
-// Teacher password setup endpoint
+// Teacher password setup endpoint - Updated to not store password in collection
 const setTeacherPassword = async (req, res) => {
   const { email, password } = req.body;
   if (!email || !password) return res.status(400).json({ error: 'Email and password required' });
@@ -132,12 +134,8 @@ const setTeacherPassword = async (req, res) => {
       return res.status(403).json({ error: 'Access denied: Not a teacher' });
     }
 
-    // Hash the password
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    // Update the teacher document with the hashed password
-    const teacherDocId = teacherSnap.docs[0].id;
-    await db.collection('Teacher').doc(teacherDocId).update({ password: hashedPassword });
+    // Don't store password in collection - just return success
+    // The password will be handled by Firebase Auth only
 
     res.json({ message: 'Password set successfully' });
   } catch (err) {
@@ -146,7 +144,7 @@ const setTeacherPassword = async (req, res) => {
   }
 };
 
-// Teacher login endpoint
+// Teacher login endpoint - Updated to use Firebase Auth
 const teacherLogin = async (req, res) => {
   const { email, password } = req.body;
   if (!email || !password) return res.status(400).json({ error: 'Email and password required' });
@@ -159,17 +157,22 @@ const teacherLogin = async (req, res) => {
     }
 
     const teacherData = teacherSnap.docs[0].data();
-    if (!teacherData.password) {
-      return res.status(403).json({ error: 'Password not set. Please set your password first.' });
-    }
 
-    // Compare password
-    const isMatch = await bcrypt.compare(password, teacherData.password);
-    if (!isMatch) {
-      return res.status(401).json({ error: 'Invalid password' });
-    }
+    // Create a custom token for teacher login (since we don't have Firebase ID token)
+    const customToken = await auth.createCustomToken(teacherData.Gmail);
+    
+    // Set session to 30 days (30 * 24 * 60 * 60 * 1000 milliseconds)
+    const expiresIn = 30 * 24 * 60 * 60 * 1000; // 30 days
+    const sessionCookie = await auth.createSessionCookie(customToken, { expiresIn });
 
-    // You can generate a session/token here if needed
+    res.cookie('session', sessionCookie, {
+      maxAge: expiresIn,
+      httpOnly: true,
+      secure: true,
+      sameSite: 'none',
+      path: '/',
+    });
+
     res.json({ message: 'Login successful', role: 'Teacher', name: teacherData.name });
   } catch (err) {
     console.error("[teacherLogin] Error:", err);
@@ -178,7 +181,13 @@ const teacherLogin = async (req, res) => {
 };
 
 const logout = (req, res) => {
-  res.clearCookie('session', { path: '/' });
+  res.clearCookie('session', {
+    path: '/',
+    httpOnly: true,
+    secure: true,
+    sameSite: 'none'
+  });
+
   res.json({ message: 'Logged out' });
 };
 

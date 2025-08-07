@@ -3,14 +3,20 @@ const cors = require('cors');
 const Razorpay = require('razorpay');
 const crypto = require('crypto');
 const authRoutes = require('./routes/auth');
+const fileRoutes = require('./routes/files');
 const cookieParser = require('cookie-parser');
+const { connectDB } = require('./config/mongodb');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 
+// Connect to MongoDB
+connectDB();
+
 // CORS Configuration
 app.use(cors({
-  origin:process.env.CLIENT_URL ,
+  origin: process.env.CLIENT_URL,
+
   credentials: true
 }));
 
@@ -18,8 +24,9 @@ app.use(cors({
 app.use(express.json());
 app.use(cookieParser());
 
-// Auth Routes
+// Routes
 app.use('/api/auth', authRoutes);
+app.use('/api/files', fileRoutes);
 
 // Razorpay Setup , replace 
 const razorpay = new Razorpay({

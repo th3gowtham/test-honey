@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
+import ProtectedAdminRoute from "./components/ProtectedAdminRoute";
+import Unauthorized from "./pages/Unauthorized";
 import Home from "./pages/Home";
 import About from "./pages/About";
 import Classes from "./pages/Classes";
@@ -13,12 +15,14 @@ import PlogDetails from "./pages/PlogDetails";
 import Login from "./components/Login";
 import ForgotPassword from "./components/ForgotPassword"; // retained from your original
 import ChatApp from './ChatApp';
+import AdminDashboard from './components/AdminDashboard';
 import AOS from "aos";
 import "aos/dist/aos.css";
 import Header from "./components/Header";
 import Footer from './components/Footer';
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { Toaster } from "react-hot-toast";
 
 // App inner content
 function AppContent({ showLogin, setShowLogin }) {
@@ -31,15 +35,20 @@ function AppContent({ showLogin, setShowLogin }) {
 
   const showHeaderPaths = [
     "/", "/about", "/classes", "/contact", "/gallery",
-    "/pg", "/teachers", "/product", "/plog_details"
+    "/pg", "/teachers", "/product", "/plog_details","/teacher-login"
   ];
 
+ ;
+
+  
+      {showHeaderPaths.includes(location.pathname) && <Header onLoginClick={() => setShowLogin(true)} />} 
   const showFooter = showFooterPaths.includes(location.pathname);
   const isChatRoute = location.pathname.startsWith('/chat');
+  const isAdminRoute = location.pathname.startsWith('/admin');
 
   return (
     <>
-      {showHeaderPaths.includes(location.pathname) && <Header onLoginClick={() => setShowLogin(true)} />} 
+      {!isAdminRoute && <Header onLoginClick={() => setShowLogin(true)} />}
 
       <ToastContainer
         position="top-right"
@@ -52,6 +61,29 @@ function AppContent({ showLogin, setShowLogin }) {
         draggable
         pauseOnHover
         theme="light"
+      />
+      
+      <Toaster
+        position="top-right"
+        toastOptions={{
+          duration: 3000,
+          style: {
+            background: '#363636',
+            color: '#fff',
+          },
+          success: {
+            duration: 3000,
+            style: {
+              background: '#14b8a6',
+            },
+          },
+          error: {
+            duration: 4000,
+            style: {
+              background: '#ef4444',
+            },
+          },
+        }}
       />
 
       <Routes>
@@ -67,9 +99,13 @@ function AppContent({ showLogin, setShowLogin }) {
         <Route path="/chat" element={<ChatApp />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/teacher-login" element={<TeacherLogin />} />
+         <Route path="/admin" element={<ProtectedAdminRoute><AdminDashboard /></ProtectedAdminRoute>} />
+        <Route path="/unauthorized" element={<Unauthorized />} />
       </Routes>
 
-      {!isChatRoute && showFooter && <Footer />}
+     
+
+      {!isChatRoute && !isAdminRoute && showFooter && <Footer />}
       {showLogin && <Login onClose={() => setShowLogin(false)} />}
     </>
   );

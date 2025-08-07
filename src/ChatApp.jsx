@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { Bell, ArrowLeft} from "lucide-react";
+import { Bell, ArrowLeft, BellIcon} from "lucide-react";
 import { collection, getDocs } from 'firebase/firestore';
 import { db } from './services/firebase';
 import { useAuth } from './context/AuthContext';
@@ -98,7 +98,7 @@ const ChatApp = () => {
        
       
         {activeChat === null && <WelcomeScreen />}
-        {activeChat && activeChat.type === 'batch' && <BatchBroadcast />}
+        {activeChat && activeChat.type === 'batch' && <BatchBroadcast activeChat={activeChat} />}
         {activeChat && activeChat.type === 'private' && <PrivateChat receiverId={activeChat.id} activeChat={activeChat.name} />}
         {activeChat && activeChat.type === 'announcement' && <AnnouncementsView />}
         
@@ -107,7 +107,7 @@ const ChatApp = () => {
       {/* 🔔 Notification Icon */}
       {!activeChat && (
         <div className="chat-notification" onClick={() => setShowNotifications(true)}>
-      <Bell />
+      <BellIcon />
       </div>
       )}
       {/* Modals */}
