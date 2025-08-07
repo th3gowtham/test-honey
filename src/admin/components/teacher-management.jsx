@@ -433,7 +433,7 @@ export default function TeacherManagement() {
                 <label className="form-label">Assign Courses</label>
                 <div className="courses-grid">
                   {availableCourses.map((course) => (
-                    <label key={course} className="course-checkbox">
+                    <label key={course} className="admin_course-checkbox">
                       <input
                         type="checkbox"
                         checked={formData.courses.includes(course)}

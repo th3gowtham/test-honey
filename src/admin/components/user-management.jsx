@@ -227,7 +227,7 @@ export default function UserManagement() {
               <tr>
                 <th>User ID</th>
                 <th>Name</th>
-                <th>Role</th>
+              
                 <th>Email</th>
                 <th>Phone</th>
                 <th>Join Date</th>
@@ -246,9 +246,7 @@ export default function UserManagement() {
                         <span className="user-name">{user.name || "Unknown"}</span>
                       </div>
                     </td>
-                    <td>
-                      <span className={`role-badge ${user.role}`}>{user.role}</span>
-                    </td>
+                   
                     <td>{user.email || "N/A"}</td>
                     <td>{user.phone || "N/A"}</td>
                     <td>{user.joinDate ? new Date(user.joinDate).toLocaleDateString() : "N/A"}</td>
