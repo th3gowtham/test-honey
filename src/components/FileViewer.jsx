@@ -27,16 +27,32 @@ const FileViewer = ({ batchId, onFileDeleted, onFileCountUpdate }) => {
   const fetchFiles = async () => {
     try {
       setLoading(true);
+      setError(null);
+      console.log(`Fetching files for batchId: ${batchId}`);
+      
       const response = await fetch(`${apiUrl}/api/files/files/batch/${batchId}`, {
-        credentials: 'include'
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json'
+        }
       });
 
       if (!response.ok) {
-        throw new Error('Failed to fetch files');
+        const errorText = await response.text();
+        console.error('Failed to fetch files:', {
+          status: response.status,
+          statusText: response.statusText,
+          error: errorText,
+          url: response.url
+        });
+        throw new Error(`Failed to fetch files: ${response.status} ${response.statusText}`);
       }
 
       const data = await response.json();
+      console.log('Files API response:', data);
+      
       const fileList = data.files || [];
+      console.log(`Found ${fileList.length} files for batch ${batchId}`);
       setFiles(fileList);
 
       // Show toast only if not shown for this batchId yet
@@ -59,7 +75,18 @@ const FileViewer = ({ batchId, onFileDeleted, onFileCountUpdate }) => {
       }
     } catch (error) {
       console.error('Error fetching files:', error);
-      setError('Failed to load files');
+      setError(`Error loading files: ${error.message}`);
+      
+      // Show error toast
+      toast.error(`Failed to load files: ${error.message}`, {
+        duration: 5000,
+        style: {
+          background: '#fef2f2',
+          color: '#b91c1c',
+          fontWeight: 600,
+          fontSize: '0.9rem'
+        }
+      });
     } finally {
       setLoading(false);
     }

@@ -4,50 +4,197 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { getUserChats } from '../utils/chatUtils';
 import WelcomeScreen from  "../pages/WelcomeScreen"
-
-
+import { db } from '../services/firebase'; 
+import { collection, onSnapshot, query, where, doc, getDoc, getDocs } from 'firebase/firestore'; 
 
 const Sidebar = ({ currentView, setCurrentView, setActiveChat, setShowProfileSettings, setProfileTab, users }) => {
-  const { currentUser } = useAuth();
+  const { currentUser, userRole } = useAuth();
   const [isMobile, setIsMobile] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [chats, setChats] = useState([]);
+  const [batches, setBatches] = useState([]);
+  const [teachers, setTeachers] = useState([]);
+  const [courses, setCourses] = useState([]);
+  const [myStudentDocId, setMyStudentDocId] = useState(null);
 
-  // Batches array - component-based mapping
-  const batches = [
-    {
-      id: 'Math101',
-      name: 'Math 101 Batch',
-      students: 25,
-      unread: 3,
-      teacher: 'Sarah Johnson',
-      subject: 'Mathematics'
-    },
-    {
-      id: 'Science101',
-      name: 'Science 101 Batch',
-      students: 22,
-      unread: 1,
-      teacher: 'Dr. Smith',
-      subject: 'Science'
-    },
-    {
-      id: 'English101',
-      name: 'English 101 Batch',
-      students: 28,
-      unread: 0,
-      teacher: 'Ms. Davis',
-      subject: 'English'
-    },
-    {
-      id: 'History101',
-      name: 'History 101 Batch',
-      students: 20,
-      unread: 2,
-      teacher: 'Prof. Wilson',
-      subject: 'History'
+  // Effect to fetch all teachers (normalized fields)
+  useEffect(() => {
+    const teachersQuery = query(collection(db, 'Teacher'));
+    const unsubscribe = onSnapshot(teachersQuery, (snapshot) => {
+      const teachersData = snapshot.docs.map(doc => ({
+        id: doc.id,
+        uid: doc.data().uid || doc.id,
+        name: doc.data().name || 'Unknown',
+        email: doc.data().Gmail || doc.data().email || '',
+        status: doc.data().status || 'active',
+        ...doc.data()
+      }));
+      setTeachers(teachersData);
+    });
+    return () => unsubscribe();
+  }, []);
+
+  // Effect to fetch all courses (with fallback for empty collection)
+  useEffect(() => {
+    const coursesQuery = query(collection(db, 'courses'));
+    const unsubscribe = onSnapshot(coursesQuery, (snapshot) => {
+      if (snapshot.empty) {
+        // Fallback to mock list like admin batch screen so UI shows names
+        const mockCoursesData = [
+          { id: 'C001', courseName: 'React Fundamentals', status: 'active' },
+          { id: 'C002', courseName: 'JavaScript Advanced', status: 'active' },
+          { id: 'C003', courseName: 'Python Basics', status: 'active' },
+          { id: 'C004', courseName: 'Web Design', status: 'active' },
+          { id: 'C005', courseName: 'UI/UX', status: 'active' },
+          { id: 'C006', courseName: 'Data Science', status: 'active' }
+        ];
+        setCourses(mockCoursesData);
+      } else {
+        const coursesData = snapshot.docs.map(doc => ({
+          id: doc.id,
+          courseName: doc.data().name || doc.data().courseName || '',
+          status: doc.data().status || 'active',
+          ...doc.data()
+        })).filter(c => c.status === 'active');
+        setCourses(coursesData);
+      }
+    });
+    return () => unsubscribe();
+  }, []);
+
+  // Effect to fetch batches and resolve names
+  useEffect(() => {
+    const batchesQuery = query(collection(db, 'batches'), where('status', '==', 'active'));
+    const unsubscribe = onSnapshot(batchesQuery, (snapshot) => {
+      const batchesData = snapshot.docs.map(doc => {
+        const data = doc.data();
+        // Find the teacher's name using the teacherId
+        const teacherInfo = teachers.find(t => t.id === data.teacherId);
+        let teacherName = teacherInfo?.name || 'Unknown Teacher';
+
+        // Find the course name using the courseId
+        const courseInfo = courses.find(c => c.id === data.courseId);
+        const courseName = courseInfo?.courseName || courseInfo?.name || '';
+
+        if (userRole === 'student') {
+          teacherName = 'Teacher';
+        } else if (userRole === 'teacher' && teacherInfo?.uid !== currentUser?.uid) {
+          teacherName = 'Teacher';
+        }
+        return {
+          id: doc.id,
+          ...data,
+          teacher: teacherName,
+          students: Array.isArray(data.students) ? data.students : [],
+          studentsCount: Array.isArray(data.students) ? data.students.length : 0,
+          courseName
+        };
+      });
+
+      // Role-aware filtering: Admin sees all, Teacher sees own, Student sees assigned
+      const roleLower = (userRole || '').toLowerCase();
+      const myUid = currentUser?.uid;
+      const myEmail = currentUser?.email?.toLowerCase();
+      const myTeacher = teachers.find(t => {
+        const tEmail = t.email ? t.email.toLowerCase() : '';
+        return t.uid === myUid || t.id === myUid || (myEmail && tEmail === myEmail);
+      });
+
+      const visibleBatches = batchesData.filter(batch => {
+        if (roleLower === 'admin') return true;
+        if (roleLower === 'teacher') {
+          // Normalize possible identifiers for teacher matching
+          const teacherCandidates = [
+            batch.teacherId,
+            batch.teacherUid,
+            batch.teacherEmail ? batch.teacherEmail.toLowerCase() : null
+          ].filter(Boolean);
+
+          // Direct match against current user's identifiers
+          const directMatch = (
+            teacherCandidates.includes(myTeacher?.id) ||
+            teacherCandidates.includes(myTeacher?.uid) ||
+            (myEmail && teacherCandidates.includes(myEmail)) ||
+            (myUid && teacherCandidates.includes(myUid))
+          );
+
+          if (directMatch) return true;
+
+          // Fallback: resolve by teacherId -> Teacher collection email comparison
+          if (batch.teacherId) {
+            const matchingTeacher = teachers.find(t => t.id === batch.teacherId);
+            if (matchingTeacher) {
+              const tEmail = matchingTeacher.email ? matchingTeacher.email.toLowerCase() : '';
+              if (myEmail && tEmail === myEmail) return true;
+            }
+          }
+
+          return false;
+        }
+        if (roleLower === 'student') {
+          // Normalize assigned entries (supports strings or objects with uid/email/id/Gmail)
+          const assigned = Array.isArray(batch.students) ? batch.students : [];
+          const normalizedAssigned = assigned.map((entry) => {
+            if (typeof entry === 'string') return entry.toLowerCase();
+            if (!entry || typeof entry !== 'object') return '';
+            return (
+              entry.email?.toLowerCase() ||
+              entry.Gmail?.toLowerCase() ||
+              entry.uid ||
+              (typeof entry.id === 'string' ? entry.id.toLowerCase() : entry.id) ||
+              ''
+            );
+          }).filter(Boolean);
+
+          const myStudentIdLower = myStudentDocId ? myStudentDocId.toLowerCase() : null;
+
+          return (
+            (myEmail && normalizedAssigned.includes(myEmail)) ||
+            (myUid && normalizedAssigned.includes(myUid)) ||
+            (myStudentIdLower && normalizedAssigned.includes(myStudentIdLower))
+          );
+        }
+        return false;
+      });
+
+      setBatches(visibleBatches);
+    });
+
+    return () => unsubscribe();
+  }, [teachers, courses, currentUser, userRole, myStudentDocId]); // Rerun when deps change
+
+  // Resolve current user's Students doc id to support batches storing doc ids
+  useEffect(() => {
+    const resolveStudentDocId = async () => {
+      try {
+        const lowerEmail = currentUser?.email?.toLowerCase();
+        let resolvedId = null;
+        if (lowerEmail) {
+          const ref = doc(db, 'Students', lowerEmail);
+          const snap = await getDoc(ref);
+          if (snap.exists()) {
+            resolvedId = snap.id;
+          }
+        }
+        if (!resolvedId && currentUser?.uid) {
+          const q = query(collection(db, 'Students'), where('uid', '==', currentUser.uid));
+          const qs = await getDocs(q);
+          if (!qs.empty) {
+            resolvedId = qs.docs[0].id;
+          }
+        }
+        setMyStudentDocId(resolvedId);
+      } catch (e) {
+        setMyStudentDocId(null);
+      }
+    };
+    if (currentUser) {
+      resolveStudentDocId();
+    } else {
+      setMyStudentDocId(null);
     }
-  ];
+  }, [currentUser]);
+
 
   useEffect(() => {
     const handleResize = () => {
@@ -62,9 +209,7 @@ const Sidebar = ({ currentView, setCurrentView, setActiveChat, setShowProfileSet
   useEffect(() => {
     if (!currentUser) return;
     
-    console.log('[DEBUG] Sidebar: Subscribing to chats for user:', currentUser.uid);
     const unsubscribe = getUserChats(currentUser.uid, (userChats) => {
-      console.log('[DEBUG] Sidebar: Received chats:', userChats);
       setChats(userChats);
     });
     
@@ -88,24 +233,20 @@ const Sidebar = ({ currentView, setCurrentView, setActiveChat, setShowProfileSet
     chat.type === 'group' && chat.users.includes(currentUser?.uid)
   ) || [];
   
-  console.log('[DEBUG] Sidebar: Group chats found:', groupChats);
-  
   const filteredGroupChats = groupChats.filter(chat => 
     chat.groupName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     chat.courseName?.toLowerCase().includes(searchTerm.toLowerCase())
   ) || [];
-  
-  console.log('[DEBUG] Sidebar: Filtered group chats:', filteredGroupChats);
 
   // Handle batch click
   const handleBatchClick = (batch) => {
     setActiveChat({
       type: 'batch',
-      name: batch.name,
       id: batch.id,
-      students: batch.students,
+      name: batch.batchName,
+      students: batch.studentsCount,
       teacher: batch.teacher,
-      subject: batch.subject
+      subject: batch.courseName || batch.course || ''
     });
   };
 
@@ -170,13 +311,6 @@ const Sidebar = ({ currentView, setCurrentView, setActiveChat, setShowProfileSet
       <div className="sidebar-user-header">
         <h1 className="sidebar-title">HoneyBee Learning</h1>
       </div>
-      {/* <div className="sidebar-user-details">
-        <div className="sidebar-user-tags">
-          <span className="user-name">{currentUser?.displayName || 'User'}</span>
-          <span className="user-role">{currentUser?.role || 'User'}</span>
-        </div>
-        <p className="user-email">john@honeybee.com</p>
-      </div> */}
     </div>
   );
   return (
@@ -209,8 +343,8 @@ const Sidebar = ({ currentView, setCurrentView, setActiveChat, setShowProfileSet
                   onClick={() => handleBatchClick(batch)}
                 >
                   <div>
-                    <h3 className="chat-title">{batch.name}</h3>
-                    <p className="chat-subtitle">{batch.students} students • {batch.subject}</p>
+                    <h3 className="chat-title">{batch.batchName}</h3>
+                    <p className="chat-subtitle">{batch.studentsCount} Students{batch.courseName ? ` • ${batch.courseName}` : ''}</p>
                   </div>
                   {batch.unread > 0 && (
                     <div className="chat-badge">{batch.unread}</div>
@@ -276,7 +410,7 @@ const Sidebar = ({ currentView, setCurrentView, setActiveChat, setShowProfileSet
             </>
           )}
           {currentView === 'announcements' && (
-            <div className="chat-item" onClick={() => setActiveChat({ type: 'announcement', name: 'Community Announcements', id: 'community' })}>
+            <div className="chat-item" onClick={() => setActiveChat({ type: 'announcement', name: 'Community Announcements', id: 'community' })}> 
               <div>
                 <h3 className="chat-title">Community Announcements</h3>
                 <p className="chat-subtitle">2 pinned</p>

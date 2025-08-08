@@ -237,6 +237,11 @@
   .announcements-btn {
           margin-right: 0;
     white-space: nowrap;
+    transform: translateY(0); /* Reset */
+    margin-right: 0;
+    margin-left: 70%;
+    position: absolute;
+    margin-bottom: 17%;
   }
 
   .announcements-header-info {

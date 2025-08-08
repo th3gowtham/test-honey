@@ -1,3 +1,8 @@
+/**
+ * Retrieves the current database connection instance.
+ * Throws an error if the database is not connected.
+ * @returns {Db} The MongoDB database instance.
+ */
 const { getDB } = require('../config/mongodb');
 const { GridFSBucket, ObjectId } = require('mongodb');
 const multer = require('multer');
@@ -133,38 +138,79 @@ const getAllFiles = async (req, res) => {
 
 // READ - Get files by batch ID
 const getFilesByBatch = async (req, res) => {
+  console.log('getFilesByBatch called with batchId:', req.params.batchId);
+  
   try {
     const { batchId } = req.params;
+    
+    if (!batchId) {
+      console.error('No batchId provided in request');
+      return res.status(400).json({ error: 'Batch ID is required' });
+    }
+    
+    console.log('Connecting to database...');
     const db = getDB();
     const bucket = new GridFSBucket(db);
-
+    
+    console.log('Querying files for batchId:', batchId);
+    const query = { 'metadata.batchId': batchId };
+    console.log('MongoDB query:', JSON.stringify(query, null, 2));
+    
     const files = [];
-    const cursor = bucket.find({ 'metadata.batchId': batchId }).sort({ 'metadata.uploadDate': -1 });
-
+    const cursor = bucket.find(query).sort({ 'metadata.uploadDate': -1 });
+    
+    console.log('Starting to process cursor...');
+    let fileCount = 0;
+    
     for await (const file of cursor) {
+      fileCount++;
+      console.log(`Processing file ${fileCount}:`, {
+        fileId: file._id,
+        filename: file.filename,
+        metadata: file.metadata
+      });
+      
       files.push({
         fileId: file._id,
         filename: file.filename,
-        originalName: file.metadata.originalName,
-        uploadedBy: file.metadata.uploadedBy,
-        uploadedByRole: file.metadata.uploadedByRole,
-        uploadedByName: file.metadata.uploadedByName, // Add this
-        uploadDate: file.metadata.uploadDate,
-        fileSize: file.metadata.fileSize,
-        contentType: file.metadata.contentType,
-        description: file.metadata.description
+        originalName: file.metadata?.originalName || file.filename,
+        uploadedBy: file.metadata?.uploadedBy || 'Unknown',
+        uploadedByRole: file.metadata?.uploadedByRole || 'user',
+        uploadedByName: file.metadata?.uploadedByName || 'Unknown User',
+        uploadDate: file.metadata?.uploadDate || file.uploadDate,
+        fileSize: file.metadata?.fileSize || file.length,
+        contentType: file.metadata?.contentType || file.contentType || 'application/octet-stream',
+        description: file.metadata?.description || ''
       });
     }
-
-    res.json({
+    
+    console.log(`Found ${fileCount} files for batch ${batchId}`);
+    
+    const response = {
+      success: true,
       batchId: batchId,
       files: files,
-      count: files.length
-    });
-
+      count: files.length,
+      timestamp: new Date().toISOString()
+    };
+    
+    console.log('Sending response:', JSON.stringify(response, null, 2));
+    res.json(response);
+    
   } catch (error) {
-    console.error('Get files error:', error);
-    res.status(500).json({ error: 'Failed to retrieve files' });
+    console.error('Get files error:', {
+      message: error.message,
+      stack: error.stack,
+      batchId: req.params.batchId,
+      timestamp: new Date().toISOString()
+    });
+    
+    res.status(500).json({ 
+      success: false,
+      error: 'Failed to retrieve files',
+      message: error.message,
+      batchId: req.params.batchId
+    });
   }
 };
 

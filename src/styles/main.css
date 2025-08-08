@@ -131,6 +131,7 @@ body {
   -webkit-transform: translateY(-50%);
   transform: translateY(-50%);
   font-size: 20px;
+
 }
 .popular-classes {
   padding-block: 70px;
@@ -364,4 +365,198 @@ footer .copy-right span {
 }
 [dir=rtl] .breadcrumb-section .breadcrumb-item:before {
   float: right;
+}
+
+.col.p-3 .item {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.col.p-3 .item:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+
+.card {
+  border-radius: 12px;
+  transition: transform 0.2s ease;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+}
+
+.course-card {
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  display: flex;
+  flex-direction: column;
+}
+
+.course-card .card-body {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.course-description {
+  min-height: 90px;
+  margin-top: 10px;
+}
+
+.course-info-table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+.course-info-table td {
+  padding: 12px 10px;
+  vertical-align: middle;
+  font-size: 15px;
+  border: 1px solid #ddd;
+}
+
+.course-info-table tr td:first-child {
+  font-weight: 600;
+  background-color: #f9f9f9;
+}
+
+
+.enroll-btn {
+  background-color: #127d8e;
+  color: #ffffff;
+  border: none;
+  border-radius: 999px;
+  padding: 10px 24px;
+  font-weight: 600;
+  font-size: 16px;
+  transition: all 0.3s ease;
+}
+
+.enroll-btn:hover {
+  background-color: #127d8e;
+  transform: scale(1.02);
+}
+
+/* Ensure SwiperSlide cards are the same height */
+.swiper-slide {
+  display: flex;
+  flex-direction: column;
+  height: 70% !important;
+}
+
+.swiper-slide > div {
+  flex: 1;
+  height: 70%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+/* Optional: Make inner testimonial card consistent */
+.swiper-slide .shadow {
+  min-height: 150px; /* Adjust as needed */
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.swiper-slide .shadow {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.swiper-slide .shadow:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+@media (max-width: 576px) {
+  .col.p-3 {
+    padding: 0.75rem !important; /* reduce padding */
+  }
+
+  .col.p-3 .item img {
+    max-width: 120px;
+    height: auto;
+    margin: 0 auto;
+  }
+
+  .col.p-3 .item .h4 {
+    font-size: 1rem; /* smaller title */
+  }
+
+  .col.p-3 .item .fst-italic {
+    font-size: 0.9rem; /* smaller subtitle */
+  }
+}
+
+@media (max-width: 576px) {
+  /* Reduce top headings */
+  .contact-us .main-heading h2 {
+    font-size: 1.5rem !important;
+  }
+
+  .contact-us .main-heading span {
+    font-size: 0.85rem !important;
+  }
+
+  /* Resize icons */
+  .contact-us .icon svg {
+    font-size: 1.5rem !important; /* default is ~2rem or more */
+    padding: 0.5rem !important;
+  }
+
+  /* Resize labels like 'Email', 'Phone' etc. */
+  .contact-us .content .h5 {
+    font-size: 1rem !important;
+  }
+
+  /* Resize smaller text like email/phone/address */
+  .contact-us .content span {
+    font-size: 0.9rem !important;
+  }
+
+  /* Optional: Reduce spacing between icon and text */
+  .contact-us .gap-4 {
+    gap: 1rem !important;
+  }
+
+  /* Optional: reduce vertical spacing */
+  .contact-us .py-3 {
+    padding-top: 0.75rem !important;
+    padding-bottom: 0.75rem !important;
+  }
+}
+@media (max-width: 576px) {
+  .breadcrumb-section .display-3 {
+    font-size: 2rem !important; /* or adjust to 2.25rem or 1.75rem based on your design */
+  }
+}
+@media (max-width: 576px) {
+  .about-us .item img {
+    width: 100%;
+    max-width: 450px; /* prevents it from becoming too large */
+    min-width: 390px; /* prevents it from shrinking too small */
+    margin: 0 auto;
+    display: block;
+  }
+}
+@media (max-width: 576px) {
+  .about-us .img-fluid {
+    width: 100%;
+    max-width: 450px; /* prevents it from becoming too large */
+    min-width: 390px; /* prevents it from shrinking too small */
+    margin: 0 auto;
+    display: block;
+  }
+}
+@media (max-width: 576px) {
+  .about-us .main-link {
+    display: inline-block !important;
+    margin: 0 auto !important;
+  }
+
+  .about-us .content {
+    text-align: center !important;
+  }
 }
