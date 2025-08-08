@@ -3,6 +3,7 @@ import { sendPasswordResetEmail } from 'firebase/auth';
 import { auth } from '../services/firebase';
 import { useNavigate } from 'react-router-dom';
 import React from 'react';
+import axios from 'axios';
 
 // Add global styles for autofill
 const globalStyles = `
@@ -44,16 +45,33 @@ const ForgotPassword = ({ onClose }) => {
     setMessage({ text: '', type: '' });
     
     try {
-      await sendPasswordResetEmail(auth, email);
+      // First check if email exists in your database
+      const apiUrl = import.meta.env.VITE_API_URL;
+      const checkResponse = await axios.post(`${apiUrl}/api/auth/forgot-password`, { email });
+      
+      // If backend says it's valid, send Firebase reset email
+      if (checkResponse.data.success) {
+        try {
+          await sendPasswordResetEmail(auth, email);
+          console.log('Firebase reset email sent successfully');
+        } catch (firebaseError) {
+          console.error('Firebase reset email error:', firebaseError);
+          // Don't expose Firebase errors to user
+        }
+      }
+      
+      // Always show the same success message
       setMessage({ 
-        text: 'Password reset email sent! Please check your inbox.', 
+        text: 'A reset link has been sent', 
         type: 'success' 
       });
       setEmail('');
+      
     } catch (err) {
+      // Always show the same message even on error to prevent enumeration
       setMessage({ 
-        text: err.message || 'Failed to send reset email. Please try again.', 
-        type: 'error' 
+        text: 'A reset link has been sent', 
+        type: 'success' 
       });
     } finally {
       setIsSubmitting(false);
@@ -79,6 +97,7 @@ const ForgotPassword = ({ onClose }) => {
           }}
           aria-label="Close"
         >×</button>
+        
         <h1 style={{
           color: '#333', fontWeight: 600, marginBottom: 16, fontSize: '1.5rem', textAlign: 'left'
         }}>Reset Password</h1>
@@ -102,7 +121,9 @@ const ForgotPassword = ({ onClose }) => {
 
         <form onSubmit={handleSubmit}>
           <div style={{ marginBottom: 16 }}>
-            <label style={{ display: 'block', marginBottom: 6, fontSize: '0.9rem', color: '#333', fontWeight: 500 }}>Email Address</label>
+            <label style={{ display: 'block', marginBottom: 6, fontSize: '0.9rem', color: '#333', fontWeight: 500 }}>
+              Email Address
+            </label>
             <input
               type="email"
               value={email}
@@ -110,6 +131,7 @@ const ForgotPassword = ({ onClose }) => {
               placeholder="Enter your email address"
               style={{ width: "100%", padding: 10, borderRadius: 4, border: '1px solid #ddd', fontSize: '0.9rem' }}
               required
+              disabled={isSubmitting}
             />
           </div>
 
