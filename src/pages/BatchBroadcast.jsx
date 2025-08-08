@@ -1,82 +1,98 @@
-import { Calendar, MoreVertical, Send, Upload, FolderOpen, Paperclip, X } from 'lucide-react';
+import { MoreVertical, Send, Paperclip, X } from 'lucide-react';
 import "../styles/BatchBroadcast.css";
 import BookCallModal from '../components/BookCallModal';
 import FileUploadModal from '../components/FileUploadModal';
 import FileViewer from '../components/FileViewer';
 import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { db } from '../services/firebase';
+import { collection, addDoc, query, orderBy, onSnapshot, serverTimestamp, getDoc, doc } from 'firebase/firestore';
 
 const BatchBroadcast = ({ activeChat }) => {
+  const { currentUser, userRole } = useAuth();
+  const [messages, setMessages] = useState([]);
+  const [newMessage, setNewMessage] = useState('');
   const [showBookModal, setShowBookModal] = useState(false);
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [showFiles, setShowFiles] = useState(false);
-  const [fileCount, setFileCount] = useState(0); // 1. Add this state
-  // const [files, setFiles] = useState([]); // Removed as FileViewer handles its own state
-  const { userRole } = useAuth();
-  const fileInputRef = useRef(null);
-
-  // Extract batch information from activeChat
-  const batchId = activeChat?.id || '';
-  const batchName = activeChat?.name || 'Unknown Batch';
-  const studentCount = activeChat?.students || 25;
-  const teacherName = activeChat?.teacher || 'Sarah Johnson';
-  const subject = activeChat?.subject || 'Mathematics';
-
-  // Reset files when batch changes
-  useEffect(() => {
-    // setFiles([]); // No longer needed
-    setShowFiles(false);
-  }, [batchId]);
-
-  // Remove the files state and related handlers
-  // const [files, setFiles] = useState([]);
-
-  const handleFileCountUpdate = (count) => {
-    setFileCount(count); // 2. Update the state when notified
-  };
-
-  const handleFileUploaded = (newFile) => {
-    // Just close the modal, FileViewer will handle the file list
-    setShowUploadModal(false);
-  };
-
-  const handleFileDeleted = (fileId) => {
-    // FileViewer handles its own state, so we don't need to do anything here
-    console.log(`File deleted: ${fileId}`);
-  };
-
-  // Handle attach button click
-  const handleAttachClick = () => {
-    console.log('Attach button clicked, userRole:', userRole);
-
-    // Only allow teachers and admins to upload files
-    if (userRole?.toLowerCase() === 'teacher' || userRole?.toLowerCase() === 'admin') {
-      setShowUploadModal(true);
-    } else {
-      // For students, show files instead
-      setShowFiles(!showFiles);
-    }
-  };
-
-  // Get batch-specific welcome message
-  const getWelcomeMessage = () => {
-    switch (batchId) {
-      case 'Math101':
-        return "Good morning! Today we'll cover quadratic equations.";
-      case 'Science101':
-        return "Welcome to Science 101! Today we'll explore the scientific method.";
-      case 'English101':
-        return "Welcome to English 101! Today we'll discuss literature analysis.";
-      case 'History101':
-        return "Welcome to History 101! Today we'll explore ancient civilizations.";
-      default:
-        return "Welcome to the class! Let's get started.";
-    }
-  };
-
-  // three dot click to show session button and view file
+  const [fileCount, setFileCount] = useState(0);
   const [showMenu, setShowMenu] = useState(false);
   const menuRef = useRef(null);
+  const messagesEndRef = useRef(null);
+
+  const { id: batchId, name: batchName, students: studentCount, subject } = activeChat || {};
+
+  // Scroll to the bottom of the messages container
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
+
+  // Fetch messages in real-time
+  useEffect(() => {
+    if (!batchId) return;
+
+    const messagesRef = collection(db, 'batches', batchId, 'messages');
+    const q = query(messagesRef, orderBy('timestamp', 'asc'));
+
+    const unsubscribe = onSnapshot(q, (querySnapshot) => {
+      const msgs = querySnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data(),
+        // Convert Firestore timestamp to JS Date object
+        timestamp: doc.data().timestamp?.toDate()
+      }));
+      setMessages(msgs);
+    });
+
+    return () => unsubscribe();
+  }, [batchId]);
+
+  const handleSendMessage = async (e) => {
+    e.preventDefault();
+    if (newMessage.trim() === '') return;
+
+    try {
+      // First get the batch document to get all receiver IDs
+      const batchDoc = await getDoc(doc(db, 'batches', batchId));
+      if (!batchDoc.exists()) {
+        console.error('Batch not found');
+        return;
+      }
+      
+      const batchData = batchDoc.data();
+      const receiverIds = (Array.isArray(batchData.receiverIds) && batchData.receiverIds.length > 0)
+        ? batchData.receiverIds
+        : Array.from(new Set([
+            batchData.teacherId,
+            batchData.receiverId,
+            ...(Array.isArray(batchData.students) ? batchData.students : [])
+          ].filter(Boolean)));
+      
+      // Save the message with all receiver IDs
+      const messagesRef = collection(db, 'batches', batchId, 'messages');
+      await addDoc(messagesRef, {
+        text: newMessage,
+        senderId: currentUser.uid,
+        senderName: currentUser.displayName || (currentUser.email ? currentUser.email.split('@')[0] : 'User'),
+        senderRole: userRole || 'student',
+        receiverIds: receiverIds, // Store all receiver IDs with the message
+        timestamp: serverTimestamp(),
+      });
+      
+      setNewMessage('');
+    } catch (error) {
+      console.error("Error sending message: ", error);
+    }
+  };
+
+  const handleFileUploaded = () => setShowUploadModal(false);
+  const handleFileCountUpdate = (count) => setFileCount(count);
+
+  // Handle clicks outside of the dropdown menu
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (menuRef.current && !menuRef.current.contains(event.target)) {
@@ -89,11 +105,10 @@ const BatchBroadcast = ({ activeChat }) => {
 
   return (
     <div className="batch-broadcast">
-      {/* Header */}
       <div className="batch-header">
         <div className="batch-header-info">
           <div className="batch-avatar">
-            <span>{batchId.charAt(0)}</span>
+            <span>{batchName?.charAt(0)}</span>
           </div>
           <div className="batch-header-text">
             <h2>{batchName}</h2>
@@ -101,65 +116,73 @@ const BatchBroadcast = ({ activeChat }) => {
           </div>
         </div>
         <div className="session-btn-dropdown-container" ref={menuRef}>
-          <button
-            className="session-btn-dropdown-toggle"
-            onClick={() => setShowMenu((prev) => !prev)}
-            role='button'
-            tabIndex={0}
-          >
+          <button className="session-btn-dropdown-toggle" onClick={() => setShowMenu(p => !p)}>
             <MoreVertical size={23} />
           </button>
           {showMenu && (
             <div className="session-btn-dropdown-menu">
-              <button
-                className="session-btn-dropdown-item"
-                onClick={() => setShowBookModal(true)}
-              >
-                Book Session
-              </button>
-              <button
-                className="session-btn-dropdown-item"
-                onClick={() => {
-                  setShowFiles(true)
-                  setShowMenu(false);
-                }}
-              >
-                View File
+              <button className="session-btn-dropdown-item" onClick={() => { setShowBookModal(true); setShowMenu(false); }}>Book Session</button>
+              <button className="session-btn-dropdown-item" onClick={() => { setShowFiles(true); setShowMenu(false); }}>
+                View Files {fileCount > 0 && <span className="file-count-badge">{fileCount}</span>}
               </button>
             </div>
           )}
         </div>
       </div>
 
-      {/* Chat Messages */}
       <div className="batch-messages">
-        <div className="batch-message">
-          <div className="message-avatar">
-            <span>{batchId.charAt(0)}</span>
-          </div>
-          <div>
-            <div className="message-meta">
-              <span className="name">{teacherName}</span>
-              <span className="status"></span>
-              <span>2:30 PM</span>
+        {messages.map(msg => {
+          const senderRoleLower = (msg.senderRole || '').toLowerCase();
+          const viewerRoleLower = (userRole || '').toLowerCase();
+
+          const nameToShow = senderRoleLower === 'admin'
+            ? 'Admin'
+            : viewerRoleLower === 'admin'
+              ? (msg.senderName || 'User')
+              : (msg.senderId === currentUser.uid)
+                ? 'You'
+                : senderRoleLower === 'teacher'
+                  ? 'Teacher'
+                  : senderRoleLower === 'student'
+                    ? 'Student'
+                    : 'User';
+
+          const avatarChar = senderRoleLower === 'admin'
+            ? 'A'
+            : viewerRoleLower === 'admin'
+              ? (msg.senderName?.charAt(0) || 'U')
+              : (msg.senderId === currentUser.uid)
+                ? 'Y'
+                : senderRoleLower === 'teacher'
+                  ? 'T'
+                  : senderRoleLower === 'student'
+                    ? 'S'
+                    : 'U';
+
+          return (
+            <div key={msg.id} className={`batch-message ${msg.senderId === currentUser.uid ? 'sent' : 'received'}`}>
+              <div className="message-avatar">
+                <span>{avatarChar}</span>
+              </div>
+              <div>
+                <div className="message-meta">
+                  <span className="name">{nameToShow}</span>
+                  <span className="timestamp">{msg.timestamp?.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                </div>
+                <div className="message-bubble">
+                  <p>{msg.text}</p>
+                </div>
+              </div>
             </div>
-            <div className="message-bubble">
-              <p>{getWelcomeMessage()}</p>
-            </div>
-          </div>
-        </div>
+          );
+        })}
+        <div ref={messagesEndRef} />
       </div>
 
-      {/* Message Input */}
-      <div className="batch-input">
+      <form className="batch-input" onSubmit={handleSendMessage}>
         <div className="batch-input-wrapper">
-          {/* Attach button - Only for teachers and admins */}
           {(userRole?.toLowerCase() === 'teacher' || userRole?.toLowerCase() === 'admin') && (
-            <button
-              className="batch-attach-btn"
-              onClick={handleAttachClick}
-              title="Upload File"
-            >
+            <button type="button" className="batch-attach-btn" onClick={() => setShowUploadModal(true)} title="Upload File">
               <Paperclip size={18} />
             </button>
           )}
@@ -167,29 +190,18 @@ const BatchBroadcast = ({ activeChat }) => {
             type="text"
             placeholder={`Type your message in ${batchName}...`}
             className="batch-text-input"
+            value={newMessage}
+            onChange={(e) => setNewMessage(e.target.value)}
           />
-          <button className="batch-send-btn">
+          <button type="submit" className="batch-send-btn">
             <Send size={20} />
           </button>
         </div>
-      </div>
+      </form>
 
-      {/* Book Call Modal */}
-      <BookCallModal
-        isOpen={showBookModal}
-        onClose={() => setShowBookModal(false)}
-        collectionName="batchBroadcastBookings"
-      />
+      <BookCallModal isOpen={showBookModal} onClose={() => setShowBookModal(false)} collectionName="batchBroadcastBookings" />
+      <FileUploadModal isOpen={showUploadModal} onClose={() => setShowUploadModal(false)} batchId={batchId} onFileUploaded={handleFileUploaded} />
 
-      {/* File Upload Modal */}
-      <FileUploadModal
-        isOpen={showUploadModal}
-        onClose={() => setShowUploadModal(false)}
-        batchId={batchId}
-        onFileUploaded={handleFileUploaded}
-      />
-
-      {/* File Viewer Modal */}
       {showFiles && (
         <div className="modal-overlay">
           <div className="modal-content file-viewer-modal">
@@ -197,20 +209,12 @@ const BatchBroadcast = ({ activeChat }) => {
               <h3 data-file-count={`${fileCount} file${fileCount !== 1 ? 's' : ''}`}>
                 Files - {batchName}
               </h3>
-              <button
-                className="modal-close-btn"
-                onClick={() => setShowFiles(false)}
-              >
+              <button className="modal-close-btn" onClick={() => setShowFiles(false)}>
                 <X size={20} />
               </button>
             </div>
             <div className="modal-body">
-              <FileViewer
-                batchId={batchId}
-                userRole={userRole}
-                onFileDeleted={handleFileDeleted}
-                onFileCountUpdate={handleFileCountUpdate}
-              />
+              <FileViewer batchId={batchId} userRole={userRole} onFileCountUpdate={handleFileCountUpdate} />
             </div>
           </div>
         </div>
