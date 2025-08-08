@@ -13,36 +13,12 @@ const PORT = process.env.PORT || 5000;
 // Connect to MongoDB
 connectDB();
 
-// =================================================================
-// START: UPDATED CORS CONFIGURATION
-// =================================================================
+// CORS Configuration
+app.use(cors({
+  origin: process.env.CLIENT_URL,
 
-// List of websites that are allowed to connect to your backend
-const allowedOrigins = [
-  'https://thehoneybee.netlify.app', // Your live website
-  'http://localhost:5173'           // Your local computer for development
-];
-
-const corsOptions = {
-  origin: function (origin, callback) {
-    // This function checks if the incoming request origin is in our allowed list.
-    // If it is, `callback(null, true)` tells the cors middleware to send back an
-    // Access-Control-Allow-Origin header with that specific origin, which is what the browser needs.
-    if (!origin || allowedOrigins.indexOf(origin) !== -1) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
   credentials: true
-};
-
-app.use(cors(corsOptions));
-
-// =================================================================
-// END: UPDATED CORS CONFIGURATION
-// =================================================================
-
+}));
 
 // Middleware
 app.use(express.json());
@@ -67,6 +43,8 @@ app.post('/api/payment/order', async (req, res) => {
       return res.status(400).json({ error: 'Invalid amount' });
     }
 
+    console.log('Creating order:', { amount, name, email, courseName });
+
     const options = {
       amount: amount * 100,
       currency: 'INR',
@@ -75,6 +53,8 @@ app.post('/api/payment/order', async (req, res) => {
     };
 
     const order = await razorpay.orders.create(options);
+
+    console.log('Order created successfully:', order.id);
     
     res.status(200).json({
       orderId: order.id,
