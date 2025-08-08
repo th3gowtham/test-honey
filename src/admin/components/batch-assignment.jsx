@@ -1,7 +1,8 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { FiPlus, FiSearch, FiEdit, FiTrash2, FiX, FiUsers } from "react-icons/fi"
+import { FiPlus, FiSearch, FiEdit, FiTrash2, FiX, FiUsers, FiFile } from "react-icons/fi"
+import FileViewer from "../../components/FileViewer";
 import { db } from "../../services/firebase"
 import { collection, onSnapshot, query, doc, deleteDoc, addDoc, updateDoc, serverTimestamp, where, getDocs } from "firebase/firestore"
 import { toast, ToastContainer } from 'react-toastify'
@@ -29,6 +30,8 @@ export default function BatchAssignment() {
     students: null
   })
   const [searchStudentTerm, setSearchStudentTerm] = useState("")
+  const [showFileViewer, setShowFileViewer] = useState(false)
+  const [selectedBatchId, setSelectedBatchId] = useState(null)
   const itemsPerPage = 6
 
   const [formData, setFormData] = useState({
@@ -226,28 +229,38 @@ export default function BatchAssignment() {
   const handleSubmit = async (e) => {
     e.preventDefault()
 
-    if (!formData.batchName || !formData.courseId || !formData.teacherId || formData.students.length === 0) {
-      toast.error("Please fill all required fields and select at least one student")
+    if (!formData.courseId || !formData.teacherId || formData.students.length === 0) {
+      toast.error("Please select a course, a teacher, and at least one student")
       return
     }
 
+    // Find the selected course to generate the batch name
+    const selectedCourse = courses.find(c => c.id === formData.courseId)
+    if (!selectedCourse) {
+      toast.error("Selected course not found. Please refresh and try again.")
+      return
+    }
+    const newBatchName = `${selectedCourse.courseName} Batch`;
+
     try {
-      // Check for duplicate batch name
+      // Check if a batch for this course already exists
       const batchesRef = collection(db, "batches")
-      const q = query(batchesRef, where("batchName", "==", formData.batchName))
+      const q = query(batchesRef, where("courseId", "==", formData.courseId))
       const querySnapshot = await getDocs(q)
       
+      // If we are creating a new batch (not editing) and a batch for this course already exists, show an error.
       if (!editingBatch && !querySnapshot.empty) {
-        toast.error("A batch with this name already exists. Please choose a different name.")
+        toast.error("A batch for this course already exists. You can edit it from the main list.")
         return
       }
 
       if (editingBatch) {
         // Update existing batch in Firestore
         await updateDoc(doc(db, "batches", editingBatch.id), {
-          batchName: formData.batchName,
+          batchName: newBatchName, // Use the generated name
           courseId: formData.courseId,
           teacherId: formData.teacherId,
+          receiverId: formData.teacherId, // Update receiverId when teacher is changed
           students: formData.students,
           status: formData.status,
           updatedAt: serverTimestamp()
@@ -260,9 +273,10 @@ export default function BatchAssignment() {
         // Add new batch to Firestore
         await addDoc(collection(db, "batches"), {
           batchId: batchId,
-          batchName: formData.batchName,
+          batchName: newBatchName, // Use the generated name
           courseId: formData.courseId,
           teacherId: formData.teacherId,
+          receiverId: formData.teacherId, // Adding receiverId same as teacherId
           students: formData.students,
           status: formData.status,
           createdAt: serverTimestamp()
@@ -404,10 +418,28 @@ export default function BatchAssignment() {
                     </td>
                     <td>
                       <div className="action-buttons">
-                        <button className="btn-icon" onClick={() => handleEdit(batch)}>
+                        <button 
+                          className="btn-icon" 
+                          onClick={() => {
+                            setSelectedBatchId(batch.id);
+                            setShowFileViewer(true);
+                          }}
+                          title="View Files"
+                        >
+                          <FiFile />
+                        </button>
+                        <button 
+                          className="btn-icon" 
+                          onClick={() => handleEdit(batch)}
+                          title="Edit Batch"
+                        >
                           <FiEdit />
                         </button>
-                        <button className="btn-icon btn-danger" onClick={() => handleDelete(batch.id)}>
+                        <button 
+                          className="btn-icon btn-danger" 
+                          onClick={() => handleDelete(batch.id)}
+                          title="Delete Batch"
+                        >
                           <FiTrash2 />
                         </button>
                       </div>
@@ -417,6 +449,52 @@ export default function BatchAssignment() {
               </tbody>
             </table>
           )}
+        </div>
+      )}
+
+      {/* File Viewer Modal */}
+      {showFileViewer && selectedBatchId && (
+        <div style={{
+          position: "fixed",
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: "rgba(0,0,0,0.5)",
+          zIndex: 1000,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center"
+        }}>
+          <div style={{
+            background: "white",
+            padding: 24,
+            borderRadius: 12,
+            width: "90%",
+            maxWidth: 800,
+            maxHeight: "80vh",
+            overflowY: "auto",
+            boxShadow: "0 8px 32px rgba(0,0,0,0.18)",
+            position: "relative"
+          }}>
+            <button 
+              onClick={() => setShowFileViewer(false)}
+              style={{
+                position: "absolute",
+                top: 16,
+                right: 16,
+                background: "none",
+                border: "none",
+                fontSize: 20,
+                cursor: "pointer",
+                color: "#6b7280"
+              }}
+            >
+              <FiX />
+            </button>
+            <h3 style={{ marginTop: 0, marginBottom: 20, color: "#1f2937" }}>Batch Files</h3>
+            <FileViewer batchId={selectedBatchId} />
+          </div>
         </div>
       )}
 
@@ -453,16 +531,7 @@ export default function BatchAssignment() {
               </button>
             </div>
             <form onSubmit={handleSubmit}>
-              <div className="form-group">
-                <label className="form-label">Batch Name</label>
-                <input
-                  type="text"
-                  className="form-input"
-                  value={formData.batchName}
-                  onChange={(e) => setFormData({ ...formData, batchName: e.target.value })}
-                  required
-                />
-              </div>
+              
               <div className="form-group">
                 <label className="form-label">Select Course</label>
                 {loading.courses ? (

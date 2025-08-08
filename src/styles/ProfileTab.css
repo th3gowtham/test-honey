@@ -257,7 +257,7 @@
   border: 1px solid #d1d5db;
   border-radius: 0.5rem;
   background-color: #f9fafb;
-  min-height: 42px;
+  min-height: 42px; /* Match name/email fields */
 }
 
 .info-text {
@@ -269,10 +269,27 @@
   flex: 1;
   border: none;
   outline: none;
-  font-size: 0.875rem;
+  font-size: 0.95rem; /* Slightly larger for readability */
   background: none !important;
-  padding: 0;
+  padding: 0 0.125rem; /* Minimal padding to avoid increasing box height */
   color: #111827;
+  line-height: 1.5; /* Increase line height to feel less cramped */
+  min-height: 0; /* Let container control height for consistency */
+}
+
+/* Remove any native focus underline/outline/inner shadow on inputs */
+.info-input:focus,
+.info-input:focus-visible,
+.info-input::-moz-focus-inner {
+  outline: none !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+.info-input {
+  -webkit-appearance: none;
+  appearance: none;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .info-input::placeholder {
