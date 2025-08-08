@@ -15,6 +15,7 @@ export default function UserManagement() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [showModal, setShowModal] = useState(false)
+  const [editingUser, setEditingUser] = useState(null)
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -119,6 +120,21 @@ export default function UserManagement() {
     setFormError("")
     setFormSuccess("")
     setShowModal(false)
+    setEditingUser(null)
+  }
+
+  const handleEdit = (user) => {
+    setEditingUser(user)
+    setFormData({
+      name: user.name || "",
+      email: user.email || "",
+      phone: user.phone || "",
+      password: "", // Don't populate password for security reasons
+      role: user.role || "student",
+      status: user.status || "active",
+      joinDate: user.joinDate || new Date().toISOString().split("T")[0]
+    })
+    setShowModal(true)
   }
 
   const handleSubmit = async (e) => {
@@ -129,45 +145,71 @@ export default function UserManagement() {
 
     try {
       // Validate form
-      if (!formData.name || !formData.email || !formData.password || !formData.phone) {
+      if (!formData.name || !formData.email || !formData.phone) {
         setFormError("Please fill all required fields")
         setIsSubmitting(false)
         return
       }
 
-      // Create user in Firebase Authentication
-      const userCredential = await createUserWithEmailAndPassword(
-        auth, 
-        formData.email, 
-        formData.password
-      )
+      // If we're editing an existing user
+      if (editingUser) {
+        // Update student details in Firestore
+        await updateDoc(doc(db, "Students", editingUser.id), {
+          name: formData.name,
+          Gmail: formData.email,
+          email: formData.email,
+          phone: formData.phone,
+          status: formData.status,
+          updatedAt: serverTimestamp(),
+          joinDate: formData.joinDate
+        })
 
-      // Get the UID from the newly created user
-      const uid = userCredential.user.uid
+        setFormSuccess("Student updated successfully!")
+        setTimeout(() => {
+          resetForm()
+        }, 2000)
+      } else {
+        // For new users, validate password
+        if (!formData.password) {
+          setFormError("Password is required for new students")
+          setIsSubmitting(false)
+          return
+        }
 
-      // Store student details in Firestore
-      await addDoc(collection(db, "Students"), {
-        name: formData.name,
-        Gmail: formData.email,
-        email: formData.email,
-        phone: formData.phone,
-        status: formData.status,
-        role: "student",
-        uid: uid,
-        createdAt: serverTimestamp(),
-        joinDate: formData.joinDate
-      })
+        // Create user in Firebase Authentication
+        const userCredential = await createUserWithEmailAndPassword(
+          auth, 
+          formData.email, 
+          formData.password
+        )
 
-      setFormSuccess("Student added successfully!")
-      setTimeout(() => {
-        resetForm()
-      }, 2000)
+        // Get the UID from the newly created user
+        const uid = userCredential.user.uid
+
+        // Store student details in Firestore
+        await addDoc(collection(db, "Students"), {
+          name: formData.name,
+          Gmail: formData.email,
+          email: formData.email,
+          phone: formData.phone,
+          status: formData.status,
+          role: "student",
+          uid: uid,
+          createdAt: serverTimestamp(),
+          joinDate: formData.joinDate
+        })
+
+        setFormSuccess("Student added successfully!")
+        setTimeout(() => {
+          resetForm()
+        }, 2000)
+      }
     } catch (err) {
-      console.error("Error adding student:", err)
+      console.error("Error processing student:", err)
       if (err.code === 'auth/email-already-in-use') {
         setFormError("This email is already registered. Please use a different email.")
       } else {
-        setFormError("Failed to add student: " + err.message)
+        setFormError("Failed to process student: " + err.message)
       }
     } finally {
       setIsSubmitting(false)
@@ -260,10 +302,10 @@ export default function UserManagement() {
                     </td>
                     <td>
                       <div className="action-buttons">
-                        <button className="btn-icon">
+                        <button className="btn-icon" onClick={() => handleEdit(user)} type="button">
                           <FiEdit />
                         </button>
-                        <button className="btn-icon btn-danger" onClick={() => handleDelete(user.id)}>
+                        <button className="btn-icon btn-danger" onClick={() => handleDelete(user.id)} type="button">
                           <FiTrash2 />
                         </button>
                       </div>
@@ -309,7 +351,7 @@ export default function UserManagement() {
         }}>
           <div style={{ background: "white", padding: 32, borderRadius: 12, maxWidth: 500, width: "90%", maxHeight: "80vh", overflowY: "auto", boxShadow: "0 8px 32px rgba(0,0,0,0.18)" }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
-              <h3 style={{ fontSize: 20, fontWeight: 600, color: "#2d3748" }}>Add New Student</h3>
+              <h3 style={{ fontSize: 20, fontWeight: 600, color: "#2d3748" }}>{editingUser ? "Edit Student" : "Add New Student"}</h3>
               <button style={{ background: "none", border: "none", fontSize: 24, cursor: "pointer", color: "#a0aec0", padding: 4 }} onClick={resetForm}>
                 ×
               </button>
@@ -359,13 +401,14 @@ export default function UserManagement() {
                 />
               </div>
               <div className="form-group">
-                <label className="form-label">Password *</label>
+                <label className="form-label">Password {!editingUser && "*"}</label>
                 <input
                   type="password"
                   className="form-input"
                   value={formData.password}
                   onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                  required
+                  required={!editingUser}
+                  placeholder={editingUser ? "Leave blank to keep current password" : ""}
                 />
               </div>
               <div className="form-group">
@@ -394,7 +437,7 @@ export default function UserManagement() {
                   Cancel
                 </button>
                 <button type="submit" className="btn btn-primary" disabled={isSubmitting}>
-                  {isSubmitting ? "Adding..." : "Add Student"}
+                  {isSubmitting ? (editingUser ? "Updating..." : "Adding...") : (editingUser ? "Update Student" : "Add Student")}
                 </button>
               </div>
             </form>
