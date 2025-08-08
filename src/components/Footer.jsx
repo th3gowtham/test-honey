@@ -88,7 +88,7 @@ const Footer = () => (
         <Link to="#" className="text-decoration-none">
           <span>The Honeybee Learning</span>
         </Link>
-        All Rights Reserved
+         All Rights Reserved
       </div>
     </div>
   </footer>

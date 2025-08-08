@@ -35,7 +35,7 @@ function AppContent({ showLogin, setShowLogin }) {
 
   const showHeaderPaths = [
     "/", "/about", "/classes", "/contact", "/gallery",
-    "/pg", "/teachers", "/product", "/plog_details"
+    "/pg", "/teachers", "/product", "/plog_details","/teacher-login"
   ];
 
  ;

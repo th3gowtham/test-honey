@@ -51,7 +51,7 @@ const About = () => (
                   <div className="item py-2 px-4 position-relative d-flex align-items-center border-top justify-content-center justify-content-md-start">Creativity and Innovation</div>
                 </div>
               </div>
-              <a href="/classes" className="main-link mb-2 mb-lg-0 d-inline-block text-decoration-none text-white py-2 px-4 rounded-pill">Join Class</a>
+              <a href="/classes" className=" flex-column align-items-center main-link mb-2 text-decoration-none justify-content-center  text-white py-2 px-4 rounded-pill">Join Class</a>
             </div>
           </div>
         </div>

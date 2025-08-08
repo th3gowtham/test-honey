@@ -30,21 +30,24 @@ async function getUserRoleAndName(email, nameFromToken) {
     return { role: 'Teacher', name: dbName };
   }
 
-  // 3. Handle Student (existing or new)
-  const studentRef = db.collection('Students').doc(email);
-  const studentSnap = await studentRef.get();
+  // 3. Handle Student (existing or new) - Updated to use where query and auto-generated IDs
+  const studentSnapshot = await db.collection('Students').where('Gmail', '==', email).get();
 
-  if (studentSnap.exists) {
+  if (!studentSnapshot.empty) {
     // For existing students, use their name from the database
-    const studentData = studentSnap.data();
+    const studentData = studentSnapshot.docs[0].data();
     const dbName = studentData.name || email.split('@')[0];
     console.log(`[getUserRoleAndName] Found existing Student. Email: ${email}, Name from DB: ${dbName}`);
     return { role: 'Student', name: dbName };
   } else {
-    // For NEW students, use the name from the token (e.g., from Google or registration form)
+    // For NEW students, use auto-generated ID and the name from the token
     const newStudentName = nameFromToken; // Always use the provided name
     console.log(`[getUserRoleAndName] Creating new Student. Email: ${email}, Name: ${newStudentName}`);
-    await studentRef.set({ Gmail: email, name: newStudentName, createdAt: new Date() });
+    const newStudentRef = await db.collection('Students').add({ 
+      Gmail: email, 
+      name: newStudentName, 
+      createdAt: new Date() 
+    });
     return { role: 'Student', name: newStudentName };
   }
 }
@@ -55,8 +58,8 @@ async function emailExistsInAnyCollection(email) {
   if (!adminSnap.empty) return true;
   const teacherSnap = await db.collection('Teacher').where('Gmail', '==', email).get();
   if (!teacherSnap.empty) return true;
-  const studentSnap = await db.collection('Students').doc(email).get();
-  if (studentSnap.exists) return true;
+  const studentSnap = await db.collection('Students').where('Gmail', '==', email).get();
+  if (!studentSnap.empty) return true;
   return false;
 }
 
@@ -70,8 +73,8 @@ const handleEmailRegister = async (req, res) => {
       return res.status(400).json({ error: 'Email already exists in the system' });
     }
     // At this point, Firebase Auth user is already created on frontend
-    // Create Student record in Firestore
-    await db.collection('Students').doc(userEmail).set({
+    // Create Student record in Firestore with auto-generated ID
+    await db.collection('Students').add({
       Gmail: userEmail,
       name,
       createdAt: new Date()

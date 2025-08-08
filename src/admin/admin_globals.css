@@ -1194,7 +1194,7 @@ body {
   background-color: #f7fafc;
 }
 
-.course-checkbox {
+.admin_course-checkbox {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -1204,11 +1204,11 @@ body {
   transition: background-color 0.2s ease;
 }
 
-.course-checkbox:hover {
+.admin_course-checkbox:hover {
   background-color: #e2e8f0;
 }
 
-.course-checkbox input[type="checkbox"] {
+.admin_course-checkbox input[type="checkbox"] {
   margin: 0;
 }
 
@@ -1241,6 +1241,9 @@ body {
 .btn-primary {
   background-color: #127d8e;
   color: white;
+  display:flex;
+  align-items:center;
+  width:fit-content;
 }
 
 .btn-primary:hover {
