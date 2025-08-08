@@ -5,6 +5,12 @@ const { auth, db } = require('../config/firebaseAdmin');
 // At the top, add bcrypt for password hashing
 const bcrypt = require('bcryptjs');
 
+// Add at the top with other imports
+const crypto = require('crypto');
+
+// Add rate limiting for forgot password
+const forgotPasswordAttempts = new Map();
+
 // Helper: assign role (reuse your logic)
 // This helper function now correctly checks for Admins and Teachers
 // and returns the name stored in the database for them.
@@ -16,7 +22,6 @@ async function getUserRoleAndName(email, nameFromToken) {
     const adminData = adminSnapshot.docs[0].data();
     // Use the name from the Admin record in the database
     const dbName = adminData.name || email.split('@')[0]; // Fallback if name is missing in DB
-    console.log(`[getUserRoleAndName] Found Admin. Email: ${email}, Name from DB: ${dbName}`);
     return { role: 'Admin', name: dbName };
   }
 
@@ -26,7 +31,6 @@ async function getUserRoleAndName(email, nameFromToken) {
     const teacherData = teacherSnapshot.docs[0].data();
     
     const dbName = teacherData.name || email.split('@')[0];
-    console.log(`[getUserRoleAndName] Found Teacher. Email: ${email}, Name from DB: ${dbName}`);
     return { role: 'Teacher', name: dbName };
   }
 
@@ -37,12 +41,10 @@ async function getUserRoleAndName(email, nameFromToken) {
     // For existing students, use their name from the database
     const studentData = studentSnapshot.docs[0].data();
     const dbName = studentData.name || email.split('@')[0];
-    console.log(`[getUserRoleAndName] Found existing Student. Email: ${email}, Name from DB: ${dbName}`);
     return { role: 'Student', name: dbName };
   } else {
     // For NEW students, use auto-generated ID and the name from the token
     const newStudentName = nameFromToken; // Always use the provided name
-    console.log(`[getUserRoleAndName] Creating new Student. Email: ${email}, Name: ${newStudentName}`);
     const newStudentRef = await db.collection('Students').add({ 
       Gmail: email, 
       name: newStudentName, 
@@ -194,17 +196,14 @@ const logout = (req, res) => {
 // Check if teacher exists endpoint
 const teacherExists = async (req, res) => {
   const email = (req.query.email || '').trim().toLowerCase();
-  console.log('[teacherExists] Received email:', email);
   if (!email) return res.status(400).json({ exists: false });
   try {
-    console.log('[teacherExists] Querying Teacher collection for Gmail ==', email);
     const teacherSnap = await db.collection('Teacher').where('Gmail', '==', email).get();
-    console.log('[teacherExists] Query result empty:', teacherSnap.empty, 'Count:', teacherSnap.size);
     if (!teacherSnap.empty) {
-      console.log('[teacherExists] Teacher found for email:', email);
+    
       return res.json({ exists: true });
     } else {
-      console.log('[teacherExists] Teacher NOT found for email:', email);
+    
       return res.json({ exists: false });
     }
   } catch (err) {
@@ -213,5 +212,84 @@ const teacherExists = async (req, res) => {
   }
 };
 
-module.exports = { handleGoogleLogin, logout, getUserRoleAndName, handleEmailRegister, setTeacherPassword, teacherLogin, teacherExists };
+// Simple forgot password endpoint
+const forgotPassword = async (req, res) => {
+  const { email } = req.body;
+  
+  try {
+    // 1. Basic validation
+    if (!email || !email.includes('@')) {
+      return res.status(400).json({ 
+        message: 'A reset link has been sent' 
+      });
+    }
+
+    const lowerEmail = email.trim().toLowerCase();
+    
+    // 2. Rate limiting (5 attempts per hour per IP)
+    const clientIP = req.ip || req.connection.remoteAddress;
+    const now = Date.now();
+    const attempts = forgotPasswordAttempts.get(clientIP) || [];
+    const recentAttempts = attempts.filter(time => now - time < 3600000); // 1 hour
+    
+    if (recentAttempts.length >= 5) {
+      return res.status(429).json({ 
+        message: 'Too many requests. Please try again later.' 
+      });
+    }
+    
+    // 3. Check if email exists in your organization collections
+    const emailExists = await emailExistsInAnyCollection(lowerEmail);
+    
+    // 4. Always return the same response (prevents email enumeration)
+    const response = { 
+      message: 'A reset link has been sent.',
+      success: true
+    };
+    
+    // 5. Only send Firebase reset email if user exists in database
+    if (emailExists) {
+      try {
+        // Use Firebase Admin to send reset email
+        const { auth } = require('../config/firebaseAdmin');
+        
+        // Generate password reset link
+        const actionCodeSettings = {
+          url: `${process.env.CLIENT_URL || 'http://localhost:5173'}/login`,
+          handleCodeInApp: true,
+        };
+        
+        // Send password reset email via Firebase
+        await auth.generatePasswordResetLink(lowerEmail, actionCodeSettings);
+        
+      } catch (firebaseError) {
+        // Silent error handling - no console logs
+      }
+    }
+    
+    // 6. Update rate limiting
+    recentAttempts.push(now);
+    forgotPasswordAttempts.set(clientIP, recentAttempts);
+    
+    res.json(response);
+    
+  } catch (error) {
+    // Always return the same response even on error
+    res.json({ 
+      message: 'A reset link has been sent',
+      success: true
+    });
+  }
+};
+
+module.exports = { 
+  handleGoogleLogin, 
+  logout, 
+  getUserRoleAndName, 
+  handleEmailRegister, 
+  setTeacherPassword, 
+  teacherLogin, 
+  teacherExists,
+  forgotPassword
+};
 
