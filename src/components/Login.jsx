@@ -57,6 +57,7 @@ const Login = ({ onClose }) => {
   const [showForgotPassword, setShowForgotPassword] = useState(false);
   const [form, setForm] = useState({ email: "", password: "", name: "" });
   const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   // Apply global styles
   React.useEffect(() => {
@@ -77,6 +78,7 @@ const Login = ({ onClose }) => {
 
   // Google login
   const loginclick = async () => {
+    setIsLoading(true);
     try {
       const result = await signInWithPopup(auth, googleprovider);
       const idToken = await result.user.getIdToken();
@@ -86,17 +88,21 @@ const Login = ({ onClose }) => {
       closeModal();
     } catch (err) {
       alert("Login failed: " + err.message);
+    } finally {
+      setIsLoading(false);
     }
   };
 
   // Email/password registration
   const handleEmailRegister = async (e) => {
     e.preventDefault();
+    setIsLoading(true);
     try {
       const email = form.email.trim().toLowerCase();
       const { password, name } = form;
       if (!email || !password || !name) {
         alert("Please fill all fields.");
+        setIsLoading(false);
         return;
       }
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
@@ -115,17 +121,21 @@ const Login = ({ onClose }) => {
         // For any other error, show the default message
         alert("Registration failed: " + err.message);
       }
+    } finally {
+      setIsLoading(false);
     }
   };
 
   // Email/password login
   const handleEmailLogin = async (e) => {
     e.preventDefault();
+    setIsLoading(true);
     try {
       const email = form.email.trim().toLowerCase();
       const { password } = form;
       if (!email || !password) {
         alert("Please fill all fields.");
+        setIsLoading(false);
         return;
       }
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
@@ -136,6 +146,8 @@ const Login = ({ onClose }) => {
       closeModal();
     } catch (err) {
       alert("Login failed: " + err.message);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -143,6 +155,11 @@ const Login = ({ onClose }) => {
 
   return (
     <>
+      {isLoading && (
+        <div className="login-loading-overlay">
+          <div className="loader-circle-50"></div>
+        </div>
+      )}
       {showForgotPassword ? (
         <ForgotPassword onClose={() => setShowForgotPassword(false)} />
       ) : (
