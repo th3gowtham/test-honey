@@ -38,9 +38,9 @@ export default function ChatAssignment() {
         const assignedAt = data.assignedAt
         let assignedDate = 'Unknown'
         if (assignedAt && typeof assignedAt.toDate === 'function') {
-          try { assignedDate = assignedAt.toDate().toISOString().split('T')[0] } catch { /* ignore parse error */ }
+          try { assignedDate = assignedAt.toDate().toISOString().split('T')[0] } catch {}
         } else if (assignedAt instanceof Date) {
-          try { assignedDate = assignedAt.toISOString().split('T')[0] } catch { /* ignore parse error */ }
+          try { assignedDate = assignedAt.toISOString().split('T')[0] } catch {}
         }
         return {
           id: d.id,

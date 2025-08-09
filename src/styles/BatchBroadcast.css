@@ -3,7 +3,7 @@
   flex-direction: column;
   height: 100vh;
   font-family: 'Segoe UI', sans-serif;
-  background-color: #f9fafb;
+  background-color: #ffffff; /* chat background set to white */
   
 }
 
@@ -13,11 +13,11 @@
   justify-content: space-between;
   align-items: center;
   padding: 12px;
-  background-color: white;
-  border-bottom: 1px solid #e5e7eb;
+  background-color: #14b8a6; /* site primary */
+  border-bottom: 1px solid rgba(0,0,0,0.05);
   flex-wrap: wrap;
   flex-shrink: 0;
-  background-color: lightgray;
+  color: #ffffff;
 }
 
 .batch-header-info {
@@ -42,11 +42,12 @@
   font-size: 16px;
   margin: 0;
   font-weight: 600;
+  color: #ffffff;
 }
 
 .batch-header-text p {
   font-size: 12px;
-  color: #6b7280;
+  color: rgba(255,255,255,0.9);
   margin: 0;
 }
 
@@ -581,35 +582,45 @@
 .batch-messages {
   flex: 1;
   overflow-y: auto;
-  padding: 12px;
-  padding-bottom: 80px;
+  overflow-x: hidden; /* prevent horizontal scrollbar line above input */
+  padding: 16px; /* more breathing room */
+  padding-bottom: 84px;
   display: flex;
   flex-direction: column;
   gap: 16px;
+  background-color: #ffffff; /* ensure chat area is white */
 }
 
 .batch-message {
   display: flex;
   gap: 10px;
-  max-width: 85%;
-  width: fit-content;
+  max-width: 100%; /* allow full row space for bubble sizing */
+  width: auto;
+  align-items: flex-end;
 }
 
 /* Received message (from others) */
 .batch-message.received {
   align-self: flex-start;
   flex-direction: row;
+  margin-left: 12px; /* keep off the left edge */
 }
 
 /* Sent message (current user) */
 .batch-message.sent {
   align-self: flex-end;
   flex-direction: row-reverse;
+  padding-right: 8px; /* keep bubble from touching right edge */
+  margin-right: 12px; /* keep off the right edge */
 }
 
+/* Align text blocks flush-left inside both bubbles */
+.batch-message .message-content { display: block; }
+.batch-message .message-content .sender-name { margin-left: 0; }
+
 .message-avatar {
-  background-color: #14b8a6;
-  color: white;
+  background-color: #e5e7eb;
+  color: #111827;
   font-size: 14px;
   font-weight: bold;
   border-radius: 50%;
@@ -621,36 +632,80 @@
   flex-shrink: 0;
 }
 
+/* Role-specific colors */
+.message-avatar.role-admin { background-color: #f43f5e; color: #fff; }
+.message-avatar.role-teacher { background-color: #3b82f6; color: #fff; }
+.message-avatar.role-student { background-color: #10b981; color: #fff; }
+.message-avatar.role-you { background-color: #0e766e; color: #fff; }
+
 .message-content {
   display: flex;
   flex-direction: column;
   max-width: calc(100% - 42px); /* Account for avatar + gap */
 }
 
-.message-meta {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 11px;
-  color: #6b7280;
-  margin-bottom: 4px;
+/* Hide the meta row above bubbles to mimic WhatsApp (we keep time inside bubble) */
+.message-meta { display: none; }
+
+/* Smaller, subtle role label above each bubble */
+.sender-name {
+  font-size: 10px;
+  line-height: 1;
+  color: #667781;
+  margin: 0 0 3px 6px;
+}
+.batch-message.sent .sender-name {
+  text-align: right;
+  margin: 0 6px 3px 0;
 }
 
 .message-bubble {
-  padding: 10px 14px;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  column-gap: 8px;
+  padding: 12px 16px;
   border-radius: 18px;
   font-size: 14px;
   line-height: 1.4;
-  word-wrap: break-word;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  max-width: min(840px, 90%); /* allow longer lines, apply to both sides */
+  min-width: 160px;
 }
 
-/* Sent message bubble */
-.batch-message.sent .message-bubble {
-  background-color: #dcf8c6;
-  border-top-right-radius: 4px;
-  color: #111827;
+/* Ensure text wraps but timestamp stays on one line */
+.bubble-text { white-space: normal; overflow-wrap: break-word; word-break: break-word; }
+
+.bubble-time {
+  white-space: nowrap;
+  font-size: 11px;
+  color: #667781;
+  align-self: end;
+  justify-self: end;
 }
+
+/* Centered date chips between messages (WhatsApp-like) */
+.date-separator {
+  align-self: center;
+  margin: 10px auto;
+  padding: 4px 10px;
+  background: #e9f5f5;
+  color: #54656f;
+  font-size: 12px;
+  border-radius: 10px;
+  display: inline-block;
+}
+
+/* Sent message bubble (now white like received) */
+.batch-message.sent .message-bubble {
+  background-color: #ffffff;
+  border-top-right-radius: 6px;
+  color: #111827;
+  border: 1px solid #e5e7eb;
+}
+.batch-message.sent .bubble-time { color: #667781; }
+
+/* Add a tiny right margin so the time never gets clipped */
+.batch-message.sent .message-bubble { margin-right: 4px; }
 
 /* Received message bubble */
 .batch-message.received .message-bubble {
@@ -667,16 +722,32 @@
   margin-left: auto;
 }
 
-/* Hide avatar for sent messages */
+/* Show avatar for sent messages (Y) on the right side */
 .batch-message.sent .message-avatar {
-  display: none;
+  display: flex;
 }
 
 /* Input */
 .batch-input {
   padding: 10px;
-  background-color: white;
-  border-top: 1px solid #e5e7eb;  
+  background-color: #f0fdfa; /* light primary tint for typing bar */
+  border-top: none; /* remove dark separator */
+  box-shadow: none;
+  scrollbar-width: none; /* Firefox */
+}
+
+.batch-input::-webkit-scrollbar {
+  display: none; /* Chrome/Safari */
+}
+
+/* Hide any accidental horizontal rules/dividers within batch chat footer */
+.batch-broadcast hr,
+.batch-broadcast .divider,
+.batch-broadcast .separator,
+.batch-broadcast .scroll-shadow {
+  display: none !important;
+  height: 0 !important;
+  border: 0 !important;
 }
 
 .batch-input-wrapper {
@@ -691,6 +762,11 @@
   border-radius: 8px;
   padding: 8px 12px;
   font-size: 14px;
+}
+.batch-text-input:focus {
+  outline: none;
+  border-color: #14b8a6;
+  box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.15);
 }
 
 .batch-attach-btn,
@@ -1403,5 +1479,5 @@
 .session-btn-dropdown-item:disabled {
   color: #d1d5db; /* gray text */
   cursor: not-allowed;
-  background-color: #ffffff;
+  background-color: #ffffff;
 }
