@@ -12,10 +12,29 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  border-right: 1px solid #2a2f32;
- 
-  
-  
+  border-right: 1px solid #2a2f32;  
+}
+/* Only apply tooltip styles inside the chatapp left navbar */
+.left-nav-icons .tooltip {
+  position: absolute;
+  left: 150%;
+  top: 50%;
+  transform: translateY(-50%) translateX(-10px);
+  background: rgba(0,0,0,0.85);
+  color: #fff;
+  font-size: 12px;
+  padding: 6px 8px;
+  border-radius: 6px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .18s ease, transform .18s ease;
+  z-index: 50;
+}
+
+.left-nav-icons .nav-icon:hover .tooltip {
+  opacity: 1;
+  transform: translateY(-50%) translateX(0);
 }
 
 .nav-icon {
@@ -23,11 +42,17 @@
   color: #b1b3b5;
   cursor: pointer;
   position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   
 }
 .left-nav-icons .nav-icon:last-child {
   margin-top: auto; /* Push it to the bottom of the column */
   margin-bottom: 12px;
+}
+.chatapp-nav-item.active svg {
+  color: white;
 }
 
 

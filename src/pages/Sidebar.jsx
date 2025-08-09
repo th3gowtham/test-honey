@@ -256,27 +256,29 @@ const Sidebar = ({ currentView, setCurrentView, setActiveChat, setShowProfileSet
         onClick={() => setCurrentView('batch-broadcasts')}
       >
         <MessageSquare />
-        {currentView === 'batch-broadcasts' && <span className="active-dot" />}
+         <span className="tooltip">Batch</span>
+
       </div>
       <div
         className={`nav-icon ${currentView === 'private-chat' ? 'active' : ''}`}
         onClick={() => setCurrentView('private-chat')}
       >
         <BellDot />
-        {currentView === 'private-chat' && <span className="active-dot" />}
+         <span className="tooltip">Private</span>
       </div>
       <div
         className={`nav-icon ${currentView === 'announcements' ? 'active' : ''}`}
         onClick={() => setCurrentView('announcements')}
       >
         <Users2 />
-        {currentView === 'announcements' && <span className="active-dot" />}
+         <span className="tooltip">Communities</span>
       </div>
       <div
         className="nav-icon"
         onClick={() => setShowProfileSettings(true)}
       >
         <User />
+         <span className="tooltip">Profile</span>
       </div>
     </div>
   );
@@ -284,7 +286,7 @@ const Sidebar = ({ currentView, setCurrentView, setActiveChat, setShowProfileSet
     <div className="chatapp-mobile-bottom-nav">
       <div className={`chatapp-nav-item ${currentView === 'batch-broadcasts' ? 'active' : ''}`} onClick={() => setCurrentView('batch-broadcasts')}>
         <MessageSquare />
-        <span>Chats</span>
+        <span>Batch</span>
       </div>
       <div className={`chatapp-nav-item ${currentView === 'private-chat' ? 'active' : ''}`} onClick={() => setCurrentView('private-chat')}>
         <BellDot />

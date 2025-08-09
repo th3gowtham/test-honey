@@ -24,13 +24,16 @@ const Product = () => {
       <nav aria-label="breadcrumb" className="breadcrumb-section position-relative">
         <div className="position-absolute top-50 start-50 translate-middle">
           {/* <h2 className="text-center display-3 text-white">Page Under Construction</h2> */}
-          <button
-            onClick={handleApp}
-            className="bg-black text-white px-6 py-2 rounded-full text-lg font-medium shadow-md hover:bg-cyan-500 hover:scale-105 transition-all duration-300"
-          >
-            Chat App
-          </button>
-
+          <div className="chat-hero">
+        <h1>Welcome to The Honeybee Chat App</h1>
+        <p>
+          Stay connected with your teachers and classmates instantly.  
+          Click the button below to start chatting now!
+        </p>
+        <button onClick={handleApp} className="chat-hero-btn">
+          🚀 Click Here to Access the Chat App
+        </button>
+      </div>
         </div>
       </nav>
 

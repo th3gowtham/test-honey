@@ -560,3 +560,90 @@ footer .copy-right span {
     text-align: center !important;
   }
 }
+/* chat app style */
+.chat-hero {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 3rem 2rem;
+  background: linear-gradient(135deg, #127d8e, #127d8e);
+  color: white;
+}
+
+.chat-hero h1 {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+}
+
+.chat-hero p {
+  max-width: 600px;
+  margin-bottom: 2rem;
+  font-size: 1.2rem;
+  line-height: 1.5;
+}
+
+/* Button */
+.chat-hero-btn {
+  background: white;
+  color: #127d8e;
+  font-size: 1.2rem;
+  font-weight: 600;
+  padding: 1rem 2rem;
+  border-radius: 12px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.chat-hero-btn:hover {
+  background: #f0f9ff;
+  transform: translateY(-3px) scale(1.05);
+}
+
+/* 📱 Mobile view adjustments */
+@media (max-width: 621px) {
+  .chat-hero {
+    padding: 2rem 1rem;
+    width: 100%;
+
+  }
+
+  .chat-hero h1 {
+    font-size: 1.5rem;
+    width: 100%;
+
+  }
+
+  .chat-hero p {
+    font-size: 1rem;
+    margin-bottom: 1.5rem;
+    padding: 0 0.5rem;
+  }
+
+  .chat-hero-btn {
+    margin-top: 0;
+    font-size: 1rem;
+    padding: 0.8rem 1.5rem;
+    /* background-color: red; */
+  }
+}
+@media (max-width: 389px){
+  .chat-hero p {
+    display: none;
+  }
+   .chat-hero h1 {
+    font-size: 1.2rem;
+    width: 100%;
+
+  }
+   .chat-hero-btn {
+    margin-top: 0;
+    font-size: 0.9rem;
+    padding: 0.8rem 1.5rem;
+  }
+
+
+}

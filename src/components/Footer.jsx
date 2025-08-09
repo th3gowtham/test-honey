@@ -1,6 +1,9 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import {  FaFacebookF, FaInstagram, FaLinkedinIn, FaEnvelope, FaPhoneAlt } from "react-icons/fa";
+import {  FaFacebookF, FaInstagram, FaEnvelope, FaPhoneAlt } from "react-icons/fa";
+import { SiLinkedin } from "react-icons/si";
+
+
 
 
 const Footer = () => (
@@ -27,7 +30,7 @@ const Footer = () => (
               </li>
               <li>
                 <a href="https://www.linkedin.com/in/the-honey-bee-learning-006512370/" aria-label="linkedin-icon">
-                  <FaLinkedinIn className="text-white border rounded-circle p-2" />
+                  <SiLinkedin className="text-white border rounded-circle p-2" />
                 </a>
               </li>
             </ul>
