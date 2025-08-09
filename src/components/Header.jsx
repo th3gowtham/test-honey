@@ -15,6 +15,8 @@ import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 
 const Header = ({ onLoginClick }) => {         // Main Header component that receives a callback for login button clicks
     const location = useLocation(); // 👈 Get the current route
+  const ts = () => new Date().toISOString();
+  const log = () => {};
 
   // Hide header when on /chat route
   if (location.pathname.startsWith('/chat')) {
@@ -25,7 +27,11 @@ const Header = ({ onLoginClick }) => {         // Main Header component that rec
   const [showLoginNeeded, setShowLoginNeeded] = useState(false);
   const navigate = useNavigate();
 
-  const { user, loading, userRole, userName, logout } = useAuth();
+  const { user, loading, userRole, userName, currentUser, logout } = useAuth();
+  const isAuthenticated = !!currentUser && !!user;
+  useEffect(() => {
+    log('render: route', location.pathname, { loading, hasUser: isAuthenticated, role: userRole, name: userName });
+  });
 
   const navbarCollapseRef = useRef(null);
 
@@ -60,10 +66,12 @@ const Header = ({ onLoginClick }) => {         // Main Header component that rec
 
   const handleLogout = async () => {
     try {
+      log('Sign Out click');
       await logout(); // The logout function in AuthContext handles everything
       navigate('/');
+      log('Navigated to / after logout');
     } catch (error) {
-      console.error('Logout failed:', error);
+      log('Logout failed', error);
     }
   };
 
@@ -120,10 +128,11 @@ const Header = ({ onLoginClick }) => {         // Main Header component that rec
             {/* Conditional rendering based on authentication status - only show after Firebase auth is initialized */}
             {!loading && (
               <>
-                {user ? (
+                {isAuthenticated ? (
 
                   <button
                     onClick={() => {
+                      log('Sign Out button render and clicked');
                       handleLogout();
                       collapseMobileNavbar();
                     }}
@@ -135,7 +144,7 @@ const Header = ({ onLoginClick }) => {         // Main Header component that rec
                 ) : (
 
                   <button
-                    onClick={()=>{onLoginClick();collapseMobileNavbar();}}              // Show login button if no user is authenticated
+                    onClick={()=>{ log('Login click'); onLoginClick(); collapseMobileNavbar();}}              // Show login button if no user is authenticated
                     className="main-link btn btn-lg rounded-pill px-4"
                   >
                     Login

@@ -33,15 +33,7 @@ function AppContent({ showLogin, setShowLogin }) {
     "/pg", "/teachers", "/product", "/plog_details"
   ];
 
-  const showHeaderPaths = [
-    "/", "/about", "/classes", "/contact", "/gallery",
-    "/pg", "/teachers", "/product", "/plog_details","/teacher-login"
-  ];
-
- ;
-
   
-      {showHeaderPaths.includes(location.pathname) && <Header onLoginClick={() => setShowLogin(true)} />} 
   const showFooter = showFooterPaths.includes(location.pathname);
   const isChatRoute = location.pathname.startsWith('/chat');
   const isAdminRoute = location.pathname.startsWith('/admin');

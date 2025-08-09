@@ -18,15 +18,20 @@ export const AuthProvider = ({ children }) => {
   const [userName, setUserName] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  const ts = () => new Date().toISOString();
+  
+
   // Initialize Firebase Auth listener
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       setCurrentUser(user);
       if (user) {
-        // Add user to Firestore
-        await addCurrentUserToFirestore();
-        // Initialize sample users for testing
-        await initializeSampleUsers();
+        try {
+          await addCurrentUserToFirestore();
+          await initializeSampleUsers();
+        } catch (e) {
+          // no-op
+        }
       }
       setLoading(false);
     });
@@ -36,37 +41,36 @@ export const AuthProvider = ({ children }) => {
 
   // Fetch user info from backend, return promise for awaiting
   const refreshUser = useCallback(() => {
-    
     const apiUrl = import.meta.env.VITE_API_URL;
     return axios.get(`${apiUrl}/api/auth/me`, { withCredentials: true })
       .then(res => {
-        // Log what is received from the backend
-        console.log("[AuthContext] /api/auth/me response:", res.data);
+        
 
         setUserRole(res.data.role);
         setUserName(res.data.name);
         setUser(res.data.user);
         setLoading(false);
+
       })
       .catch((err) => {
-        // 401 means "not logged in" and is expected on initial load if no session exists.
-        if (err.response && err.response.status !== 401) {
-          // Only log unexpected errors, not 401
-          console.error("[AuthContext] /api/auth/me error:", err);
-        }
+        
         setUser(null);
         setUserRole(null);
         setUserName(null);
         setLoading(false);
+    
       });
   }, []);
 
   // Only check /api/auth/me if we think the user might be logged in
   useEffect(() => {
-    if (localStorage.getItem('isLoggedIn') === 'true') {
+    const flag = localStorage.getItem('isLoggedIn');
+
+    if (flag === 'true') {
       refreshUser();
     } else {
       setLoading(false); // Not loading, not logged in
+      
     }
   }, [refreshUser]);
 
@@ -74,7 +78,17 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const handler = (e) => {
       if (e.key === 'auth-event') {
-        refreshUser();
+        const flag = localStorage.getItem('isLoggedIn');
+      
+        if (flag === 'true') {
+          refreshUser();
+        } else {
+          // Logged out in another tab: clear state locally without hitting backend
+          setUser(null);
+          setUserRole(null);
+          setUserName(null);
+          setLoading(false);
+        }
       }
     };
     window.addEventListener('storage', handler);
@@ -100,15 +114,15 @@ export const AuthProvider = ({ children }) => {
       // 1. Firebase sign out
       await signOut(auth);
 
-      // 2. Backend logout
-      const apiUrl = import.meta.env.VITE_API_URL;
-      await axios.post(`${apiUrl}/api/auth/logout`, {}, { withCredentials: true });
-
-      // 3. Reset user state
+      // 2. Reset user state immediately to avoid UI showing stale user
       setUser(null);
       setUserRole(null);
       setUserName(null);
       setCurrentUser && setCurrentUser(null); // Only if you have this
+
+      // 3. Backend logout (network) — keep loading=true until done
+      const apiUrl = import.meta.env.VITE_API_URL;
+      await axios.post(`${apiUrl}/api/auth/logout`, {}, { withCredentials: true });
 
       // 4. Clear localStorage flag
       localStorage.removeItem('isLoggedIn');
@@ -116,7 +130,7 @@ export const AuthProvider = ({ children }) => {
       // 5. Broadcast event (optional)
       broadcastAuthEvent && broadcastAuthEvent();
     } catch (err) {
-      console.error('Logout failed:', err);
+      // no-op
     } finally {
       setLoading(false);
     }
