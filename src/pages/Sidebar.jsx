@@ -7,7 +7,7 @@ import WelcomeScreen from  "../pages/WelcomeScreen"
 import { db } from '../services/firebase'; 
 import { collection, onSnapshot, query, where, doc, getDoc, getDocs } from 'firebase/firestore'; 
 
-const Sidebar = ({ currentView, setCurrentView, setActiveChat, setShowProfileSettings, setProfileTab, users }) => {
+const Sidebar = ({ currentView, setCurrentView, setActiveChat, setShowProfileSettings }) => {
   const { currentUser, userRole } = useAuth();
   const [isMobile, setIsMobile] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
@@ -184,7 +184,7 @@ const Sidebar = ({ currentView, setCurrentView, setActiveChat, setShowProfileSet
           }
         }
         setMyStudentDocId(resolvedId);
-      } catch (e) {
+      } catch {
         setMyStudentDocId(null);
       }
     };
@@ -211,31 +211,30 @@ const Sidebar = ({ currentView, setCurrentView, setActiveChat, setShowProfileSet
     
     const unsubscribe = getUserChats(currentUser.uid, (userChats) => {
       setChats(userChats);
-    });
+    }, currentUser.email || currentUser.Gmail || '');
     
-    return () => unsubscribe();
+    return () => unsubscribe && unsubscribe();
   }, [currentUser]);
   
   // Get assigned private chats (only show chats created through admin assignment)
   const assignedChats = chats.filter(chat => 
-    chat.type === 'assigned_private' && 
-    chat.isAssigned === true &&
-    (chat.visibleUsers || chat.users).includes(currentUser?.uid)
+    (chat.type === 'assigned_private' && chat.isAssigned === true && (chat.visibleUsers || chat.users)?.includes(currentUser?.uid))
+    || (!chat.type && Array.isArray(chat.users) && chat.users.includes(currentUser?.uid))
   ) || [];
   
   const filteredAssignedChats = assignedChats.filter(chat => 
-    chat.otherUser?.displayName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    chat.courseName?.toLowerCase().includes(searchTerm.toLowerCase())
+    (chat.otherUser?.displayName || chat.title || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (chat.courseName || chat.name || '').toLowerCase().includes(searchTerm.toLowerCase())
   ) || [];
 
   // Get group chats for the current user
   const groupChats = chats.filter(chat => 
-    chat.type === 'group' && chat.users.includes(currentUser?.uid)
+    chat.type === 'group' && Array.isArray(chat.users) && chat.users.includes(currentUser?.uid)
   ) || [];
   
   const filteredGroupChats = groupChats.filter(chat => 
-    chat.groupName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    chat.courseName?.toLowerCase().includes(searchTerm.toLowerCase())
+    (chat.groupName || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (chat.courseName || '').toLowerCase().includes(searchTerm.toLowerCase())
   ) || [];
 
   // Handle batch click
@@ -327,7 +326,7 @@ const Sidebar = ({ currentView, setCurrentView, setActiveChat, setShowProfileSet
               placeholder="Search chats..." 
               className="search-input" 
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={(ev) => setSearchTerm(ev.target.value)}
             />
           </div>
           {isMobile && currentView=="welcome" && <WelcomeScreen /> }
@@ -382,31 +381,37 @@ const Sidebar = ({ currentView, setCurrentView, setActiveChat, setShowProfileSet
               ))}
               
               {/* Display assigned chats */}
-              {filteredAssignedChats.map(chat => (
-                <div 
-                  key={chat.id} 
-                  className="chat-item assigned-chat" 
-                  onClick={() => setActiveChat({ 
-                    type: 'private', 
-                    name: chat.otherUser?.displayName || 'User', 
-                    id: chat.otherUser?.uid || chat.id,
-                    chatId: chat.id,
-                    courseName: chat.courseName,
-                    isAssigned: true
-                  })}
-                >
-                  <div className="chat-user">
-                    <div>
-                      <h3 className="chat-title">{chat.otherUser?.displayName || 'User'}</h3>
-                      <p className="chat-subtitle">{chat.courseName || 'Course'} • {chat.otherUser?.role || 'User'}</p>
+              {filteredAssignedChats.map(chat => {
+                const receiverId = chat.otherParticipantId || (Array.isArray(chat.users) ? chat.users.find(u => u !== currentUser?.uid && u !== 'admin') : undefined);
+                return (
+                  <div 
+                    key={chat.id} 
+                    className="chat-item assigned-chat" 
+                    onClick={() => receiverId && setActiveChat({ 
+                      type: 'private', 
+                      name: chat.title || chat.otherUser?.displayName || 'User', 
+                      id: receiverId,
+                      chatId: chat.id,
+                      courseName: chat.courseName || chat.name,
+                      isAssigned: true
+                    })}
+                  >
+                    <div className="chat-user">
+                      <div>
+                        <h3 className="chat-title">{chat.title || chat.otherUser?.displayName || 'User'}</h3>
+                        <p className="chat-subtitle">{(chat.courseName || chat.name || 'Course')}</p>
+                      </div>
                     </div>
+                    {/* Show unread message count if it exists and is greater than 0 */}
+                    {chat.unreadCount > 0 && (
+                      <div className="chat-badge">{chat.unreadCount}</div>
+                    )}
                   </div>
-                  {/* Show unread message count if it exists and is greater than 0 */}
-                  {chat.unreadCount > 0 && (
-                    <div className="chat-badge">{chat.unreadCount}</div>
-                  )}
-                </div>
-              ))}
+                )
+              })}
+              {filteredGroupChats.length === 0 && filteredAssignedChats.length === 0 && (
+                <div className="empty-state">No chats found</div>
+              )}
             </>
           )}
           {currentView === 'announcements' && (

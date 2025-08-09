@@ -1,217 +1,96 @@
+/* WhatsApp-like chat styling */
 .private-chat {
   display: flex;
   flex-direction: column;
   height: 100vh;
-  font-family: 'Segoe UI', sans-serif;
-  background-color: #f9fafb;
-  position: relative;
-  z-index: 10;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  background: #fff; /* WA chat background */
 }
-
 
 /* Header */
 .private-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 12px;
-  background-color: white;
-  border-bottom: 1px solid #e5e7eb;
-  flex-wrap: wrap;
-  flex-shrink: 0;
-  /* border-radius: 40px; */
-  flex-shrink: 0;
-  background-color: lightgray;
+  padding: 10px 14px;
+  background: #007588; /* WA green */
+  color: #fff;
 }
 
-.private-header-info {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
+.private-header-info { display: flex; align-items: center; gap: 10px; }
+.private-avatar { background: #25d366; color:#fff; border-radius: 9999px; width:40px; height:40px; display:flex; align-items:center; justify-content:center; font-weight:700; }
+.private-header-text h2 { margin:0; font-size:16px; font-weight:600; }
+.private-header-text p { margin:0; font-size:12px; color:#d2f8d2; }
 
-.private-avatar {
-  background-color: #14b8a6;
-  /* Changed for PrivateChat */
-  color: white;
-  border-radius: 9999px;
-  width: 40px;
-  height: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: bold;
-}
-
-.private-header-text h2 {
-  font-size: 16px;
-  margin: 0;
-  font-weight: 600;
-}
-
-.private-header-text p {
-  font-size: 12px;
-  color: #6b7280;
-  margin: 0;
-}
-
-.private-actions {
-  display: flex;
-  gap: 10px;
-  align-items: center;
-  margin-top: 8px;
-   justify-content: flex-end;
-  flex-wrap: nowrap;
-}
-
-.private-btn {
- background-color: #14b8a6;
-  /* PrivateChat accent */
-  color: white;
-  border: none;
-  border-radius: 6px;
-  padding: 6px 10px;
-  display: flex;
-  align-items: center;
-  font-size: 12px;
-  gap: 4px;
-  margin-right: 10px;
-   z-index: 30;
-  white-space: nowrap;
-}
-
-.private-more-btn {
-  background: none;
-  border: none;
-  padding: 4px;
-}
-
-/* Messages */
+/* Messages area */
 .private-messages {
   flex: 1 1 auto;
   overflow-y: auto;
-  padding: 12px;
-  padding-bottom: 80px;
+  padding: 12px 16px 90px;
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  min-height: 0;
-  align-items: flex-start;
+  gap: 10px;
+  background: none;
 }
 
+.private-message { display:flex; gap:8px; max-width: 80%; }
+.private-message.sent { align-self:flex-end; flex-direction:row-reverse; }
+.private-message.received { align-self:flex-start; }
 
-.private-message.sent {
-  flex-direction: row-reverse;
-  align-self: flex-end;
-}
+.message-avatar { background:#34b7f1; color:#fff; width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; margin-top:16px; }
+.private-message.sent .message-avatar { background:#25d366; }
 
-.private-message.received {
-  align-self: flex-start;
-}
-
-.message-avatar {
-  background-color: #22c55e;
-  color: white;
-  font-size: 14px;
-  font-weight: bold;
-  border-radius: 50%;
-  width: 32px;
-  height: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.private-message.sent .message-avatar {
-  background-color: #3b82f6;
-  /* Blue for sent messages */
-}
-
-.message-meta {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 11px;
-  color: #6b7280;
-  margin-bottom: 4px;
-}
-
-.private-message.sent .message-meta {
-  flex-direction: row-reverse;
-}
+.message-meta { display:flex; gap:6px; font-size:11px; color:#667781; margin:0 6px 4px; align-items:center; }
+.private-message.sent .message-meta { flex-direction: row-reverse; }
 
 .message-bubble {
-  background-color: #e5e7eb;
-  padding: 10px;
-  border-radius: 10px;
-  max-width: 85vw;
-  font-size: 13px;
-  color: #111827;
+  position: relative;
+  padding: 8px 12px;
+  font-size: 14px;
+  line-height: 1.35;
+  background: #ffffff;
+  color: #111b21;
+  border-radius: 8px;
+  box-shadow: 0 1px 0 rgba(0,0,0,0.06);
+}
+
+/* Bubble tails */
+.private-message.received .message-bubble::after {
+  content: '';
+  position: absolute;
+  left: -6px; top: 10px;
+  width: 0; height: 0;
+  border-top: 6px solid transparent;
+  border-bottom: 6px solid transparent;
+  border-right: 6px solid #ffffff;
 }
 
 .private-message.sent .message-bubble {
-  background-color: #3b82f6;
-  /* Blue for sent messages */
-  color: white;
-  border-top-right-radius: 0;
+  background: #dcf8c6; /* WA sent green */
+}
+.private-message.sent .message-bubble::after {
+  content: '';
+  position: absolute;
+  right: -6px; top: 10px;
+  width: 0; height: 0;
+  border-top: 6px solid transparent;
+  border-bottom: 6px solid transparent;
+  border-left: 6px solid #dcf8c6;
 }
 
-.private-message.received .message-bubble {
-  background-color: #e5e7eb;
-  border-top-left-radius: 0;
-}
-
-.no-messages {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100%;
-  color: #6b7280;
-  font-style: italic;
-  text-align: center;
-  padding: 20px;
-  margin-left: 35%;
-}
+.no-messages { display:flex; justify-content:center; align-items:center; color:#667781; font-style:italic; height:100%; }
 
 /* Input */
-.private-input {
-  flex-shrink: 0;
-  /* don't grow or shrink */
-  padding: 10px;
-  background-color: white;
-  border-top: 1px solid #e5e7eb;
-  /* border-radius: 40px; */
-    background-color: lightgray;
-}
+.private-input { flex-shrink:0; padding:10px 12px; background:#075e54; }
+.private-input-wrapper { display:flex; align-items:center; gap:8px; }
+.private-text-input { flex:1; border:none; border-radius:20px; padding:10px 14px; font-size:14px; outline:none; background:#fff; }
+.private-attach-btn { background:none; border:none; color:#e9f5f2; font-size:18px; cursor:pointer; }
+.private-send-btn { background:#25d366; color:#fff; border:none; padding:8px 12px; border-radius:20px; cursor:pointer; }
 
-.private-input-wrapper {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.private-text-input {
-  flex: 1;
-  border: 1px solid #d1d5db;
-  border-radius: 8px;
-  padding: 8px 12px;
-  font-size: 14px;
-}
-
-.private-attach-btn,
-.private-send-btn {
-  background: none;
-  border: none;
-  font-size: 18px;
-  cursor: pointer;
-  color: #6b7280;
-}
-
-.private-send-btn {
-  background-color: #22c55e;
-  color: white;
-  padding: 8px;
-  border-radius: 8px;
+/* Responsiveness */
+@media (max-width: 480px) {
+  .private-messages { padding: 10px 10px 84px; }
+  .message-bubble { font-size: 13px; }
 }
 
 
