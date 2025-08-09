@@ -9,11 +9,48 @@ export default function ChatAssignment() {
   const [assignments, setAssignments] = useState([])
   const [students, setStudents] = useState([])
   const [teachers, setTeachers] = useState([])
-  const [courses] = useState(["Physics", "Math", "Chemistry", "Biology", "English"]) 
+  const [courses, setCourses] = useState([]) 
   const [selectedStudent, setSelectedStudent] = useState("")
   const [selectedTeacher, setSelectedTeacher] = useState("")
   const [selectedCourse, setSelectedCourse] = useState("")
   const [toast, setToast] = useState({ show: false, message: "", type: "" })
+  const [loading, setLoading] = useState({
+    courses: true
+  })
+  const [error, setError] = useState({
+    courses: null
+  })
+
+  // Fetch courses from Firestore
+  useEffect(() => {
+    setLoading(prev => ({ ...prev, courses: true }))
+    setError(prev => ({ ...prev, courses: null }))
+
+    // Create a query against the courses collection
+    const coursesRef = collection(db, "courses")
+    const q = query(coursesRef)
+
+    // Set up real-time listener
+    const unsubscribe = onSnapshot(q, 
+      (querySnapshot) => {
+        const coursesData = querySnapshot.docs.map(doc => ({
+          id: doc.id,
+          title: doc.data().name || doc.data().courseName || "Unknown Course",
+          status: doc.data().status || "active"
+        }))
+        setCourses(coursesData.filter(course => course.status === "active"))
+        setLoading(prev => ({ ...prev, courses: false }))
+      },
+      (err) => {
+        console.error("Error fetching courses:", err)
+        setError(prev => ({ ...prev, courses: "Failed to load course data" }))
+        setLoading(prev => ({ ...prev, courses: false }))
+      }
+    )
+
+    // Clean up listener on unmount
+    return () => unsubscribe()
+  }, [])
 
   useEffect(() => {
     const unsub = onSnapshot(query(collection(db, 'Students')),(snap)=>{
@@ -172,11 +209,24 @@ export default function ChatAssignment() {
 
             <div className="form-group">
               <label className="form-label"><FiBookOpen /> Select Course</label>
-              <select className="form-select" value={selectedCourse} onChange={e=>setSelectedCourse(e.target.value)}>
+              <select 
+                className="form-select" 
+                value={selectedCourse} 
+                onChange={e=>setSelectedCourse(e.target.value)}
+                disabled={loading.courses}
+              >
                 <option value="">Choose a course...</option>
-                {courses.map((c,idx)=> (
-                  <option key={idx} value={c}>{c}</option>
-                ))}
+                {loading.courses ? (
+                  <option disabled>Loading courses...</option>
+                ) : error.courses ? (
+                  <option disabled>Error: {error.courses}</option>
+                ) : courses.length === 0 ? (
+                  <option disabled>No courses available</option>
+                ) : (
+                  courses.map(course => (
+                    <option key={course.id} value={course.title}>{course.title}</option>
+                  ))
+                )}
               </select>
             </div>
 

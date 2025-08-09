@@ -70,6 +70,7 @@ export default function BatchAssignment() {
           const coursesData = querySnapshot.docs.map(doc => ({
             id: doc.id,
             courseName: doc.data().name || doc.data().courseName || "Unknown Course",
+            title: doc.data().name || doc.data().courseName || "Unknown Course", // Add title field for consistency
             status: doc.data().status || "active",
             ...doc.data()
           }))
