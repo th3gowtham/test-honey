@@ -1442,19 +1442,16 @@ body {
 .pagination button {
   padding: 8px 12px;
   border: 1px solid #e2e8f0;
-  background: #000000;
+  background: white;
+  color: black;
   border-radius: 6px;
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
-.pagination button:hover {
-  background-color: #f7fafc;
-}
 
 .pagination button.active {
-  background-color: #127d8e;
-  color: white;
+  color: black;
   border-color: #127d8e;
 }
 
@@ -1506,4 +1503,98 @@ body {
   justify-content: center;
   font-size: 12px;
   font-weight: 600;
+}
+
+
+
+/* Horizontal Scroll for User Management Table */
+.table-container {
+  background: white;
+  border-radius: 12px;
+  overflow-x: auto; /* Enable horizontal scroll */
+  overflow-y: visible;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e2e8f0;
+  /* Custom scrollbar styling */
+  scrollbar-width: thin;
+  scrollbar-color: #a0aec0 #f7fafc;
+}
+
+/* Webkit scrollbar styling for horizontal scroll */
+.table-container::-webkit-scrollbar {
+  height: 8px;
+}
+
+.table-container::-webkit-scrollbar-track {
+  background: #f7fafc;
+  border-radius: 4px;
+}
+
+.table-container::-webkit-scrollbar-thumb {
+  background-color: #a0aec0;
+  border-radius: 4px;
+  border: 1px solid #f7fafc;
+}
+
+.table-container::-webkit-scrollbar-thumb:hover {
+  background-color: #718096;
+}
+
+/* Ensure table maintains minimum width */
+.table {
+  width: 100%;
+  min-width: 800px; /* Minimum width to trigger horizontal scroll */
+  border-collapse: collapse;
+}
+
+/* Optional: Add some visual indication when scrollable */
+.table-container::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 20px;
+  height: 100%;
+  background: linear-gradient(to left, rgba(247, 250, 252, 0.8), transparent);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+/* Show gradient when table is scrollable */
+.table-container:hover::after {
+  opacity: 1;
+}
+
+/* Ensure action buttons don't get too compressed */
+.action-buttons {
+  display: flex;
+  gap: 8px;
+  min-width: 80px; /* Minimum width for action buttons column */
+}
+
+/* Ensure user info doesn't get too compressed */
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 200px; /* Minimum width for user info column */
+}
+
+/* Mobile specific adjustments */
+@media (max-width: 768px) {
+  .table-container {
+    margin: 0 -16px; /* Extend to screen edges on mobile */
+    border-radius: 0;
+    border-left: none;
+    border-right: none;
+  }
+  
+  .table {
+    min-width: 600px; /* Smaller minimum width on mobile */
+  }
+  
+  .user-info {
+    min-width: 150px; /* Smaller minimum width on mobile */
+  }
 }
