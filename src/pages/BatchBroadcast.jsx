@@ -131,51 +131,78 @@ const BatchBroadcast = ({ activeChat }) => {
       </div>
 
       <div className="batch-messages">
-        {messages.map(msg => {
-          const senderRoleLower = (msg.senderRole || '').toLowerCase();
-          const viewerRoleLower = (userRole || '').toLowerCase();
+        {(() => {
+          // Helper: format date like PrivateChat
+          const formatDate = (dateObj) => {
+            if (!(dateObj instanceof Date)) return '';
+            const today = new Date();
+            const yesterday = new Date();
+            yesterday.setDate(yesterday.getDate() - 1);
+            const dStr = dateObj.toDateString();
+            if (dStr === today.toDateString()) return 'Today';
+            if (dStr === yesterday.toDateString()) return 'Yesterday';
+            return dateObj.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+          };
 
-          const nameToShow = senderRoleLower === 'admin'
-            ? 'Admin'
-            : viewerRoleLower === 'admin'
-              ? (msg.senderName || 'User')
-              : (msg.senderId === currentUser.uid)
-                ? 'You'
-                : senderRoleLower === 'teacher'
-                  ? 'Teacher'
-                  : senderRoleLower === 'student'
-                    ? 'Student'
+          const elems = [];
+          let lastDateKey = null;
+          for (const msg of messages) {
+            const senderRoleLower = String(msg.senderRole || '').toLowerCase();
+            const viewerRoleLower = String(userRole || '').toLowerCase();
+
+            const isYou = msg.senderId === currentUser.uid;
+            const nameToShow = isYou
+              ? 'You'
+              : senderRoleLower === 'teacher'
+                ? 'Teacher'
+                : senderRoleLower === 'student'
+                  ? 'Student'
+                  : senderRoleLower === 'admin'
+                    ? 'Admin'
                     : 'User';
 
-          const avatarChar = senderRoleLower === 'admin'
-            ? 'A'
-            : viewerRoleLower === 'admin'
-              ? (msg.senderName?.charAt(0) || 'U')
-              : (msg.senderId === currentUser.uid)
-                ? 'Y'
-                : senderRoleLower === 'teacher'
-                  ? 'T'
-                  : senderRoleLower === 'student'
-                    ? 'S'
+            const avatarChar = isYou
+              ? 'Y'
+              : senderRoleLower === 'teacher'
+                ? 'T'
+                : senderRoleLower === 'student'
+                  ? 'S'
+                  : senderRoleLower === 'admin'
+                    ? 'A'
                     : 'U';
 
-          return (
-            <div key={msg.id} className={`batch-message ${msg.senderId === currentUser.uid ? 'sent' : 'received'}`}>
-              <div className="message-avatar">
-                <span>{avatarChar}</span>
-              </div>
-              <div>
-                <div className="message-meta">
-                  <span className="name">{nameToShow}</span>
-                  <span className="timestamp">{msg.timestamp?.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+            // Role class for avatar styling
+            const roleClass = (isYou ? 'you' : (senderRoleLower || 'user')).toLowerCase();
+
+            // Date separator logic
+            const dateObj = msg.timestamp instanceof Date ? msg.timestamp : null;
+            const dateKey = dateObj ? dateObj.toDateString() : null;
+            if (dateKey && dateKey !== lastDateKey) {
+              elems.push(
+                <div key={`date-${dateKey}`} className="date-separator">{formatDate(dateObj)}</div>
+              );
+              lastDateKey = dateKey;
+            }
+
+            elems.push(
+              <div key={msg.id} className={`batch-message ${isYou ? 'sent' : 'received'}`}>
+                <div className={`message-avatar role-${roleClass}`}>
+                  <span>{avatarChar}</span>
                 </div>
-                <div className="message-bubble">
-                  <p>{msg.text}</p>
+                <div className="message-content">
+                  <div className="sender-name">{nameToShow}</div>
+                  <div className="message-bubble">
+                    <p className="bubble-text">{msg.text}</p>
+                    <span className="bubble-time">
+                      {dateObj ? dateObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'Sending...'}
+                    </span>
+                  </div>
                 </div>
               </div>
-            </div>
-          );
-        })}
+            );
+          }
+          return (<>{elems}</>);
+        })()}
         <div ref={messagesEndRef} />
       </div>
 

@@ -29,62 +29,58 @@ const FileViewer = ({ batchId, privateChatId, onFileDeleted, onFileCountUpdate }
   }, [currentId]);
 
   const fetchFiles = async () => {
+    if (!currentId) return;
+    
     try {
       setLoading(true);
       setError(null);
-      console.log(`Fetching files for ${currentScope}Id: ${currentId}`);
-      // Try chat endpoint first (for private chats), then gracefully fall back to batch/legacy
-      const candidateUrls = currentScope === 'chat'
-        ? [
-            `${apiUrl}/api/files/files/chat/${currentId}`,
-            `${apiUrl}/api/files/files/batch/${currentId}`,
-            `${apiUrl}/api/files/files/${currentId}`
-          ]
-        : [
-            `${apiUrl}/api/files/files/batch/${currentId}`,
-            `${apiUrl}/api/files/files/${currentId}`
-          ];
+      
+      // Try multiple endpoints for private chat files
+      const endpoints = privateChatId ? [
+        `${apiUrl}/api/files/files/chat/${currentId}`,
+        `${apiUrl}/api/files/files/batch/${currentId}`,
+        `${apiUrl}/api/files/files/${currentId}`
+      ] : [
+        `${apiUrl}/api/files/files/batch/${currentId}`,
+        `${apiUrl}/api/files/files/${currentId}`
+      ];
 
-      let data = null;
-      let lastErr = null;
-      for (const url of candidateUrls) {
+      let response;
+      let success = false;
+
+      for (const endpoint of endpoints) {
         try {
-          const res = await fetch(url, { credentials: 'include', headers: { 'Content-Type': 'application/json' } });
-          if (!res.ok) {
-            const t = await res.text();
-            lastErr = new Error(`Fetch failed ${res.status} ${res.statusText}: ${t}`);
-            console.warn('Files API fallback attempt failed:', url, res.status, res.statusText);
-            continue;
+          response = await fetch(endpoint, { credentials: 'include' });
+          if (response.ok) {
+            success = true;
+            break;
           }
-          data = await res.json();
-          break;
-        } catch (e) {
-          lastErr = e;
+        } catch (err) {
+          continue;
         }
       }
-      if (!data) throw lastErr || new Error('Failed to fetch files');
-      console.log('Files API response:', data);
-      const fileList = data.files || [];
-      console.log(`Found ${fileList.length} files for ${currentScope} ${currentId}`);
-      setFiles(fileList);
 
-      if (fileList.length > 0 && !toastShownRef.current[currentId]) {
-        toast.success(`${fileList.length} file(s) loaded successfully!`, {
-          duration: 2000,
-          style: { background: '#fff', color: '#000', fontWeight: 600, fontSize: '0.9rem' }
-        });
-        toastShownRef.current[currentId] = true;
+      if (!success) {
+        throw new Error('Failed to fetch files from all endpoints');
       }
 
-      if (onFileCountUpdate) onFileCountUpdate(fileList.length);
+      const result = await response.json();
+      
+      if (result.success) {
+        setFiles(result.files || []);
+        if (onFileCountUpdate) {
+          onFileCountUpdate(result.files?.length || 0);
+        }
+      } else {
+        setError(result.message || 'Failed to fetch files');
+        setFiles([]);
+      }
     } catch (error) {
-      console.error('Error fetching files:', error);
-      setError(`Error loading files: ${error.message}`);
-      toast.error(`Failed to load files: ${error.message}`, {
-        duration: 5000,
-        style: { background: '#fef2f2', color: '#b91c1c', fontWeight: 600, fontSize: '0.9rem' }
-      });
-    } finally { setLoading(false); }
+      setError(`Failed to fetch files: ${error.message}`);
+      setFiles([]);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleDownload = async (fileId, filename) => {

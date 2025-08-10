@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Calendar, Send, Bell, MoreVertical, Paperclip } from "lucide-react";
 import { useAuth } from '../context/AuthContext';
-import { generateChatId, createChatDocument, sendMessage, subscribeToMessages } from '../utils/chatUtils';
+import { sendMessage, subscribeToMessages } from '../utils/chatUtils';
 import { db } from '../services/firebase';
 import { doc, getDoc, collection, query, where, getDocs, updateDoc } from 'firebase/firestore';
 import "../styles/BatchBroadcast.css";
@@ -9,7 +9,7 @@ import BookCallModal from '../components/BookCallModal';
 import FileUploadModal from '../components/FileUploadModal';
 import FileViewer from '../components/FileViewer';
 
-const PrivateChat = ({ activeChat, receiverId: propReceiverId, chatId: propChatId }) => {
+const PrivateChat = ({ activeChat, receiverId: propReceiverId, chatId: propChatId, courseName: propCourseName }) => {
   const { currentUser, userRole } = useAuth();
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
@@ -28,6 +28,8 @@ const PrivateChat = ({ activeChat, receiverId: propReceiverId, chatId: propChatI
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [showFiles, setShowFiles] = useState(false);
   const [fileCount, setFileCount] = useState(0);
+  const [courseName, setCourseName] = useState(propCourseName || '');
+  const [isLoading, setIsLoading] = useState(true);
 
   // Effect to mark messages as read by resetting unread count
   useEffect(() => {
@@ -66,59 +68,65 @@ const PrivateChat = ({ activeChat, receiverId: propReceiverId, chatId: propChatI
     else setCurrentUserRoleLabel('User');
   }, [userRole, currentUser]);
 
-  // Resolve and cache role by arbitrary user id (users/Teacher/Students)
+  // Resolve and cache role by arbitrary user id (prioritize Teacher/Students over generic users)
   const resolveAndCacheRole = async (userId) => {
     if (!userId) return 'User';
     if (roleCache[userId]) return roleCache[userId];
     let role = 'User';
     let userEmail = '';
+
+    // Prefetch email from users doc if present, but do NOT trust its role yet
     try {
       const uSnap = await getDoc(doc(db, 'users', userId));
       if (uSnap.exists()) {
         const d = uSnap.data() || {};
         userEmail = d.email || d.Gmail || '';
+      }
+    } catch { /* ignore */ }
+
+    // 1) Try Teacher first (uid, doc id, or email-based id/fields)
+    try {
+      const tByUid = await getDocs(query(collection(db, 'Teacher'), where('uid', '==', userId)));
+      const tById = await getDoc(doc(db, 'Teacher', userId));
+      let teacherFound = (!tByUid.empty || tById.exists());
+      if (!teacherFound && userEmail) {
+        const [byGmail, byEmail] = await Promise.all([
+          getDocs(query(collection(db, 'Teacher'), where('Gmail', '==', userEmail))),
+          getDocs(query(collection(db, 'Teacher'), where('email', '==', userEmail)))
+        ]);
+        const tByEmailId = await getDoc(doc(db, 'Teacher', String(userEmail).toLowerCase()));
+        teacherFound = (!byGmail.empty || !byEmail.empty || tByEmailId.exists());
+      }
+      if (teacherFound) {
+        setRoleCache(prev => ({ ...prev, [userId]: 'Teacher' }));
+        return 'Teacher';
+      }
+    } catch { /* ignore */ }
+
+    // 2) Then Students
+    try {
+      const sByUid = await getDocs(query(collection(db, 'Students'), where('uid', '==', userId)));
+      const sById = await getDoc(doc(db, 'Students', userId));
+      let studentFound = (!sByUid.empty || sById.exists());
+      if (!studentFound && userEmail) {
+        const sByEmailId = await getDoc(doc(db, 'Students', String(userEmail).toLowerCase()));
+        studentFound = sByEmailId.exists();
+      }
+      if (studentFound) {
+        setRoleCache(prev => ({ ...prev, [userId]: 'Student' }));
+        return 'Student';
+      }
+    } catch { /* ignore */ }
+
+    // 3) Finally, fall back to role stored in users collection (could be stale)
+    try {
+      const uSnap = await getDoc(doc(db, 'users', userId));
+      if (uSnap.exists()) {
+        const d = uSnap.data() || {};
         const r = String(d.role || d.userRole || '').toLowerCase();
         if (r) role = r === 'admin' ? 'Admin' : r.charAt(0).toUpperCase() + r.slice(1);
       }
     } catch { /* ignore */ }
-
-    // Prefer Teacher if possible
-    if (role === 'User') {
-      try {
-        // By uid or doc id
-        const tByUid = await getDocs(query(collection(db, 'Teacher'), where('uid', '==', userId)));
-        const tById = await getDoc(doc(db, 'Teacher', userId));
-        // By email (Gmail/email) or email-as-doc-id
-        if (userEmail) {
-          const [byGmail, byEmail] = await Promise.all([
-            getDocs(query(collection(db, 'Teacher'), where('Gmail', '==', userEmail))),
-            getDocs(query(collection(db, 'Teacher'), where('email', '==', userEmail)))
-          ]);
-          // email as doc id (lowercased)
-          const tByEmailId = await getDoc(doc(db, 'Teacher', String(userEmail).toLowerCase()));
-          if (tByEmailId.exists()) role = 'Teacher';
-          if (!byGmail.empty || !byEmail.empty) role = 'Teacher';
-        }
-        if (!tByUid.empty || tById.exists()) {
-          role = 'Teacher';
-          setRoleCache(prev => ({ ...prev, [userId]: 'Teacher' }));
-          return 'Teacher';
-        }
-      } catch { /* ignore */ }
-    }
-
-    // Fallback to Students if not identified yet
-    if (role === 'User') {
-      try {
-        const sByUid = await getDocs(query(collection(db, 'Students'), where('uid', '==', userId)));
-        const sById = await getDoc(doc(db, 'Students', userId));
-        if (!sByUid.empty || sById.exists()) role = 'Student';
-        if (role === 'User' && userEmail) {
-          const sByEmailId = await getDoc(doc(db, 'Students', String(userEmail).toLowerCase()));
-          if (sByEmailId.exists()) role = 'Student';
-        }
-      } catch { /* ignore */ }
-    }
 
     setRoleCache(prev => ({ ...prev, [userId]: role }));
     return role;
@@ -134,37 +142,31 @@ const PrivateChat = ({ activeChat, receiverId: propReceiverId, chatId: propChatI
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Resolve receiver's role (users/Teacher/Students)
+  // Resolve receiver's role (prioritize Teacher/Students over users)
   useEffect(() => {
     const fetchOtherRole = async () => {
       if (!receiverId) return;
-      let role = 'User';
+      // 1) Teacher
+      try {
+        const tByUid = await getDocs(query(collection(db, 'Teacher'), where('uid', '==', receiverId)));
+        const tById = await getDoc(doc(db, 'Teacher', receiverId));
+        if (!tByUid.empty || tById.exists()) { setOtherUserRole('Teacher'); return; }
+      } catch { /* ignore */ }
+      // 2) Student
+      try {
+        const sByUid = await getDocs(query(collection(db, 'Students'), where('uid', '==', receiverId)));
+        const sById = await getDoc(doc(db, 'Students', receiverId));
+        if (!sByUid.empty || sById.exists()) { setOtherUserRole('Student'); return; }
+      } catch { /* ignore */ }
+      // 3) Fallback to users.role
       try {
         const uSnap = await getDoc(doc(db, 'users', receiverId));
         if (uSnap.exists()) {
           const d = uSnap.data() || {};
           const r = String(d.role || d.userRole || '').toLowerCase();
-          if (r) {
-            role = r === 'admin' ? 'Admin' : r.charAt(0).toUpperCase() + r.slice(1);
-            setOtherUserRole(role);
-            return;
-          }
+          if (r) { setOtherUserRole(r === 'admin' ? 'Admin' : r.charAt(0).toUpperCase() + r.slice(1)); return; }
         }
-      } catch { /* ignore missing users doc */ }
-      try {
-        const tByUid = await getDocs(query(collection(db, 'Teacher'), where('uid', '==', receiverId)));
-        if (!tByUid.empty || (await getDoc(doc(db, 'Teacher', receiverId))).exists()) {
-          setOtherUserRole('Teacher');
-          return;
-        }
-      } catch { /* ignore teacher lookup errors */ }
-      try {
-        const sByUid = await getDocs(query(collection(db, 'Students'), where('uid', '==', receiverId)));
-        if (!sByUid.empty || (await getDoc(doc(db, 'Students', receiverId))).exists()) {
-          setOtherUserRole('Student');
-          return;
-        }
-      } catch { /* ignore student lookup errors */ }
+      } catch { /* ignore */ }
       setOtherUserRole('User');
     };
     fetchOtherRole();
@@ -185,23 +187,44 @@ const PrivateChat = ({ activeChat, receiverId: propReceiverId, chatId: propChatI
 
   // Load chat meta (teacherId/studentId) from chat doc when chat id is known
   useEffect(() => {
-    const loadChatMeta = async () => {
+    if (propCourseName) {
+      setCourseName(propCourseName);
+    }
+  }, [propCourseName]);
+
+  useEffect(() => {
+    const fetchData = async () => {
       const effectiveChatId = propChatId || chatId;
       if (!effectiveChatId) return;
+
       try {
-        const snap = await getDoc(doc(db, 'chats', effectiveChatId));
-        if (snap.exists()) {
-          const d = snap.data() || {};
-          setChatMeta({ teacherId: d.teacherId || null, studentId: d.studentId || null });
+        const chatRef = doc(db, 'chats', effectiveChatId);
+        const chatSnap = await getDoc(chatRef);
+
+        if (chatSnap.exists()) {
+          const chatData = chatSnap.data() || {};
+          console.log('DEBUG: Chat Meta:', { teacherId: chatData.teacherId, studentId: chatData.studentId });
+          setChatMeta({ teacherId: chatData.teacherId || null, studentId: chatData.studentId || null });
+
+          // Only fetch course name if not passed as a prop
+          if (!propCourseName && chatData.courseId) {
+            const courseRef = doc(db, 'courses', chatData.courseId);
+            const courseSnap = await getDoc(courseRef);
+            if (courseSnap.exists()) {
+              setCourseName(courseSnap.data().name);
+            }
+          }
         } else {
           setChatMeta({ teacherId: null, studentId: null });
         }
-      } catch {
+      } catch (error) {
+        console.error('Error fetching chat data:', error);
         setChatMeta({ teacherId: null, studentId: null });
       }
     };
-    loadChatMeta();
-  }, [propChatId, chatId]);
+
+    fetchData();
+  }, [propChatId, chatId, propCourseName]);
 
   // Build id variants for teacher and student to handle uid/doc-id mismatches
   useEffect(() => {
@@ -240,10 +263,12 @@ const PrivateChat = ({ activeChat, receiverId: propReceiverId, chatId: propChatI
           }
         } catch { /* ignore */ }
       }
+      console.log('DEBUG: Teacher ID Variants:', Array.from(tSet));
+      console.log('DEBUG: Student ID Variants:', Array.from(sSet));
       setTeacherIdVariants(Array.from(tSet));
       setStudentIdVariants(Array.from(sSet));
     };
-    buildVariants();
+    buildVariants().finally(() => setIsLoading(false));
   }, [chatMeta]);
 
   useEffect(() => {
@@ -253,9 +278,9 @@ const PrivateChat = ({ activeChat, receiverId: propReceiverId, chatId: propChatI
 
     if (!propChatId) {
       if (!receiverId) return;
-      const currentChatId = generateChatId(currentUser.uid, receiverId);
-      setChatId(currentChatId);
-      createChatDocument(currentChatId, currentUser.uid, receiverId);
+      // For auto-generated IDs, we need to find existing chat or create new one
+      // This will be handled by the chat assignment system
+      return;
     } else {
       setChatId(propChatId);
     }
@@ -289,6 +314,10 @@ const PrivateChat = ({ activeChat, receiverId: propReceiverId, chatId: propChatI
     }
   };
 
+  if (isLoading) {
+    return <div className="private-chat-loading">Loading chat...</div>;
+  }
+
   if (!currentUser) {
     return <div className="private-chat">Please log in to chat.</div>;
   }
@@ -307,8 +336,8 @@ const PrivateChat = ({ activeChat, receiverId: propReceiverId, chatId: propChatI
     };
 
     messages.forEach(msg => {
-      if (msg.timestamp) {
-        const messageDate = new Date(msg.timestamp);
+      if (msg.timestamp?.toDate) {
+        const messageDate = msg.timestamp.toDate();
         const messageDateString = messageDate.toDateString();
         if (messageDateString !== lastDate) {
           messageElements.push(
@@ -322,16 +351,22 @@ const PrivateChat = ({ activeChat, receiverId: propReceiverId, chatId: propChatI
 
       const senderRoleLabel = msg.senderId === currentUser.uid ? currentUserRoleLabel : (roleCache[msg.senderId] || otherUserRole);
       const normalizedSender = String(msg.senderId || '');
+      console.log(`DEBUG: Msg Sender: ${normalizedSender}, fromTeacher: ${teacherIdVariants.includes(normalizedSender)}, fromStudent: ${studentIdVariants.includes(normalizedSender)}`);
       const fromTeacher = teacherIdVariants.includes(normalizedSender);
       const fromStudent = studentIdVariants.includes(normalizedSender);
-      
-      const nameToShow = msg.senderId === currentUser.uid
-        ? 'You'
-        : (fromTeacher ? 'Teacher' : (fromStudent ? 'Student' : senderRoleLabel));
+      const senderRole = msg.senderId === currentUser.uid
+        ? currentUserRoleLabel
+        : fromTeacher
+        ? 'Teacher'
+        : fromStudent
+        ? 'Student'
+        : (roleCache[msg.senderId] || 'User');
 
-      const avatarChar = msg.senderId === currentUser.uid 
-        ? 'Y' 
-        : nameToShow?.charAt(0) || 'U';
+      const nameToShow = msg.senderId === currentUser.uid ? 'You' : senderRole;
+
+      const avatarChar = msg.senderId === currentUser.uid
+        ? 'Y'
+        : senderRole.charAt(0).toUpperCase();
 
       const roleClass = (msg.senderId === currentUser.uid ? 'you' : senderRoleLabel || 'user').toLowerCase();
 
@@ -345,7 +380,7 @@ const PrivateChat = ({ activeChat, receiverId: propReceiverId, chatId: propChatI
             <div className="message-bubble">
               <p className="bubble-text">{msg.text}</p>
               <span className="bubble-time">
-                {msg.timestamp ? new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'Sending...'}
+                {msg.timestamp?.toDate ? msg.timestamp.toDate().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'Sending...'}
               </span>
             </div>
           </div>
@@ -365,7 +400,7 @@ const PrivateChat = ({ activeChat, receiverId: propReceiverId, chatId: propChatI
           </div>
           <div className="batch-header-text">
             <h2>{activeChat || 'Chat'}</h2>
-            <p>Private Chat</p>
+            <p>{courseName || 'Private Chat'}</p>
           </div>
         </div>
         <div className="session-btn-dropdown-container" ref={menuRef}>
@@ -418,9 +453,10 @@ const PrivateChat = ({ activeChat, receiverId: propReceiverId, chatId: propChatI
         <FileUploadModal
           isOpen={showUploadModal}
           onClose={() => setShowUploadModal(false)}
-          privateChatId={propChatId || chatId}
           batchId={propChatId || chatId}
-          onFileUploaded={() => setShowUploadModal(false)}
+          privateChatId={propChatId || chatId}
+          onFileUploaded={() => {}}
+          courseName={courseName}
         />
       )}
       {showFiles && (

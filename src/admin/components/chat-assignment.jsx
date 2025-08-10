@@ -3,7 +3,7 @@ import { useState, useEffect } from "react"
 import { FiMessageCircle, FiTrash2, FiUser, FiUserCheck, FiAlertCircle, FiBookOpen } from "react-icons/fi"
 import { db } from "../../services/firebase"
 import { collection, onSnapshot, query, doc, deleteDoc, addDoc, updateDoc, serverTimestamp, where, getDocs } from "firebase/firestore"
-import { generateChatId, createChatDocument } from "../../utils/chatUtils"
+import { createChatDocument } from "../../utils/chatUtils"
 
 export default function ChatAssignment() {
   const [assignments, setAssignments] = useState([])
@@ -108,8 +108,7 @@ export default function ChatAssignment() {
         status:'active'
       })
 
-      const chatId = generateChatId(selectedStudent, selectedTeacher, selectedCourse)
-      await createChatDocument(chatId, selectedStudent, selectedTeacher, selectedCourse)
+      await createChatDocument(selectedStudent, selectedTeacher, selectedCourse)
 
       showToast('Assignment and chat created successfully','success')
       setSelectedStudent(''); setSelectedTeacher(''); setSelectedCourse('')

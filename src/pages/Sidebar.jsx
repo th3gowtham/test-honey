@@ -383,34 +383,55 @@ const Sidebar = ({ currentView, setCurrentView, setActiveChat, setShowProfileSet
               ))}
               
               {/* Display assigned chats */}
-              {filteredAssignedChats.map(chat => {
-                const receiverId = chat.otherParticipantId || (Array.isArray(chat.users) ? chat.users.find(u => u !== currentUser?.uid && u !== 'admin') : undefined);
-                return (
-                  <div 
-                    key={chat.id} 
-                    className="chat-item assigned-chat" 
-                    onClick={() => receiverId && setActiveChat({ 
-                      type: 'private', 
-                      name: chat.title || chat.otherUser?.displayName || 'User', 
-                      id: receiverId,
-                      chatId: chat.id,
-                      courseName: chat.courseName || chat.name,
-                      isAssigned: true
-                    })}
-                  >
-                    <div className="chat-user">
-                      <div>
-                        <h3 className="chat-title">{chat.title || chat.otherUser?.displayName || 'User'}</h3>
-                        <p className="chat-subtitle">{(chat.courseName || chat.name || 'Course')}</p>
+              {(() => {
+                const uniqueChats = [];
+                const seenChats = new Set();
+
+                filteredAssignedChats.forEach(chat => {
+                  const studentId = chat.studentId || '';
+                  const teacherId = chat.teacherId || '';
+                  const courseName = chat.courseName || chat.name || '';
+                  
+                  // Normalize to handle cases where student/teacher IDs might be swapped
+                  const userIds = [studentId, teacherId].sort();
+                  const uniqueKey = `${userIds[0]}-${userIds[1]}-${courseName}`;
+
+                  if (!seenChats.has(uniqueKey)) {
+                    seenChats.add(uniqueKey);
+                    uniqueChats.push(chat);
+                  }
+                });
+
+                return uniqueChats.map(chat => {
+                  const receiverId = chat.otherParticipantId || (Array.isArray(chat.users) ? chat.users.find(u => u !== currentUser?.uid && u !== 'admin') : undefined);
+                  return (
+                    <div 
+                      key={chat.id} 
+                      className="chat-item assigned-chat" 
+                      onClick={() => receiverId && setActiveChat({ 
+                        type: 'private', 
+                        name: chat.title || chat.otherUser?.displayName || 'User', 
+                        id: receiverId,
+                        chatId: chat.id,
+                        courseName: chat.courseName || chat.name,
+                        isAssigned: true
+                      })}
+                    >
+                      <div className="chat-user">
+                        <div>
+                          <h3 className="chat-title">{chat.title || chat.otherUser?.displayName || 'User'}</h3>
+                          <p className="chat-subtitle">{(chat.courseName || chat.name || 'Course')}</p>
+                        </div>
                       </div>
+                      {/* Show unread message count if it exists and is greater than 0 */}
+                      {chat.unreadCount > 0 && (
+                        <div className="chat-badge">{chat.unreadCount}</div>
+                      )}
                     </div>
-                    {/* Show unread message count if it exists and is greater than 0 */}
-                    {chat.unreadCount > 0 && (
-                      <div className="chat-badge">{chat.unreadCount}</div>
-                    )}
-                  </div>
-                )
-              })}
+                  );
+                });
+              })()}
+
               {filteredGroupChats.length === 0 && filteredAssignedChats.length === 0 && (
                 <div className="empty-state">No chats found</div>
               )}
