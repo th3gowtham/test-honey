@@ -164,10 +164,11 @@ export default function Navbar() {
             <span className="activity-btn-text">View Activity</span>
           </button>
           
-          <button className="notification-btn" aria-label="Notifications">
+        {/* <button className="notification-btn" aria-label="Notifications">
             <FiBell />
             <span className="notification-badge">3</span>
-          </button>
+          </button> 
+          */}
 
           <div className="profile-dropdown" ref={dropdownRef}>
             <button 

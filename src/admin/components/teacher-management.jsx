@@ -7,21 +7,11 @@ import { collection, onSnapshot, query, doc, deleteDoc, updateDoc, addDoc, serve
 import { toast, ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 
-const availableCourses = [
-  "React Fundamentals",
-  "JavaScript Basics",
-  "Python Programming",
-  "Machine Learning",
-  "UI/UX Design",
-  "Graphic Design",
-  "Web Development",
-  "Data Analysis",
-  "Mobile Development",
-  "Cloud Computing",
-]
+// Courses will be fetched from Firestore
 
 export default function TeacherManagement() {
   const [teachers, setTeachers] = useState([])
+  const [courses, setCourses] = useState([]) // State for storing courses from Firestore
   const [searchTerm, setSearchTerm] = useState("")
   const [statusFilter, setStatusFilter] = useState("all")
   const [showModal, setShowModal] = useState(false)
@@ -29,8 +19,14 @@ export default function TeacherManagement() {
   const [currentLoginLink, setCurrentLoginLink] = useState("")
   const [currentTeacherName, setCurrentTeacherName] = useState("")
   const [editingTeacher, setEditingTeacher] = useState(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(null)
+  const [loading, setLoading] = useState({
+    teachers: true,
+    courses: true
+  })
+  const [error, setError] = useState({
+    teachers: null,
+    courses: null
+  })
   const [copied, setCopied] = useState(false)
   const [formData, setFormData] = useState({
     name: "",
@@ -44,10 +40,40 @@ export default function TeacherManagement() {
   // Get domain URL from environment variables or use default
   const domainUrl = import.meta.env.VITE_CLIENT_URL || window.location.origin
 
-  // Fetch real-time data from Firestore
+  // Fetch real-time courses data from Firestore
   useEffect(() => {
-    setLoading(true)
-    setError(null)
+    setLoading(prev => ({ ...prev, courses: true }))
+    setError(prev => ({ ...prev, courses: null }))
+
+    // Create a query against the courses collection
+    const coursesRef = collection(db, "courses")
+    const q = query(coursesRef)
+
+    // Set up real-time listener
+    const unsubscribe = onSnapshot(q, 
+      (querySnapshot) => {
+        const coursesData = querySnapshot.docs.map(doc => ({
+          id: doc.id,
+          title: doc.data().name || "Unknown Course"
+        }))
+        setCourses(coursesData)
+        setLoading(prev => ({ ...prev, courses: false }))
+      },
+      (err) => {
+        console.error("Error fetching courses:", err)
+        setError(prev => ({ ...prev, courses: "Failed to load course data" }))
+        setLoading(prev => ({ ...prev, courses: false }))
+      }
+    )
+
+    // Clean up listener on unmount
+    return () => unsubscribe()
+  }, [])
+
+  // Fetch real-time teachers data from Firestore
+  useEffect(() => {
+    setLoading(prev => ({ ...prev, teachers: true }))
+    setError(prev => ({ ...prev, teachers: null }))
 
     // Create a query against the Teacher collection
     const teachersRef = collection(db, "Teacher")
@@ -70,12 +96,12 @@ export default function TeacherManagement() {
           ...doc.data()
         }))
         setTeachers(teachersData)
-        setLoading(false)
+        setLoading(prev => ({ ...prev, teachers: false }))
       },
       (err) => {
         console.error("Error fetching teachers:", err)
-        setError("Failed to load teacher data. Please try again.")
-        setLoading(false)
+        setError(prev => ({ ...prev, teachers: "Failed to load teacher data. Please try again." }))
+        setLoading(prev => ({ ...prev, teachers: false }))
       }
     )
 
@@ -288,10 +314,10 @@ export default function TeacherManagement() {
         </div>
       </div>
 
-      {loading && <div className="loading-state">Loading teacher data...</div>}
-      {error && <div className="error-state">{error}</div>}
+      {loading.teachers && <div className="loading-state">Loading teacher data...</div>}
+      {error.teachers && <div className="error-state">{error.teachers}</div>}
 
-      {!loading && !error && (
+      {!loading.teachers && !error.teachers && (
         <div className="table-container">
           <table className="table">
             <thead>
@@ -432,16 +458,24 @@ export default function TeacherManagement() {
               <div className="form-group">
                 <label className="form-label">Assign Courses</label>
                 <div className="courses-grid">
-                  {availableCourses.map((course) => (
-                    <label key={course} className="admin_course-checkbox">
-                      <input
-                        type="checkbox"
-                        checked={formData.courses.includes(course)}
-                        onChange={() => handleCourseToggle(course)}
-                      />
-                      {course}
-                    </label>
-                  ))}
+                  {loading.courses ? (
+                    <p>Loading courses...</p>
+                  ) : error.courses ? (
+                    <p>Error loading courses: {error.courses}</p>
+                  ) : courses.length === 0 ? (
+                    <p>No courses available</p>
+                  ) : (
+                    courses.map((course) => (
+                      <label key={course.id} className="admin_course-checkbox">
+                        <input
+                          type="checkbox"
+                          checked={formData.courses.includes(course.title)}
+                          onChange={() => handleCourseToggle(course.title)}
+                        />
+                        {course.title}
+                      </label>
+                    ))
+                  )}
                 </div>
               </div>
               <div className="form-group">
