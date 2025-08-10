@@ -30,9 +30,15 @@ const Product = () => {
           Stay connected with your teachers and classmates instantly.  
           Click the button below to start chatting now!
         </p>
-        <button onClick={handleApp} className="chat-hero-btn">
-          🚀 Click Here to Access the Chat App
-        </button>
+         {user ? (
+            <button onClick={handleApp} className="chat-hero-btn">
+              🚀 Click Here to Access the Chat App
+            </button>
+          ) : (
+            <Link to="/login" className="chat-hero-btn">
+              🔑 Please login to access your chat
+            </Link>
+          )}
       </div>
         </div>
       </nav>
