@@ -91,7 +91,7 @@ const ChatApp = () => {
             className="chat-back-btn"
             
           >
-            <ArrowLeft size={24} color="black" strokeWidth={2} />
+            <ArrowLeft size={20} color="black" strokeWidth={2} className='arrowleft'/>
 
           </button>
         )}
