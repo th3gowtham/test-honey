@@ -1,55 +1,27 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { FiPlus, FiSearch, FiEdit, FiTrash2, FiX } from "react-icons/fi"
-
-const mockCourses = [
-  {
-    id: "C001",
-    name: "React Fundamentals",
-    teacher: "John Smith",
-    students: 45,
-    status: "active",
-    duration: "8 weeks",
-    description: "Learn the basics of React",
-  },
-  {
-    id: "C002",
-    name: "JavaScript Advanced",
-    teacher: "Sarah Johnson",
-    students: 32,
-    status: "active",
-    duration: "12 weeks",
-    description: "Advanced JavaScript concepts",
-  },
-  {
-    id: "C003",
-    name: "Python Basics",
-    teacher: "Mike Wilson",
-    students: 28,
-    status: "inactive",
-    duration: "6 weeks",
-    description: "Introduction to Python programming",
-  },
-  {
-    id: "C004",
-    name: "Web Design",
-    teacher: "Emily Davis",
-    students: 38,
-    status: "active",
-    duration: "10 weeks",
-    description: "Modern web design principles",
-  },
-]
-
-const mockTeachers = ["John Smith", "Sarah Johnson", "Mike Wilson", "Emily Davis", "David Brown"]
+import { db } from "../../services/firebase"
+import { collection, onSnapshot, query, doc, deleteDoc, updateDoc, addDoc, serverTimestamp, getDocs } from "firebase/firestore"
+import { toast, ToastContainer } from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css'
 
 export default function CoursesManagement() {
-  const [courses, setCourses] = useState(mockCourses)
+  const [courses, setCourses] = useState([])
+  const [teachers, setTeachers] = useState([])
   const [showModal, setShowModal] = useState(false)
   const [editingCourse, setEditingCourse] = useState(null)
-  const [searchTerm, setSearchTerm] = useState("")
+  const [searchTerm, setSearchTerm] = useState("") 
   const [currentPage, setCurrentPage] = useState(1)
+  const [loading, setLoading] = useState({
+    courses: true,
+    teachers: true
+  })
+  const [error, setError] = useState({
+    courses: null,
+    teachers: null
+  })
   const itemsPerPage = 5
 
   const [formData, setFormData] = useState({
@@ -59,6 +31,71 @@ export default function CoursesManagement() {
     description: "",
     status: "active",
   })
+  
+  // Fetch courses from Firestore
+  useEffect(() => {
+    setLoading(prev => ({ ...prev, courses: true }))
+    setError(prev => ({ ...prev, courses: null }))
+
+    // Create a query against the courses collection
+    const coursesRef = collection(db, "courses")
+    const q = query(coursesRef)
+
+    // Set up real-time listener
+    const unsubscribe = onSnapshot(q, 
+      (querySnapshot) => {
+        const coursesData = querySnapshot.docs.map(doc => ({
+          id: doc.id,
+          name: doc.data().name || "Unknown",
+          teacher: doc.data().teacher || "Unassigned",
+          students: doc.data().students || 0,
+          status: doc.data().status || "active",
+          duration: doc.data().duration || "N/A",
+          description: doc.data().description || ""
+        }))
+        setCourses(coursesData)
+        setLoading(prev => ({ ...prev, courses: false }))
+      },
+      (err) => {
+        console.error("Error fetching courses:", err)
+        setError(prev => ({ ...prev, courses: "Failed to load course data" }))
+        setLoading(prev => ({ ...prev, courses: false }))
+      }
+    )
+
+    // Clean up listener on unmount
+    return () => unsubscribe()
+  }, [])
+
+  // Fetch teachers from Firestore
+  useEffect(() => {
+    setLoading(prev => ({ ...prev, teachers: true }))
+    setError(prev => ({ ...prev, teachers: null }))
+
+    // Create a query against the Teacher collection
+    const teachersRef = collection(db, "Teacher")
+    const q = query(teachersRef)
+
+    // Set up real-time listener
+    const unsubscribe = onSnapshot(q, 
+      (querySnapshot) => {
+        const teachersData = querySnapshot.docs.map(doc => ({
+          id: doc.id,
+          name: doc.data().name || "Unknown",
+        }))
+        setTeachers(teachersData.filter(teacher => teacher.name !== "Unknown"))
+        setLoading(prev => ({ ...prev, teachers: false }))
+      },
+      (err) => {
+        console.error("Error fetching teachers:", err)
+        setError(prev => ({ ...prev, teachers: "Failed to load teacher data" }))
+        setLoading(prev => ({ ...prev, teachers: false }))
+      }
+    )
+
+    // Clean up listener on unmount
+    return () => unsubscribe()
+  }, [])
 
   const filteredCourses = courses.filter(
     (course) =>
@@ -70,25 +107,40 @@ export default function CoursesManagement() {
   const startIndex = (currentPage - 1) * itemsPerPage
   const paginatedCourses = filteredCourses.slice(startIndex, startIndex + itemsPerPage)
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
 
-    if (editingCourse) {
-      setCourses(
-        courses.map((course) =>
-          course.id === editingCourse.id ? { ...course, ...formData, students: course.students } : course,
-        ),
-      )
-    } else {
-      const newCourse = {
-        id: `C${String(courses.length + 1).padStart(3, "0")}`,
-        ...formData,
-        students: 0,
+    try {
+      if (editingCourse) {
+        // Update existing course in Firestore
+        await updateDoc(doc(db, "courses", editingCourse.id), {
+          name: formData.name,
+          teacher: formData.teacher,
+          duration: formData.duration,
+          description: formData.description,
+          status: formData.status,
+          updatedAt: serverTimestamp()
+        })
+        toast.success("Course updated successfully!")
+      } else {
+        // Add new course to Firestore
+        await addDoc(collection(db, "courses"), {
+          name: formData.name,
+          teacher: formData.teacher,
+          duration: formData.duration,
+          description: formData.description,
+          status: formData.status,
+          students: 0,
+          createdAt: serverTimestamp()
+        })
+        toast.success("New course added successfully!")
       }
-      setCourses([...courses, newCourse])
-    }
 
-    resetForm()
+      resetForm()
+    } catch (err) {
+      console.error("Error saving course:", err)
+      toast.error("Failed to save course. Please try again.")
+    }
   }
 
   const resetForm = () => {
@@ -115,14 +167,25 @@ export default function CoursesManagement() {
     setShowModal(true)
   }
 
-  const handleDelete = (courseId) => {
+  const handleDelete = async (courseId) => {
     if (confirm("Are you sure you want to delete this course?")) {
-      setCourses(courses.filter((course) => course.id !== courseId))
+      try {
+        // Delete the document from Firestore
+        await deleteDoc(doc(db, "courses", courseId))
+        // Show success toast
+        toast.success("Course deleted successfully!")
+        // No need to update state as the onSnapshot will handle that
+      } catch (err) {
+        console.error("Error deleting course:", err)
+        toast.error("Failed to delete course. Please try again.")
+      }
     }
   }
 
   return (
     <div className="courses-management">
+      <ToastContainer position="top-right" autoClose={3000} />
+      
       <div className="page-header">
         <div>
           <h2>Courses Management</h2>
@@ -146,50 +209,65 @@ export default function CoursesManagement() {
       </div>
 
       <div className="table-container">
-        <table className="table">
-          <thead>
-            <tr>
-              <th>Course ID</th>
-              <th>Course Name</th>
-              <th>Assigned Teacher</th>
-              <th>Total Students</th>
-              <th>Duration</th>
-              <th>Status</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {paginatedCourses.map((course) => (
-              <tr key={course.id}>
-                <td>{course.id}</td>
-                <td>
-                  <div>
-                    <div className="course-name">{course.name}</div>
-                    <div className="course-description">{course.description}</div>
-                  </div>
-                </td>
-                <td>{course.teacher}</td>
-                <td>{course.students}</td>
-                <td>{course.duration}</td>
-                <td>
-                  <span className={`status-badge ${course.status === "active" ? "status-active" : "status-inactive"}`}>
-                    {course.status}
-                  </span>
-                </td>
-                <td>
-                  <div className="action-buttons">
-                    <button className="btn-icon" onClick={() => handleEdit(course)}>
-                      <FiEdit />
-                    </button>
-                    <button className="btn-icon btn-danger" onClick={() => handleDelete(course.id)}>
-                      <FiTrash2 />
-                    </button>
-                  </div>
-                </td>
+        {loading.courses ? (
+          <div className="loading-container">
+            <p>Loading courses...</p>
+          </div>
+        ) : error.courses ? (
+          <div className="error-container">
+            <p>{error.courses}</p>
+            <button onClick={() => window.location.reload()}>Retry</button>
+          </div>
+        ) : courses.length === 0 ? (
+          <div className="empty-container">
+            <p>No courses found. Add your first course to get started.</p>
+          </div>
+        ) : (
+          <table className="table">
+            <thead>
+              <tr>
+                <th>Course ID</th>
+                <th>Course Name</th>
+                <th>Assigned Teacher</th>
+                <th>Total Students</th>
+                <th>Duration</th>
+                <th>Status</th>
+                <th>Actions</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {paginatedCourses.map((course) => (
+                <tr key={course.id}>
+                  <td>{course.id}</td>
+                  <td>
+                    <div>
+                      <div className="course-name">{course.name}</div>
+                      <div className="course-description">{course.description}</div>
+                    </div>
+                  </td>
+                  <td>{course.teacher}</td>
+                  <td>{course.students}</td>
+                  <td>{course.duration}</td>
+                  <td>
+                    <span className={`status-badge ${course.status === "active" ? "status-active" : "status-inactive"}`}>
+                      {course.status}
+                    </span>
+                  </td>
+                  <td>
+                    <div className="action-buttons">
+                      <button className="btn-icon" onClick={() => handleEdit(course)}>
+                        <FiEdit />
+                      </button>
+                      <button className="btn-icon btn-danger" onClick={() => handleDelete(course.id)}>
+                        <FiTrash2 />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
       </div>
 
       {totalPages > 1 && (
@@ -246,20 +324,12 @@ export default function CoursesManagement() {
                 />
               </div>
               <div className="form-group">
-                <label className="form-label">Assign Teacher</label>
-                <select
-                  className="form-select"
-                  value={formData.teacher}
-                  onChange={(e) => setFormData({ ...formData, teacher: e.target.value })}
-                  required
-                >
-                  <option value="">Select a teacher</option>
-                  {mockTeachers.map((teacher) => (
-                    <option key={teacher} value={teacher}>
-                      {teacher}
-                    </option>
-                  ))}
-                </select>
+                <label className="form-label">Course Image</label>
+                <input
+                  type="file"
+                  accept="image/*"
+                  className="form-input"
+                />
               </div>
               <div className="form-group">
                 <label className="form-label">Course Duration</label>
