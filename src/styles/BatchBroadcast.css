@@ -3,7 +3,7 @@
   flex-direction: column;
   height: 100vh;
   font-family: 'Segoe UI', sans-serif;
-  background-color: #ffffff; /* chat background set to white */
+  background-color: #ece5dd; /* WhatsApp-like chat background */
   
 }
 
@@ -13,7 +13,7 @@
   justify-content: space-between;
   align-items: center;
   padding: 12px;
-  background-color: #14b8a6; /* site primary */
+  background-color: #075e54; /* WhatsApp header green */
   border-bottom: 1px solid rgba(0,0,0,0.05);
   flex-wrap: wrap;
   flex-shrink: 0;
@@ -583,12 +583,12 @@
   flex: 1;
   overflow-y: auto;
   overflow-x: hidden; /* prevent horizontal scrollbar line above input */
-  padding: 16px; /* more breathing room */
+  padding: 14px; /* WhatsApp spacing */
   padding-bottom: 84px;
   display: flex;
   flex-direction: column;
   gap: 16px;
-  background-color: #ffffff; /* ensure chat area is white */
+  background-color: transparent; /* inherit page wallpaper */
 }
 
 .batch-message {
@@ -619,24 +619,25 @@
 .batch-message .message-content .sender-name { margin-left: 0; }
 
 .message-avatar {
-  background-color: #e5e7eb;
+  background-color: #dfe5e8;
   color: #111827;
-  font-size: 14px;
-  font-weight: bold;
+  font-size: 13px;
+  font-weight: 700;
   border-radius: 50%;
-  width: 32px;
-  height: 32px;
+  width: 28px;
+  height: 28px;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  box-shadow: 0 0 0 2px #ece5dd, 0 1px 1px rgba(0, 0, 0, 0.06);
 }
 
 /* Role-specific colors */
-.message-avatar.role-admin { background-color: #f43f5e; color: #fff; }
-.message-avatar.role-teacher { background-color: #3b82f6; color: #fff; }
-.message-avatar.role-student { background-color: #10b981; color: #fff; }
-.message-avatar.role-you { background-color: #0e766e; color: #fff; }
+.message-avatar.role-admin { background-color: #f43f5e; color: #fff; box-shadow: 0 0 0 2px #fee2e2, 0 1px 2px rgba(0,0,0,0.08); }
+.message-avatar.role-teacher { background-color: #3b82f6; color: #fff; box-shadow: 0 0 0 2px #dbeafe, 0 1px 2px rgba(0,0,0,0.08); }
+.message-avatar.role-student { background-color: #10b981; color: #fff; box-shadow: 0 0 0 2px #d1fae5, 0 1px 2px rgba(0,0,0,0.08); }
+.message-avatar.role-you { background-color: #0e766e; color: #fff; box-shadow: 0 0 0 2px #ccfbf1, 0 1px 2px rgba(0,0,0,0.08); }
 
 .message-content {
   display: flex;
@@ -660,6 +661,7 @@
 }
 
 .message-bubble {
+  position: relative;
   display: grid;
   grid-template-columns: 1fr auto;
   column-gap: 8px;
@@ -667,8 +669,8 @@
   border-radius: 18px;
   font-size: 14px;
   line-height: 1.4;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-  max-width: min(840px, 90%); /* allow longer lines, apply to both sides */
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+  max-width: min(620px, 78%); /* WhatsApp-like max bubble width */
   min-width: 160px;
 }
 
@@ -695,24 +697,66 @@
   display: inline-block;
 }
 
-/* Sent message bubble (now white like received) */
+/* Sent message bubble - WhatsApp green with tail */
 .batch-message.sent .message-bubble {
-  background-color: #ffffff;
-  border-top-right-radius: 6px;
-  color: #111827;
-  border: 1px solid #e5e7eb;
+  background-color: #dcf8c6; /* WA sent green */
+  border-top-right-radius: 8px;
+  color: #0f172a;
+  border: 1px solid #b7e0ad;
+  margin-right: 4px; /* prevent clipping on the right */
 }
-.batch-message.sent .bubble-time { color: #667781; }
+.batch-message.sent .message-bubble::after {
+  content: '';
+  position: absolute;
+  right: -8px;
+  top: 12px;
+  width: 0; height: 0;
+  border-top: 8px solid transparent;
+  border-bottom: 8px solid transparent;
+  border-left: 8px solid #dcf8c6;
+}
+.batch-message.sent .message-bubble::before {
+  /* small border to match bubble outline */
+  content: '';
+  position: absolute;
+  right: -9px;
+  top: 12px;
+  width: 0; height: 0;
+  border-top: 9px solid transparent;
+  border-bottom: 9px solid transparent;
+  border-left: 9px solid #b7e0ad;
+  z-index: -1;
+}
+.batch-message.sent .bubble-time { color: #475569; }
 
-/* Add a tiny right margin so the time never gets clipped */
-.batch-message.sent .message-bubble { margin-right: 4px; }
-
-/* Received message bubble */
+/* Received message bubble - classic white with tail */
 .batch-message.received .message-bubble {
   background-color: #ffffff;
-  border-top-left-radius: 4px;
+  border-top-left-radius: 8px;
   border: 1px solid #e5e7eb;
   color: #111827;
+}
+.batch-message.received .message-bubble::before {
+  content: '';
+  position: absolute;
+  left: -8px;
+  top: 12px;
+  width: 0; height: 0;
+  border-top: 8px solid transparent;
+  border-bottom: 8px solid transparent;
+  border-right: 8px solid #ffffff;
+}
+.batch-message.received .message-bubble::after {
+  /* small border to match bubble outline */
+  content: '';
+  position: absolute;
+  left: -9px;
+  top: 12px;
+  width: 0; height: 0;
+  border-top: 9px solid transparent;
+  border-bottom: 9px solid transparent;
+  border-right: 9px solid #e5e7eb;
+  z-index: -1;
 }
 
 /* Adjust meta alignment for sent messages */
@@ -730,7 +774,7 @@
 /* Input */
 .batch-input {
   padding: 10px;
-  background-color: #f0fdfa; /* light primary tint for typing bar */
+  background-color: #f0f2f5; /* WhatsApp input bar */
   border-top: none; /* remove dark separator */
   box-shadow: none;
   scrollbar-width: none; /* Firefox */

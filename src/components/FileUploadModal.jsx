@@ -4,7 +4,7 @@ import { toast } from 'react-hot-toast';
 import { useAuth } from '../context/AuthContext';
 import '../styles/FileUploadModal.css';
 
-const FileUploadModal = ({ isOpen, onClose, batchId, onFileUploaded }) => {
+const FileUploadModal = ({ isOpen, onClose, batchId, privateChatId, onFileUploaded, courseName }) => {
   const [selectedFile, setSelectedFile] = useState(null);
   const [description, setDescription] = useState('');
   const [uploading, setUploading] = useState(false);
@@ -157,11 +157,22 @@ const FileUploadModal = ({ isOpen, onClose, batchId, onFileUploaded }) => {
 
   if (!isOpen) return null;
 
+  // Determine the appropriate title based on context
+  const getModalTitle = () => {
+    if (privateChatId) {
+      return `Upload File to ${courseName || 'Private Chat'}`;
+    }
+    if (batchId) {
+      return 'Upload File to Batch';
+    }
+    return 'Upload File';
+  };
+
   return (
     <div className="file-upload-modal-overlay">
       <div className="file-upload-modal">
         <div className="file-upload-header">
-          <h3>Upload File to {batchId}</h3>
+          <h3>{getModalTitle()}</h3>
           <button className="close-btn" onClick={handleClose} disabled={uploading}>
             <X size={20} />
           </button>

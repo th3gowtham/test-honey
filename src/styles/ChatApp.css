@@ -241,3 +241,9 @@
     /* space for fixed bottom nav */
   }
 }
+
+.arrowleft{
+  position: fixed;
+  margin-left:25px;
+  margin-top:23px;
+}

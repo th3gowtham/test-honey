@@ -11,7 +11,8 @@ import {
   orderBy,
   onSnapshot,
   where,
-  writeBatch
+  writeBatch,
+  deleteDoc
 } from 'firebase/firestore'
 
 // Generate chat id from two user ids; optionally include course for per-course chats
@@ -94,10 +95,31 @@ export const subscribeToMessages = (chatId, callback, currentUserId) => {
   try {
     const messagesRef = collection(db, 'chats', chatId, 'messages')
     const q = query(messagesRef, orderBy('timestamp', 'asc'))
+
+    // Prefetch chat meta once to infer roles without changing UI
+    const chatRef = doc(db, 'chats', chatId)
+    let chatMeta = { teacherId: null, studentId: null }
+    getDoc(chatRef)
+      .then((snap) => {
+        if (snap.exists()) {
+          const data = snap.data() || {}
+          chatMeta.teacherId = data.teacherId || null
+          chatMeta.studentId = data.studentId || null
+        }
+      })
+      .catch(() => {})
+
     return onSnapshot(q, (snapshot) => {
-      const messages = snapshot.docs.map(d => ({ id: d.id, ...d.data(),
-        timestamp: d.data().timestamp?.toDate?.() ? d.data().timestamp.toDate().toISOString() : null
-      }))
+      const messages = snapshot.docs.map(d => {
+        const data = d.data()
+        const ts = data.timestamp?.toDate?.() ? data.timestamp.toDate().toISOString() : null
+        const senderId = data.senderId
+        let senderRole = 'User'
+        if (senderId === 'admin') senderRole = 'Admin'
+        else if (chatMeta.teacherId && String(senderId) === String(chatMeta.teacherId)) senderRole = 'Teacher'
+        else if (chatMeta.studentId && String(senderId) === String(chatMeta.studentId)) senderRole = 'Student'
+        return { id: d.id, ...data, timestamp: ts, senderRole }
+      })
       if (currentUserId) {
         markMessagesAsRead(chatId, currentUserId)
       }
@@ -210,8 +232,74 @@ export const getUserChats = (userId, callback, currentUserEmail) => {
           for (const d of snapshot.docs) {
             const a = d.data()
             if (!a.studentId) continue
-            const cid = generateChatId(a.studentId, teacherUid, a.course)
-            await createChatDocument(cid, a.studentId, teacherUid, a.course || '')
+            // If assignment already has chatId, nothing to do
+            if (a.chatId) continue
+
+            // 1) Try to find an already existing chat created elsewhere (by pair+course)
+            let resolvedChatId = null
+            try {
+              const filters = [
+                where('studentId', '==', a.studentId),
+                where('teacherId', '==', teacherUid)
+              ]
+              if (a.course) filters.push(where('name', '==', a.course))
+              const qExisting = query(collection(db, 'chats'), ...filters)
+              const existingSnap = await getDocs(qExisting)
+              if (!existingSnap.empty) {
+                resolvedChatId = existingSnap.docs[0].id
+              }
+            } catch { /* no-op reserve failure */ }
+
+            // 2) If none found, reserve a deterministic ID on the assignment FIRST
+            if (!resolvedChatId) {
+              resolvedChatId = generateChatId(a.studentId, teacherUid, a.course)
+            }
+
+            // Reserve the chatId on the assignment so other listeners skip creation
+            try {
+              await setDoc(doc(db, 'chatAssignments', d.id), { chatId: resolvedChatId }, { merge: true })
+            } catch { /* ignore reserve failure */ }
+
+            // 3) Ensure the chat document exists (idempotent create)
+            await createChatDocument(resolvedChatId, a.studentId, teacherUid, a.course || '')
+
+            // 4) Cleanup duplicates for same student/teacher/course keeping resolvedChatId
+            try {
+              const filters = [
+                where('studentId', '==', a.studentId),
+                where('teacherId', '==', teacherUid)
+              ]
+              if (a.course) filters.push(where('name', '==', a.course))
+              const qDup = query(collection(db, 'chats'), ...filters)
+              const dupSnap = await getDocs(qDup)
+              const dupIds = dupSnap.docs.map(docSnap => docSnap.id).filter(id => id !== resolvedChatId)
+              for (const dupId of dupIds) {
+                try {
+                  // delete messages in batches
+                  const msgsRef = collection(db, 'chats', dupId, 'messages')
+                  const msgsSnap = await getDocs(msgsRef)
+                  if (!msgsSnap.empty) {
+                    const batchLimit = 450
+                    let buffer = []
+                    for (const m of msgsSnap.docs) {
+                      buffer.push(m.ref)
+                      if (buffer.length >= batchLimit) {
+                        const b = writeBatch(db)
+                        buffer.forEach(ref => b.delete(ref))
+                        await b.commit()
+                        buffer = []
+                      }
+                    }
+                    if (buffer.length > 0) {
+                      const b = writeBatch(db)
+                      buffer.forEach(ref => b.delete(ref))
+                      await b.commit()
+                    }
+                  }
+                  await deleteDoc(doc(db, 'chats', dupId))
+                } catch { /* no-op per-duplicate delete */ }
+              }
+            } catch { /* no-op duplicate scan */ }
           }
         })
         unsubscribers.push(unsubA)
@@ -223,7 +311,7 @@ export const getUserChats = (userId, callback, currentUserEmail) => {
     startTeacherFallback()
 
     return () => unsubscribers.forEach((u) => {
-      try { u && u() } catch {}
+      try { u && u() } catch { /* no-op unsubscribe */ }
     })
   } catch (err) {
     console.error('Error getting user chats:', err)
