@@ -11,8 +11,8 @@ const menuItems = [
   { id: "teachers", label: "Teacher Management", icon: FiUserCheck },
   { id: "chat-assignment", label: "One-on-One Chat", icon: FiMessageCircle },
   { id: "batch-assignment", label: "Batch Groups", icon: FiLayers },
-  { id: "events", label: "Events Management", icon: FiCalendar },
-  { id: "settings", label: "Settings", icon: FiSettings },
+  { id: "events", label: "Enrollments Management", icon: FiCalendar },
+  
 ]
 
 export default function Sidebar({ activeRoute, setActiveRoute, collapsed, setCollapsed }) {

@@ -180,7 +180,7 @@ export default function EventsManagement() {
       </div>
 
       <div className="table-container">
-        <table className="table">
+        <table className="admin-table">
           <thead>
             <tr>
               <th>Event ID</th>

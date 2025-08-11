@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
 import CourseCard from "../components/CourseCard";
 import EnquiryModal from "../components/EnquiryModal";
@@ -7,219 +7,11 @@ import "../styles/all.min.css";
 import "../styles/bootstrap.min.css";
 import "../styles/swiper-bundle.min.css";
 import "../styles/main.css";
-import phoni from "../assets/phoni.jpeg";
-import gram from "../assets/gram.jpg";
-import ha from "../assets/ha.jpg";
-import portfolio3 from "../assets/portfolio-3.jpg";
-import math from "../assets/math.jpeg";
-import s from "../assets/s.jpeg";
-import cod from "../assets/cod.jpg";
-import com from "../assets/com.jpeg";
-import art from "../assets/art.jpeg";
-import web from "../assets/web.jpg";
-import game from "../assets/game.png";
-import dm from "../assets/dm.jpg";
-import ai from "../assets/ai.jpg";
-import des from "../assets/des.png";
-import ani from "../assets/ani.png";
 import { usePayment } from "../context/PaymentContext";
+import { db } from "../services/firebase";
+import { collection, onSnapshot, query } from "firebase/firestore";
 
 
-const courses = [
-  {
-    imgSrc: phoni,
-    title: "Jolly Phonics",
-    description: "A fun, interactive approach to teaching children essential reading and writing skills through phonics, blending, and engaging activities.",
-    age: "3+ Years",
-    seats: "Upto 5 Kids per Batch",
-    duration: "9 Months",
-    fee: 4999,
-  },
-  {
-    imgSrc: gram,
-    title: "Jolly Grammar",
-    description: "A fun, interactive approach to teaching children essential grammar skills through phonics, blending, and engaging activities.",
-    age: "4+ Years",
-    seats: "Upto 5 Kids per Batch",
-    duration: "1 Year",
-    fee: 5999,
-  },
-  {
-    imgSrc: ha,
-    title: "Spoken English",
-    description: "A fun and interactive spoken English class for building confidence through engaging activities, storytelling, and real-life conversations!",
-    age: "6+ Years",
-    seats: "Upto 5 Kids per Batch",
-    duration: "4 Months",
-    fee: 3999,
-  },
-  {
-    imgSrc: portfolio3,
-    title: "Handwriting Class (English)",
-    description: "A focused and engaging class that helps children improve their handwriting skills through structured practice and creative activities, promoting neatness and clarity.",
-    age: "3+ Years",
-    seats: "Upto 5 Kids per Batch",
-    duration: "4 Months",
-    fee: 3999,
-  },
-  {
-    imgSrc: math,
-    title: "Math Class",
-    description: "An engaging and interactive approach to help children develop strong mathematical skills through fun lessons and engaging activities.",
-    age: "5+ Years",
-    seats: "Upto 5 Kids per Batch",
-    duration: "12 Months",
-    fee: 3999,
-  },
-  {
-    imgSrc: s,
-    title: "Tamil Phonics",
-    description: "An engaging and interactive method to help children learn Tamil sounds, pronunciation, and reading skills through ancient teaching methods.",
-    age: "5+ Years",
-    seats: "Upto 5 Kids per Batch",
-    duration: "5 Months",
-    fee: 3999,
-  },
-  {
-    imgSrc: portfolio3,
-    title: "Tamil Handwriting Class",
-    description: "A focused and engaging class that helps children improve their tamil handwriting skills through structured practice and creative activities, promoting neatness and clarity.",
-    age: "5+ Years",
-    seats: "Upto 5 Kids per Batch",
-    duration: "4 Months",
-    fee: 3999,
-  },
-  {
-    imgSrc: cod,
-    title: "Computer Basics",
-    description: "A fun and interactive way for children to learn computer basics, including typing, using software, and safe internet practices!",
-    age: "6+ Years",
-    seats: "Upto 4 Kids per Batch",
-    duration: "3 Months",
-    fee: 3999,
-  },
-  {
-    imgSrc: com,
-    title: "Programming for Beginners & Kids",
-    description: "An engaging and interactive way for children and beginners to learn programming, develop problem-solving skills, and create their own digital projects!",
-    age: "8+ Years",
-    seats: "Upto 4 Kids per Batch",
-    duration: "6 Months",
-    fee: 3999,
-  },
-  {
-    imgSrc: art,
-    title: "Mandala & Warli Art Class",
-    description: "A dynamic and creative class that encourages children to explore various art forms, develop their artistic skills, and express their imagination through hands-on projects.",
-    age: "8+ Years",
-    seats: "Upto 5 per Batch",
-    duration: "3 Months",
-    fee: 3999,
-  },
-
-];
-
-const advancedCourses = [
-  {
-    imgSrc: math,
-    title: "Mathematics",
-    description: "Fun and engaging math classes for children to build a strong foundation in numbers, shapes, and problem-solving.",
-    age: "4+ Years",
-    seats: "Upto 5 Kids per Batch",
-    duration: "1 Year",
-    fee: 6999,
-  },
-  {
-    imgSrc: s,
-    title: "Science",
-    description: "Interactive science classes for children to explore the world around them, from basic concepts to advanced experiments.",
-    age: "5+ Years",
-    seats: "Upto 5 Kids per Batch",
-    duration: "1 Year",
-    fee: 7999,
-  },
-  {
-    imgSrc: cod,
-    title: "Coding",
-    description: "Introduction to programming for children, teaching them the basics of coding and problem-solving through fun activities.",
-    age: "7+ Years",
-    seats: "Upto 5 Kids per Batch",
-    duration: "1 Year",
-    fee: 8999,
-  },
-  {
-    imgSrc: com,
-    title: "Communication Skills",
-    description: "Enhance your child's communication skills through engaging activities and interactive sessions.",
-    age: "4+ Years",
-    seats: "Upto 5 Kids per Batch",
-    duration: "1 Year",
-    fee: 5999,
-  },
-  {
-    imgSrc: art,
-    title: "Art & Craft",
-    description: "Creative and artistic classes for children to explore their imagination and develop their artistic skills.",
-    age: "3+ Years",
-    seats: "Upto 5 Kids per Batch",
-    duration: "1 Year",
-    fee: 4999,
-  },
-  {
-    imgSrc: web,
-    title: "Web Development",
-    description: "Introduction to web development for children, teaching them the basics of HTML, CSS, and JavaScript.",
-    age: "10+ Years",
-    seats: "Upto 5 Kids per Batch",
-    duration: "1 Year",
-    fee: 12999,
-  },
-  {
-    imgSrc: game,
-    title: "Game Development",
-    description: "Fun and engaging game development classes for children to learn about game design and programming.",
-    age: "10+ Years",
-    seats: "Upto 5 Kids per Batch",
-    duration: "1 Year",
-    fee: 11999,
-  },
-  {
-    imgSrc: dm,
-    title: "Digital Marketing",
-    description: "Introduction to digital marketing for children, teaching them about social media, SEO, and online advertising.",
-    age: "12+ Years",
-    seats: "Upto 5 Kids per Batch",
-    duration: "1 Year",
-    fee: 10999,
-  },
-  {
-    imgSrc: ai,
-    title: "Artificial Intelligence",
-    description: "Introduction to artificial intelligence for children, teaching them about machine learning and neural networks.",
-    age: "12+ Years",
-    seats: "Upto 5 Kids per Batch",
-    duration: "1 Year",
-    fee: 13999,
-  },
-  {
-    imgSrc: des,
-    title: "Graphic Design",
-    description: "Introduction to graphic design for children, teaching them about color theory, typography, and basic design principles.",
-    age: "10+ Years",
-    seats: "Upto 5 Kids per Batch",
-    duration: "1 Year",
-    fee: 9999,
-  },
-  {
-    imgSrc: ani,
-    title: "Animation",
-    description: "Introduction to animation for children, teaching them about keyframe animation and basic animation principles.",
-    age: "10+ Years",
-    seats: "Upto 5 Kids per Batch",
-    duration: "1 Year",
-    fee: 8999,
-  },
-];
 
 const Classes = () => {
   const { user, userName, currentUser } = useAuth();
@@ -227,6 +19,48 @@ const Classes = () => {
   const [showLoginNeeded, setShowLoginNeeded] = useState(false);
   const [showEnquiryModal, setShowEnquiryModal] = useState(false);
   const [selectedCourse, setSelectedCourse] = useState(null);
+  const [courses, setCourses] = useState([]);
+  const [advancedCourses, setAdvancedCourses] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Fetch courses from Firestore
+  useEffect(() => {
+    // Set up listener for regular courses
+    const coursesRef = collection(db, "courses");
+    const coursesQuery = query(coursesRef);
+    
+    const unsubscribeCourses = onSnapshot(coursesQuery, (snapshot) => {
+      const coursesData = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }));
+      setCourses(coursesData);
+      setIsLoading(false);
+    }, (error) => {
+      console.error("Error fetching courses:", error);
+      setIsLoading(false);
+    });
+
+    // Set up listener for advanced courses
+    const advancedCoursesRef = collection(db, "advancedCourses");
+    const advancedCoursesQuery = query(advancedCoursesRef);
+    
+    const unsubscribeAdvancedCourses = onSnapshot(advancedCoursesQuery, (snapshot) => {
+      const advancedCoursesData = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }));
+      setAdvancedCourses(advancedCoursesData);
+    }, (error) => {
+      console.error("Error fetching advanced courses:", error);
+    });
+
+    // Clean up listeners on component unmount
+    return () => {
+      unsubscribeCourses();
+      unsubscribeAdvancedCourses();
+    };
+  }, []);
 
   // Handler for "Enroll Now" button
   const handleApply = (course) => {
@@ -260,45 +94,75 @@ const Classes = () => {
           <h2 className="text-center display-3 text-white">Our Classes</h2>
         </div>
       </nav>
+      
+      {/* Popular Classes Section */}
       <div className="popular-classes">
         <div className="container">
           <div className="main-heading text-center">
             <span className="text-uppercase position-relative d-inline-block px-2">Popular Classes</span>
             <h2 className="fw-bold my-3">Classes We Provide</h2>
           </div>
-          <div className="row row-cols-1 row-cols-md-2 row-cols-lg-3">
-            {courses.map((course, idx) => (
-              <CourseCard
-                key={idx}
-                {...course}
-                onApply={() => handleApply(course)}
-                loading={loading && selectedCourse && selectedCourse.title === course.title}
-              />
-            ))}
-          </div>
-        </div>
-      </div>
-      {/* Advanced Courses Section */}
-      <div className="popular-classes">
-      <div className="container">
-      <div className="main-heading text-center">
-        <span className="text-uppercase position-relative d-inline-block px-2">Advanced Courses</span>
-        <h2 className="fw-bold my-3">Technical & Non-Tech Classes </h2>
-      </div>
-      <div className="container mb-5">
-        <div className="row row-cols-1 row-cols-md-2 row-cols-lg-3">
-          {advancedCourses.map((course, idx) => (
-            <CourseCard
-              key={idx}
-              {...course}
-              onApply={() => handleApply(course)}
-              loading={loading && selectedCourse && selectedCourse.title === course.title}
-            />
-          ))}
+          
+          {isLoading ? (
+            <div className="text-center py-5">
+              <div className="spinner-border text-primary" role="status">
+                <span className="visually-hidden">Loading...</span>
+              </div>
+              <p className="mt-3">Loading courses...</p>
+            </div>
+          ) : courses.length === 0 ? (
+            <div className="alert alert-info text-center" role="alert">
+              No courses available at the moment. Please check back later.
+            </div>
+          ) : (
+            <div className="row row-cols-1 row-cols-md-2 row-cols-lg-3">
+              {courses.map((course) => (
+                <CourseCard
+                  key={course.id}
+                  {...course}
+                  onApply={() => handleApply(course)}
+                  loading={loading && selectedCourse && selectedCourse.id === course.id}
+                />
+              ))}
+            </div>
+          )}
         </div>
       </div>
       
-      </div>
+      {/* Advanced Courses Section */}
+      <div className="popular-classes">
+        <div className="container">
+          <div className="main-heading text-center">
+            <span className="text-uppercase position-relative d-inline-block px-2">Advanced Courses</span>
+            <h2 className="fw-bold my-3">Technical & Non-Tech Classes</h2>
+          </div>
+          
+          {isLoading ? (
+            <div className="text-center py-5">
+              <div className="spinner-border text-primary" role="status">
+                <span className="visually-hidden">Loading...</span>
+              </div>
+              <p className="mt-3">Loading advanced courses...</p>
+            </div>
+          ) : advancedCourses.length === 0 ? (
+            <div className="alert alert-info text-center" role="alert">
+              No advanced courses available at the moment. Please check back later.
+            </div>
+          ) : (
+            <div className="container mb-5">
+              <div className="row row-cols-1 row-cols-md-2 row-cols-lg-3">
+                {advancedCourses.map((course) => (
+                  <CourseCard
+                    key={course.id}
+                    {...course}
+                    onApply={() => handleApply(course)}
+                    loading={loading && selectedCourse && selectedCourse.id === course.id}
+                  />
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
       </div>
       
       <EnquiryModal
@@ -307,7 +171,9 @@ const Classes = () => {
         onSubmit={handleEnquirySubmit}
         onSkip={handleSkipEnquiry}
         selectedCourse={selectedCourse?.title}
+        selectedCourseId={selectedCourse?.id}
       />
+      
       {showLoginNeeded && (
         <div
           style={{

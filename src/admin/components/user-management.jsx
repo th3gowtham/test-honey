@@ -264,7 +264,7 @@ export default function UserManagement() {
 
       {!loading && !error && (
         <div className="table-container">
-          <table className="table">
+          <table className="admin-table">
             <thead>
               <tr>
                 <th>User ID</th>

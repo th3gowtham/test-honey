@@ -21,35 +21,66 @@ export default function ChatAssignment() {
     courses: null
   })
 
-  // Fetch courses from Firestore
+  // Fetch courses from both collections (courses and advancedCourses)
   useEffect(() => {
     setLoading(prev => ({ ...prev, courses: true }))
     setError(prev => ({ ...prev, courses: null }))
-
-    // Create a query against the courses collection
-    const coursesRef = collection(db, "courses")
-    const q = query(coursesRef)
-
-    // Set up real-time listener
-    const unsubscribe = onSnapshot(q, 
+    
+    // Create queries against both collections
+    const regularCoursesRef = collection(db, "courses")
+    const advancedCoursesRef = collection(db, "advancedCourses")
+    
+    // Set up real-time listeners for both collections
+    const unsubscribeRegular = onSnapshot(
+      query(regularCoursesRef),
       (querySnapshot) => {
-        const coursesData = querySnapshot.docs.map(doc => ({
+        const regularCoursesData = querySnapshot.docs.map(doc => ({
           id: doc.id,
-          title: doc.data().name || doc.data().courseName || "Unknown Course",
-          status: doc.data().status || "active"
+          title: doc.data().name || doc.data().courseName || doc.data().title || "Unknown Course",
+          status: doc.data().status || "active",
+          courseType: "regular"
         }))
-        setCourses(coursesData.filter(course => course.status === "active"))
+        
+        // We'll combine the data in the second listener
         setLoading(prev => ({ ...prev, courses: false }))
+        
+        // Set up listener for advanced courses
+        const unsubscribeAdvanced = onSnapshot(
+          query(advancedCoursesRef),
+          (querySnapshot) => {
+            const advancedCoursesData = querySnapshot.docs.map(doc => ({
+              id: doc.id,
+              title: doc.data().name || doc.data().courseName || doc.data().title || "Unknown Course",
+              status: doc.data().status || "active",
+              courseType: "advanced"
+            }))
+            
+            // Combine both course types and filter active ones
+            const allCoursesData = [...regularCoursesData, ...advancedCoursesData]
+            setCourses(allCoursesData.filter(course => course.status === "active"))
+            setLoading(prev => ({ ...prev, courses: false }))
+          },
+          (err) => {
+            console.error("Error fetching advanced courses:", err)
+            // Even if advanced courses fail, we still have regular courses
+            setCourses(regularCoursesData.filter(course => course.status === "active"))
+            setError(prev => ({ ...prev, courses: "Failed to load advanced course data" }))
+            setLoading(prev => ({ ...prev, courses: false }))
+          }
+        )
+        
+        // Return cleanup for advanced courses
+        return () => unsubscribeAdvanced()
       },
       (err) => {
-        console.error("Error fetching courses:", err)
+        console.error("Error fetching regular courses:", err)
         setError(prev => ({ ...prev, courses: "Failed to load course data" }))
         setLoading(prev => ({ ...prev, courses: false }))
       }
     )
 
     // Clean up listener on unmount
-    return () => unsubscribe()
+    return () => unsubscribeRegular()
   }, [])
 
   useEffect(() => {
@@ -239,7 +270,7 @@ export default function ChatAssignment() {
 
         <div className="assignments-section">
           <h3>Current Assignments</h3>
-          <table className="table">
+          <table className="admin-table">
             <thead>
               <tr>
                 <th>Assignment ID</th>
