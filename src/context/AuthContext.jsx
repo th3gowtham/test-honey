@@ -142,10 +142,13 @@ export const AuthProvider = ({ children }) => {
       // 4. Clear localStorage flag
       localStorage.removeItem('isLoggedIn');
 
-      // 5. Broadcast event (optional)
+      // 5. Clear session one-time admin redirect flag
+      try { sessionStorage.removeItem('adminRedirectedOnce'); } catch {}
+
+      // 6. Broadcast event (optional)
       broadcastAuthEvent && broadcastAuthEvent();
       
-      // 6. Show success toast (rendered in global container with id "auth")
+      // 7. Show success toast (rendered in global container with id "auth")
       toast.success("Signed out successfully!", {
         containerId: "auth",
         autoClose: 3000,

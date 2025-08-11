@@ -23,7 +23,7 @@ const ProtectedAdminRoute = ({ children }) => {
   if (userRole !== 'Admin') {
     return <Navigate to="/unauthorized" replace />;
   }
-
+  
   // Render the protected content if user is an admin
   return children;
 };
