@@ -17,10 +17,72 @@ const BatchBroadcast = ({ activeChat }) => {
   const [showFiles, setShowFiles] = useState(false);
   const [fileCount, setFileCount] = useState(0);
   const [showMenu, setShowMenu] = useState(false);
+  const [showStudents, setShowStudents] = useState(false);
+  const [batchStudents, setBatchStudents] = useState([]);
+  const [loadingStudents, setLoadingStudents] = useState(false);
+
   const menuRef = useRef(null);
   const messagesEndRef = useRef(null);
 
   const { id: batchId, name: batchName, students: studentCount, subject } = activeChat || {};
+  // Fetch batch students when showStudents is true
+  useEffect(() => {
+    if (!showStudents || !batchId) return;
+
+    const fetchBatchStudents = async () => {
+      setLoadingStudents(true);
+      try {
+        // Get the batch document to get student IDs
+        const batchDoc = await getDoc(doc(db, 'batches', batchId));
+        if (!batchDoc.exists()) {
+          console.error('Batch not found');
+          setBatchStudents([]);
+          return;
+        }
+
+        const batchData = batchDoc.data();
+        const studentIds = batchData.students || [];
+
+        if (studentIds.length === 0) {
+          setBatchStudents([]);
+          return;
+        }
+
+        // Fetch student details from the Students collection
+        const studentsData = [];
+        for (const studentId of studentIds) {
+          try {
+            const studentDoc = await getDoc(doc(db, 'Students', studentId));
+            if (studentDoc.exists()) {
+              studentsData.push({
+                id: studentId,
+                name: studentDoc.data().name || 'Unknown Student',
+                email: studentDoc.data().Gmail || studentDoc.data().email || 'No email',
+                ...studentDoc.data()
+              });
+            }
+          } catch (error) {
+            console.error(`Error fetching student ${studentId}:`, error);
+            // Add a placeholder for failed fetches
+            studentsData.push({
+              id: studentId,
+              name: 'Unknown Student',
+              email: 'Unable to load'
+            });
+          }
+        }
+
+        setBatchStudents(studentsData);
+      } catch (error) {
+        console.error('Error fetching batch students:', error);
+        setBatchStudents([]);
+      } finally {
+        setLoadingStudents(false);
+      }
+    };
+
+    fetchBatchStudents();
+  }, [showStudents, batchId]);
 
   // Scroll to the bottom of the messages container
   const scrollToBottom = () => {
@@ -62,16 +124,16 @@ const BatchBroadcast = ({ activeChat }) => {
         console.error('Batch not found');
         return;
       }
-      
+
       const batchData = batchDoc.data();
       const receiverIds = (Array.isArray(batchData.receiverIds) && batchData.receiverIds.length > 0)
         ? batchData.receiverIds
         : Array.from(new Set([
-            batchData.teacherId,
-            batchData.receiverId,
-            ...(Array.isArray(batchData.students) ? batchData.students : [])
-          ].filter(Boolean)));
-      
+          batchData.teacherId,
+          batchData.receiverId,
+          ...(Array.isArray(batchData.students) ? batchData.students : [])
+        ].filter(Boolean)));
+
       // Save the message with all receiver IDs
       const messagesRef = collection(db, 'batches', batchId, 'messages');
       await addDoc(messagesRef, {
@@ -82,7 +144,7 @@ const BatchBroadcast = ({ activeChat }) => {
         receiverIds: receiverIds, // Store all receiver IDs with the message
         timestamp: serverTimestamp(),
       });
-      
+
       setNewMessage('');
     } catch (error) {
       console.error("Error sending message: ", error);
@@ -112,7 +174,7 @@ const BatchBroadcast = ({ activeChat }) => {
           </div>
           <div className="batch-header-text">
             <h2>{batchName}</h2>
-            <p>📢 Broadcast • {studentCount} students • {subject}</p>
+            <p> {studentCount} Students </p>
           </div>
         </div>
         <div className="session-btn-dropdown-container" ref={menuRef}>
@@ -125,6 +187,7 @@ const BatchBroadcast = ({ activeChat }) => {
               <button className="session-btn-dropdown-item" onClick={() => { setShowFiles(true); setShowMenu(false); }}>
                 View Files {fileCount > 0 && <span className="file-count-badge">{fileCount}</span>}
               </button>
+              <button className='session-btn-dropdown-item' onClick={() => { setShowStudents(true); setShowMenu(false); }}>View Students</button>
             </div>
           )}
         </div>
@@ -186,9 +249,9 @@ const BatchBroadcast = ({ activeChat }) => {
 
             elems.push(
               <div key={msg.id} className={`batch-message ${isYou ? 'sent' : 'received'}`}>
-                <div className={`message-avatar role-${roleClass}`}>
+                {/* <div className={`message-avatar role-${roleClass}`}>
                   <span>{avatarChar}</span>
-                </div>
+                </div> */}
                 <div className="message-content">
                   <div className="sender-name">{nameToShow}</div>
                   <div className="message-bubble">
@@ -244,6 +307,39 @@ const BatchBroadcast = ({ activeChat }) => {
               <FileViewer batchId={batchId} userRole={userRole} onFileCountUpdate={handleFileCountUpdate} />
             </div>
           </div>
+        </div>
+      )}
+      {showStudents && (
+        <div className='batch-modal-student'>
+            <div className='modal-overlay'>
+          <div className='modal-content students-modal'>
+            <div className="modal-header">
+              <h3>Batch Students - {batchName}</h3>
+              <button className="modal-close-btn" onClick={() => setShowStudents(false)}>
+                <X size={20} />
+              </button>
+            </div>
+            <div className="modal-body">
+              {loadingStudents ? (
+                <div className="loading-state">Loading students...</div>
+              ) : batchStudents.length === 0 ? (
+                <div className="empty-state">
+                  <p>No students assigned to this batch yet.</p>
+                </div>
+              ) : (
+                <div className="students-list">
+                  {batchStudents.map((student, index) => (
+                    <div key={student.id} className="student-item">
+                      <div className="student-info">
+                        <div className="student-name">{student.name}</div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
         </div>
       )}
     </div>
