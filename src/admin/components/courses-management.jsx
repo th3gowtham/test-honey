@@ -7,32 +7,41 @@ import { collection, onSnapshot, query, doc, deleteDoc, updateDoc, addDoc, serve
 import { toast, ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 
+
 export default function CoursesManagement() {
   const [courses, setCourses] = useState([])
+  const [advancedCourses, setAdvancedCourses] = useState([])
   const [teachers, setTeachers] = useState([])
   const [showModal, setShowModal] = useState(false)
   const [editingCourse, setEditingCourse] = useState(null)
   const [searchTerm, setSearchTerm] = useState("") 
   const [currentPage, setCurrentPage] = useState(1)
+  const [courseType, setCourseType] = useState("regular") // regular or advanced
   const [loading, setLoading] = useState({
     courses: true,
+    advancedCourses: true,
     teachers: true
   })
   const [error, setError] = useState({
     courses: null,
+    advancedCourses: null,
     teachers: null
   })
   const itemsPerPage = 5
 
   const [formData, setFormData] = useState({
-    name: "",
-    teacher: "",
-    duration: "",
+    title: "",
     description: "",
+    imgSrc: "",
+    age: "",
+    seats: "",
+    duration: "",
+    fee: 0,
     status: "active",
+    courseType: "regular" // regular or advanced
   })
   
-  // Fetch courses from Firestore
+  // Fetch regular courses from Firestore
   useEffect(() => {
     setLoading(prev => ({ ...prev, courses: true }))
     setError(prev => ({ ...prev, courses: null }))
@@ -46,12 +55,8 @@ export default function CoursesManagement() {
       (querySnapshot) => {
         const coursesData = querySnapshot.docs.map(doc => ({
           id: doc.id,
-          name: doc.data().name || "Unknown",
-          teacher: doc.data().teacher || "Unassigned",
-          students: doc.data().students || 0,
-          status: doc.data().status || "active",
-          duration: doc.data().duration || "N/A",
-          description: doc.data().description || ""
+          ...doc.data(),
+          courseType: "regular"
         }))
         setCourses(coursesData)
         setLoading(prev => ({ ...prev, courses: false }))
@@ -60,6 +65,37 @@ export default function CoursesManagement() {
         console.error("Error fetching courses:", err)
         setError(prev => ({ ...prev, courses: "Failed to load course data" }))
         setLoading(prev => ({ ...prev, courses: false }))
+      }
+    )
+
+    // Clean up listener on unmount
+    return () => unsubscribe()
+  }, [])
+
+  // Fetch advanced courses from Firestore
+  useEffect(() => {
+    setLoading(prev => ({ ...prev, advancedCourses: true }))
+    setError(prev => ({ ...prev, advancedCourses: null }))
+
+    // Create a query against the advancedCourses collection
+    const advancedCoursesRef = collection(db, "advancedCourses")
+    const q = query(advancedCoursesRef)
+
+    // Set up real-time listener
+    const unsubscribe = onSnapshot(q, 
+      (querySnapshot) => {
+        const advancedCoursesData = querySnapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data(),
+          courseType: "advanced"
+        }))
+        setAdvancedCourses(advancedCoursesData)
+        setLoading(prev => ({ ...prev, advancedCourses: false }))
+      },
+      (err) => {
+        console.error("Error fetching advanced courses:", err)
+        setError(prev => ({ ...prev, advancedCourses: "Failed to load advanced course data" }))
+        setLoading(prev => ({ ...prev, advancedCourses: false }))
       }
     )
 
@@ -97,10 +133,14 @@ export default function CoursesManagement() {
     return () => unsubscribe()
   }, [])
 
-  const filteredCourses = courses.filter(
+  // Combine courses based on selected type
+  const allCourses = courseType === "regular" ? courses : advancedCourses
+
+  // Filter courses based on search term
+  const filteredCourses = allCourses.filter(
     (course) =>
-      course.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      course.teacher.toLowerCase().includes(searchTerm.toLowerCase()),
+      (course.title?.toLowerCase() || "").includes(searchTerm.toLowerCase()) ||
+      (course.description?.toLowerCase() || "").includes(searchTerm.toLowerCase())
   )
 
   const totalPages = Math.ceil(filteredCourses.length / itemsPerPage)
@@ -111,28 +151,30 @@ export default function CoursesManagement() {
     e.preventDefault()
 
     try {
+      // Determine which collection to use based on course type
+      const collectionName = formData.courseType === "regular" ? "courses" : "advancedCourses"
+      
+      // Prepare course data
+      const courseData = {
+        title: formData.title,
+        description: formData.description,
+        imgSrc: formData.imgSrc,
+        age: formData.age,
+        seats: formData.seats,
+        duration: formData.duration,
+        fee: Number(formData.fee),
+        status: formData.status,
+        updatedAt: serverTimestamp()
+      }
+
       if (editingCourse) {
         // Update existing course in Firestore
-        await updateDoc(doc(db, "courses", editingCourse.id), {
-          name: formData.name,
-          teacher: formData.teacher,
-          duration: formData.duration,
-          description: formData.description,
-          status: formData.status,
-          updatedAt: serverTimestamp()
-        })
+        await updateDoc(doc(db, collectionName, editingCourse.id), courseData)
         toast.success("Course updated successfully!")
       } else {
         // Add new course to Firestore
-        await addDoc(collection(db, "courses"), {
-          name: formData.name,
-          teacher: formData.teacher,
-          duration: formData.duration,
-          description: formData.description,
-          status: formData.status,
-          students: 0,
-          createdAt: serverTimestamp()
-        })
+        courseData.createdAt = serverTimestamp()
+        await addDoc(collection(db, collectionName), courseData)
         toast.success("New course added successfully!")
       }
 
@@ -145,11 +187,15 @@ export default function CoursesManagement() {
 
   const resetForm = () => {
     setFormData({
-      name: "",
-      teacher: "",
-      duration: "",
+      title: "",
       description: "",
+      imgSrc: "",
+      age: "",
+      seats: "",
+      duration: "",
+      fee: 0,
       status: "active",
+      courseType: courseType // Maintain current selected course type
     })
     setEditingCourse(null)
     setShowModal(false)
@@ -158,20 +204,28 @@ export default function CoursesManagement() {
   const handleEdit = (course) => {
     setEditingCourse(course)
     setFormData({
-      name: course.name,
-      teacher: course.teacher,
-      duration: course.duration,
-      description: course.description,
-      status: course.status,
+      title: course.title || "",
+      description: course.description || "",
+      imgSrc: course.imgSrc || "",
+      age: course.age || "",
+      seats: course.seats || "",
+      duration: course.duration || "",
+      fee: course.fee || 0,
+      status: course.status || "active",
+      courseType: course.courseType || "regular"
     })
     setShowModal(true)
   }
 
-  const handleDelete = async (courseId) => {
+  const handleDelete = async (course) => {
     if (confirm("Are you sure you want to delete this course?")) {
       try {
+        // Determine which collection to use based on course type
+        const collectionName = course.courseType === "regular" ? "courses" : "advancedCourses"
+        
         // Delete the document from Firestore
-        await deleteDoc(doc(db, "courses", courseId))
+        await deleteDoc(doc(db, collectionName, course.id))
+        
         // Show success toast
         toast.success("Course deleted successfully!")
         // No need to update state as the onSnapshot will handle that
@@ -190,6 +244,20 @@ export default function CoursesManagement() {
         <div>
           <h2>Courses Management</h2>
           <p>Manage all courses and their assignments</p>
+          <div className="course-type-selector">
+            <button 
+              className={`btn ${courseType === "regular" ? "btn-primary" : "btn-outline-primary"}`}
+              onClick={() => setCourseType("regular")}
+            >
+              Regular Courses
+            </button>
+            <button 
+              className={`btn ${courseType === "advanced" ? "btn-primary" : "btn-outline-primary"}`}
+              onClick={() => setCourseType("advanced")}
+            >
+              Advanced Courses
+            </button>
+          </div>
         </div>
         <button className="btn btn-primary" onClick={() => setShowModal(true)}>
           <FiPlus /> Add New Course
@@ -201,7 +269,7 @@ export default function CoursesManagement() {
           <FiSearch />
           <input
             type="text"
-            placeholder="Search courses or teachers..."
+            placeholder="Search courses..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
@@ -209,28 +277,30 @@ export default function CoursesManagement() {
       </div>
 
       <div className="table-container">
-        {loading.courses ? (
+        {loading[courseType === "regular" ? "courses" : "advancedCourses"] ? (
           <div className="loading-container">
-            <p>Loading courses...</p>
+            <p>Loading {courseType} courses...</p>
           </div>
-        ) : error.courses ? (
+        ) : error[courseType === "regular" ? "courses" : "advancedCourses"] ? (
           <div className="error-container">
-            <p>{error.courses}</p>
+            <p>{error[courseType === "regular" ? "courses" : "advancedCourses"]}</p>
             <button onClick={() => window.location.reload()}>Retry</button>
           </div>
-        ) : courses.length === 0 ? (
+        ) : filteredCourses.length === 0 ? (
           <div className="empty-container">
-            <p>No courses found. Add your first course to get started.</p>
+            <p>No {courseType} courses found. Add your first course to get started.</p>
           </div>
         ) : (
           <table className="table">
             <thead>
               <tr>
                 <th>Course ID</th>
-                <th>Course Name</th>
-                <th>Assigned Teacher</th>
-                <th>Total Students</th>
+                <th>Image</th>
+                <th>Title</th>
+                <th>Age Group</th>
+                <th>Seats</th>
                 <th>Duration</th>
+                <th>Fee</th>
                 <th>Status</th>
                 <th>Actions</th>
               </tr>
@@ -238,19 +308,29 @@ export default function CoursesManagement() {
             <tbody>
               {paginatedCourses.map((course) => (
                 <tr key={course.id}>
-                  <td>{course.id}</td>
+                  <td>{course.id.slice(0, 8)}...</td>
+                  <td>
+                    {course.imgSrc && (
+                      <img 
+                        src={course.imgSrc} 
+                        alt={course.title} 
+                        style={{ width: '50px', height: '50px', objectFit: 'cover' }} 
+                      />
+                    )}
+                  </td>
                   <td>
                     <div>
-                      <div className="course-name">{course.name}</div>
-                      <div className="course-description">{course.description}</div>
+                      <div className="course-title">{course.title}</div>
+                      <div className="course-description">{course.description?.substring(0, 50)}...</div>
                     </div>
                   </td>
-                  <td>{course.teacher}</td>
-                  <td>{course.students}</td>
+                  <td>{course.age}</td>
+                  <td>{course.seats}</td>
                   <td>{course.duration}</td>
+                  <td>${course.fee}</td>
                   <td>
                     <span className={`status-badge ${course.status === "active" ? "status-active" : "status-inactive"}`}>
-                      {course.status}
+                      {course.status || "active"}
                     </span>
                   </td>
                   <td>
@@ -258,7 +338,7 @@ export default function CoursesManagement() {
                       <button className="btn-icon" onClick={() => handleEdit(course)}>
                         <FiEdit />
                       </button>
-                      <button className="btn-icon btn-danger" onClick={() => handleDelete(course.id)}>
+                      <button className="btn-icon btn-danger" onClick={() => handleDelete(course)}>
                         <FiTrash2 />
                       </button>
                     </div>
@@ -304,12 +384,23 @@ export default function CoursesManagement() {
             </div>
             <form onSubmit={handleSubmit}>
               <div className="form-group">
-                <label className="form-label">Course Name</label>
+                <label className="form-label">Course Type</label>
+                <select
+                  className="form-select"
+                  value={formData.courseType}
+                  onChange={(e) => setFormData({ ...formData, courseType: e.target.value })}
+                >
+                  <option value="regular">Regular Course</option>
+                  <option value="advanced">Advanced Course</option>
+                </select>
+              </div>
+              <div className="form-group">
+                <label className="form-label">Course Title</label>
                 <input
                   type="text"
                   className="form-input"
-                  value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  value={formData.title}
+                  onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                   required
                 />
               </div>
@@ -324,23 +415,59 @@ export default function CoursesManagement() {
                 />
               </div>
               <div className="form-group">
-                <label className="form-label">Course Image</label>
-                <input
-                  type="file"
-                  accept="image/*"
-                  className="form-input"
-                />
-              </div>
-              <div className="form-group">
-                <label className="form-label">Course Duration</label>
+                <label className="form-label">Image URL</label>
                 <input
                   type="text"
                   className="form-input"
-                  placeholder="e.g., 8 weeks"
-                  value={formData.duration}
-                  onChange={(e) => setFormData({ ...formData, duration: e.target.value })}
+                  value={formData.imgSrc}
+                  onChange={(e) => setFormData({ ...formData, imgSrc: e.target.value })}
                   required
                 />
+              </div>
+              <div className="form-row">
+                <div className="form-group">
+                  <label className="form-label">Age Group</label>
+                  <input
+                    type="text"
+                    className="form-input"
+                    value={formData.age}
+                    onChange={(e) => setFormData({ ...formData, age: e.target.value })}
+                    required
+                  />
+                </div>
+                <div className="form-group">
+                  <label className="form-label">Available Seats</label>
+                  <input
+                    type="text"
+                    className="form-input"
+                    value={formData.seats}
+                    onChange={(e) => setFormData({ ...formData, seats: e.target.value })}
+                    required
+                  />
+                </div>
+              </div>
+              <div className="form-row">
+                <div className="form-group">
+                  <label className="form-label">Course Duration</label>
+                  <input
+                    type="text"
+                    className="form-input"
+                    placeholder="e.g., 8 weeks"
+                    value={formData.duration}
+                    onChange={(e) => setFormData({ ...formData, duration: e.target.value })}
+                    required
+                  />
+                </div>
+                <div className="form-group">
+                  <label className="form-label">Fee ($)</label>
+                  <input
+                    type="number"
+                    className="form-input"
+                    value={formData.fee}
+                    onChange={(e) => setFormData({ ...formData, fee: Number(e.target.value) })}
+                    required
+                  />
+                </div>
               </div>
               <div className="form-group">
                 <label className="form-label">Status</label>
