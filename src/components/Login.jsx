@@ -53,13 +53,12 @@ const globalStyles = `
 
 const Login = ({ onClose }) => {
   const navigate = useNavigate();
-  const { login, showLoginSuccess, userRole } = useAuth();
+  const { login, showLoginSuccess } = useAuth();
   const [isRegister, setIsRegister] = useState(false);
   const [showForgotPassword, setShowForgotPassword] = useState(false);
   const [form, setForm] = useState({ email: "", password: "", name: "" });
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const loadingTimerRef = React.useRef(null);
 
   // Apply global styles
   React.useEffect(() => {
@@ -69,10 +68,6 @@ const Login = ({ onClose }) => {
 
     return () => {
       document.head.removeChild(styleElement);
-      if (loadingTimerRef.current) {
-        clearTimeout(loadingTimerRef.current);
-        loadingTimerRef.current = null;
-      }
     };
   }, []);
 
@@ -85,16 +80,6 @@ const Login = ({ onClose }) => {
   // Google login
   const loginclick = async () => {
     setIsLoading(true);
-    // Safety timeout to ensure we never keep spinner forever
-    if (loadingTimerRef.current) {
-      clearTimeout(loadingTimerRef.current);
-      loadingTimerRef.current = null;
-    }
-    loadingTimerRef.current = setTimeout(() => {
-      setIsLoading(false);
-      loadingTimerRef.current = null;
-    }, 2000); // 20s safety cap
-
     try {
       const result = await signInWithPopup(auth, googleprovider);
       const idToken = await result.user.getIdToken();
@@ -104,20 +89,6 @@ const Login = ({ onClose }) => {
       closeModal();
       showLoginSuccess();
     } catch (err) {
-      // Stop loading and clear timer immediately
-      if (loadingTimerRef.current) {
-        clearTimeout(loadingTimerRef.current);
-        loadingTimerRef.current = null;
-      }
-      setIsLoading(false);
-
-      // If user closed the popup or it was blocked/cancelled, don't close the modal.
-      if (err && (err.code === 'auth/popup-closed-by-user' || err.code === 'auth/cancelled-popup-request' || err.code === 'auth/popup-blocked')) {
-        // Optionally show a light toast, but keep modal open for retry
-        return;
-      }
-
-      // Other errors: close modal and show error toast
       closeModal();
       toast.error("Login failed", {
         position: "top-right",
@@ -130,10 +101,6 @@ const Login = ({ onClose }) => {
         theme: "light",
       });
     } finally {
-      if (loadingTimerRef.current) {
-        clearTimeout(loadingTimerRef.current);
-        loadingTimerRef.current = null;
-      }
       setIsLoading(false);
     }
   };
