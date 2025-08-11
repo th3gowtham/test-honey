@@ -1129,6 +1129,61 @@ body {
   color: #718096;
 }
 
+/* Course Type Selector Styles */
+.course-type-selector {
+  display: flex;
+  gap: 16px;
+  margin: 24px 0;
+  flex-wrap: wrap;
+}
+
+.course-type-selector .btn {
+  padding: 12px 24px;
+  font-size: 14px;
+  font-weight: 500;
+  border-radius: 8px;
+  min-width: 160px;
+  flex: 1;
+  justify-content: center;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  max-width: 220px;
+}
+
+.course-type-selector .btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.course-type-selector .btn-primary {
+  background-color: #127d8e;
+  color: white;
+  border: 2px solid #127d8e;
+}
+
+.course-type-selector .btn-outline-primary {
+  background-color: transparent;
+  color: #127d8e;
+  border: 2px solid #127d8e;
+}
+
+.course-type-selector .btn-outline-primary:hover {
+  background-color: rgba(18, 125, 142, 0.1);
+}
+
+@media (max-width: 768px) {
+  .course-type-selector {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+  
+  .course-type-selector .btn {
+    width: 100%;
+    max-width: none;
+  }
+}
+
 .status-badge.status-active {
   background-color: #b2f5ea;
   color: #234e52;
@@ -1220,16 +1275,19 @@ body {
 
 /* Common Styles */
 .btn {
-
   border: none;
   border-radius: 8px;
   font-size: 16px;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;
+  display: flex;
   align-items: center;
+  justify-content: center;
   gap: 8px;
   text-decoration: none;
+  padding: 10px 20px;
+  width: fit-content;
 }
 
 .btn:hover {
@@ -1240,9 +1298,6 @@ body {
 .btn-primary {
   background-color: #127d8e;
   color: white;
-  display:flex;
-  align-items:center;
-  width:fit-content;
 }
 
 .btn-primary:hover {
@@ -1256,6 +1311,17 @@ body {
 
 .btn-secondary:hover {
   background-color: #cbd5e0;
+}
+
+.btn-outline-primary {
+  background-color: transparent;
+  color: #127d8e;
+  border: 2px solid #127d8e;
+}
+
+.btn-outline-primary:hover {
+  background-color: rgba(18, 125, 142, 0.1);
+  color: #0f6b7a;
 }
 
 .btn-danger {
@@ -1283,25 +1349,25 @@ body {
   border: 1px solid #e2e8f0;
 }
 
-.table {
+.admin-table {
   width: 100%;
   border-collapse: collapse;
 }
 
-.table th,
-.table td {
+.admin-table th,
+.admin-table td {
   padding: 16px;
   text-align: left;
   border-bottom: 1px solid #e2e8f0;
 }
 
-.table th {
+.admin-table th {
   background-color: #f7fafc;
   font-weight: 600;
   color: #4a5568;
 }
 
-.table tbody tr:hover {
+.admin-table tbody tr:hover {
   background-color: #f7fafc;
 }
 
@@ -1541,7 +1607,7 @@ body {
 }
 
 /* Ensure table maintains minimum width */
-.table {
+.admin-table {
   width: 100%;
   min-width: 800px; /* Minimum width to trigger horizontal scroll */
   border-collapse: collapse;

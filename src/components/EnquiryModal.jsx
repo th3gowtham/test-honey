@@ -3,8 +3,10 @@ import React, { useRef, useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import emailjs from '@emailjs/browser';
 import './EnquiryModal.css';
+import { db } from '../services/firebase';
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 
-const EnquiryModal = ({ show, onClose, onSubmit, onSkip, selectedCourse }) => {
+const EnquiryModal = ({ show, onClose, onSubmit, onSkip, selectedCourse, selectedCourseId }) => {
   const { userRole, userName, user } = useAuth();
 
   const [formData, setFormData] = useState({
@@ -60,12 +62,29 @@ const EnquiryModal = ({ show, onClose, onSubmit, onSkip, selectedCourse }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      // Send email notification
       await emailjs.send(
         'service_ihc4di7',
         'template_mauhknb',
         formData,
         'L8cGXGnMaq2Pj005_'
       );
+      
+      // Create enrollment record in Firestore
+      await addDoc(collection(db, "enrollments"), {
+        studentName: formData.name,
+        email: formData.email,
+        phone: formData.phone,
+        courseTitle: formData.course,
+        courseId: selectedCourseId || '',
+        enrollmentDate: serverTimestamp(),
+        paymentStatus: "Pending",
+        preferredDate: formData.preferredDate,
+        preferredTimeSlot: formData.preferredTimeSlot,
+        message: formData.message,
+        userId: user?.uid || null
+      });
+      
       setStatus({ success: true, error: false, show: true });
       setFormData({
         name: '',
@@ -76,13 +95,35 @@ const EnquiryModal = ({ show, onClose, onSubmit, onSkip, selectedCourse }) => {
         preferredTimeSlot: '',
         message: ''
       });
+      
       // Call onSubmit after successful form submission
       setTimeout(() => {
         onSubmit();
       }, 1500);
     } catch (error) {
       setStatus({ success: false, error: true, show: true });
-      console.log('FAILED...', error);
+      console.error('Failed to process enrollment:', error);
+    }
+  };
+
+  const handleSkip = async () => {
+    try {
+      // Create enrollment record in Firestore with minimal information
+      await addDoc(collection(db, "enrollments"), {
+        studentName: user?.displayName || '',
+        email: user?.email || '',
+        phone: '',
+        courseTitle: selectedCourse || '',
+        courseId: selectedCourseId || '',
+        enrollmentDate: serverTimestamp(),
+        paymentStatus: "Pending",
+        userId: user?.uid || null
+      });
+      
+      onSkip();
+    } catch (error) {
+      console.error('Failed to create enrollment record:', error);
+      onSkip(); // Still proceed to payment even if enrollment record creation fails
     }
   };
 
@@ -235,7 +276,7 @@ const EnquiryModal = ({ show, onClose, onSubmit, onSkip, selectedCourse }) => {
           </div>
           <div className="enquiry-modal-row">
             <div className="enquiry-modal-button-group">
-              <button type="button" onClick={onSkip} className="skip-button">Skip & Proceed to Payment</button>
+              <button type="button" onClick={handleSkip} className="skip-button">Skip & Proceed to Payment</button>
               <button type="submit" className="submit-button">Submit Enquiry</button>
             </div>
           </div>

@@ -1,6 +1,8 @@
 import React, { createContext, useContext, useState } from "react";
 import { useAuth } from "./AuthContext";
 import { toast } from "react-toastify";
+import { db } from "../services/firebase";
+import { collection, query, where, getDocs, updateDoc, doc } from "firebase/firestore";
 
 const PaymentContext = createContext();
 
@@ -60,6 +62,30 @@ export const PaymentProvider = ({ children }) => {
             });
             const verifyData = await verifyResponse.json();
             if (verifyResponse.ok) {
+              // Update enrollment payment status in Firestore
+              try {
+                const enrollmentsRef = collection(db, "enrollments");
+                const q = query(
+                  enrollmentsRef, 
+                  where("courseId", "==", course.id),
+                  where("userId", "==", user.uid),
+                  where("paymentStatus", "==", "Pending")
+                );
+                
+                const querySnapshot = await getDocs(q);
+                if (!querySnapshot.empty) {
+                  // Update the most recent enrollment if multiple exist
+                  const enrollmentDoc = querySnapshot.docs[0];
+                  await updateDoc(doc(db, "enrollments", enrollmentDoc.id), {
+                    paymentStatus: "Paid",
+                    paymentId: razorpayResponse.razorpay_payment_id,
+                    paymentOrderId: razorpayResponse.razorpay_order_id
+                  });
+                }
+              } catch (error) {
+                console.error("Error updating enrollment status:", error);
+              }
+              
               toast.success("Payment successful!");
             } else {
               toast.error(verifyData.error || "Payment verification failed");
