@@ -171,6 +171,7 @@ const Classes = () => {
         onSubmit={handleEnquirySubmit}
         onSkip={handleSkipEnquiry}
         selectedCourse={selectedCourse?.title}
+        selectedCourseId={selectedCourse?.id}
       />
       
       {showLoginNeeded && (

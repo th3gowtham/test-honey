@@ -291,7 +291,7 @@ export default function CoursesManagement() {
             <p>No {courseType} courses found. Add your first course to get started.</p>
           </div>
         ) : (
-          <table className="table">
+          <table className="admin-table">
             <thead>
               <tr>
                 <th>Course ID</th>

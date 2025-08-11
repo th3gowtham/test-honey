@@ -240,7 +240,7 @@ export default function ChatAssignment() {
 
         <div className="assignments-section">
           <h3>Current Assignments</h3>
-          <table className="table">
+          <table className="admin-table">
             <thead>
               <tr>
                 <th>Assignment ID</th>

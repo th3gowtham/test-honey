@@ -7,8 +7,7 @@ import UserManagement from "../admin/components/user-management";
 import TeacherManagement from "../admin/components/teacher-management";
 import ChatAssignment from "../admin/components/chat-assignment";
 import BatchAssignment from "../admin/components/batch-assignment";
-import EventsManagement from "../admin/components/events-management";
-import Settings from "../admin/components/settings";
+import EnrollmentsManagement from "../admin/components/enrollments-management";
 import "../admin/admin_globals.css";
 
 export default function AdminDashboard() {
@@ -30,7 +29,7 @@ export default function AdminDashboard() {
       case "batch-assignment":
         return <BatchAssignment />;
       case "events":
-        return <EventsManagement />;
+        return <EnrollmentsManagement />;
       case "settings":
         return <Settings />;
       default:
@@ -52,4 +51,4 @@ export default function AdminDashboard() {
       </div>
     </div>
   );
-} 
+}

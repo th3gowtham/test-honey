@@ -40,34 +40,61 @@ export default function TeacherManagement() {
   // Get domain URL from environment variables or use default
   const domainUrl = import.meta.env.VITE_CLIENT_URL || window.location.origin
 
-  // Fetch real-time courses data from Firestore
+  // Fetch real-time courses data from both collections (courses and advancedCourses)
   useEffect(() => {
     setLoading(prev => ({ ...prev, courses: true }))
     setError(prev => ({ ...prev, courses: null }))
 
-    // Create a query against the courses collection
-    const coursesRef = collection(db, "courses")
-    const q = query(coursesRef)
-
-    // Set up real-time listener
-    const unsubscribe = onSnapshot(q, 
-      (querySnapshot) => {
-        const coursesData = querySnapshot.docs.map(doc => ({
+    // Create queries against both collections
+    const regularCoursesRef = collection(db, "courses")
+    const advancedCoursesRef = collection(db, "advancedCourses")
+    
+    // Set up real-time listeners for regular courses
+    const unsubscribeRegular = onSnapshot(
+      query(regularCoursesRef),
+      (regularSnapshot) => {
+        const regularCoursesData = regularSnapshot.docs.map(doc => ({
           id: doc.id,
-          title: doc.data().name || "Unknown Course"
+          title: doc.data().name || doc.data().courseName || doc.data().title || "Unknown Course",
+          courseType: "regular"
         }))
-        setCourses(coursesData)
-        setLoading(prev => ({ ...prev, courses: false }))
+        
+        // Set up listener for advanced courses
+        const unsubscribeAdvanced = onSnapshot(
+          query(advancedCoursesRef),
+          (advancedSnapshot) => {
+            const advancedCoursesData = advancedSnapshot.docs.map(doc => ({
+              id: doc.id,
+              title: doc.data().name || doc.data().courseName || doc.data().title || "Unknown Course",
+              courseType: "advanced"
+            }))
+            
+            // Combine both course types
+            const allCoursesData = [...regularCoursesData, ...advancedCoursesData]
+            setCourses(allCoursesData)
+            setLoading(prev => ({ ...prev, courses: false }))
+          },
+          (err) => {
+            console.error("Error fetching advanced courses:", err)
+            // Even if advanced courses fail, we still have regular courses
+            setCourses(regularCoursesData)
+            setError(prev => ({ ...prev, courses: "Failed to load advanced course data" }))
+            setLoading(prev => ({ ...prev, courses: false }))
+          }
+        )
+        
+        // Return cleanup for advanced courses
+        return () => unsubscribeAdvanced()
       },
       (err) => {
-        console.error("Error fetching courses:", err)
+        console.error("Error fetching regular courses:", err)
         setError(prev => ({ ...prev, courses: "Failed to load course data" }))
         setLoading(prev => ({ ...prev, courses: false }))
       }
     )
 
     // Clean up listener on unmount
-    return () => unsubscribe()
+    return () => unsubscribeRegular()
   }, [])
 
   // Fetch real-time teachers data from Firestore
@@ -319,7 +346,7 @@ export default function TeacherManagement() {
 
       {!loading.teachers && !error.teachers && (
         <div className="table-container">
-          <table className="table">
+          <table className="admin-table">
             <thead>
               <tr>
                 <th>Teacher ID</th>

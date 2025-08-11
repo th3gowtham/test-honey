@@ -42,51 +42,90 @@ export default function BatchAssignment() {
     status: "active",
   })
 
-  // Fetch courses from Firestore
+  // Fetch courses from both collections (courses and advancedCourses)
   useEffect(() => {
     setLoading(prev => ({ ...prev, courses: true }))
     setError(prev => ({ ...prev, courses: null }))
 
-    // Since courses are using mock data in the original app, we'll create a courses collection
-    // This is a temporary solution until the courses-management.jsx is updated to use Firestore
-    const coursesRef = collection(db, "courses")
-    const q = query(coursesRef)
+    // Create queries against both collections
+    const regularCoursesRef = collection(db, "courses")
+    const advancedCoursesRef = collection(db, "advancedCourses")
+    
+    // Mock data as fallback if both collections are empty
+    const mockCoursesData = [
+      { id: "C001", courseName: "React Fundamentals", status: "active" },
+      { id: "C002", courseName: "JavaScript Advanced", status: "active" },
+      { id: "C003", courseName: "Python Basics", status: "active" },
+      { id: "C004", courseName: "Web Design", status: "active" },
+      { id: "C005", courseName: "UI/UX", status: "active" },
+      { id: "C006", courseName: "Data Science", status: "active" },
+    ]
 
-    // Set up real-time listener
-    const unsubscribe = onSnapshot(q, 
-      (querySnapshot) => {
-        if (querySnapshot.empty) {
-          // If no courses exist yet, we'll use the mock data as a fallback
-          const mockCoursesData = [
-            { id: "C001", courseName: "React Fundamentals", status: "active" },
-            { id: "C002", courseName: "JavaScript Advanced", status: "active" },
-            { id: "C003", courseName: "Python Basics", status: "active" },
-            { id: "C004", courseName: "Web Design", status: "active" },
-            { id: "C005", courseName: "UI/UX", status: "active" },
-            { id: "C006", courseName: "Data Science", status: "active" },
-          ]
-          setCourses(mockCoursesData)
-        } else {
-          const coursesData = querySnapshot.docs.map(doc => ({
-            id: doc.id,
-            courseName: doc.data().name || doc.data().courseName || "Unknown Course",
-            title: doc.data().name || doc.data().courseName || "Unknown Course", // Add title field for consistency
-            status: doc.data().status || "active",
-            ...doc.data()
-          }))
-          setCourses(coursesData.filter(course => course.status === "active"))
-        }
-        setLoading(prev => ({ ...prev, courses: false }))
+    // Set up real-time listeners for regular courses
+    const unsubscribeRegular = onSnapshot(
+      query(regularCoursesRef),
+      (regularSnapshot) => {
+        const regularCoursesData = regularSnapshot.docs.map(doc => ({
+          id: doc.id,
+          courseName: doc.data().name || doc.data().courseName || doc.data().title || "Unknown Course",
+          title: doc.data().name || doc.data().courseName || doc.data().title || "Unknown Course", // Add title field for consistency
+          status: doc.data().status || "active",
+          courseType: "regular",
+          ...doc.data()
+        }))
+        
+        // Set up listener for advanced courses
+        const unsubscribeAdvanced = onSnapshot(
+          query(advancedCoursesRef),
+          (advancedSnapshot) => {
+            const advancedCoursesData = advancedSnapshot.docs.map(doc => ({
+              id: doc.id,
+              courseName: doc.data().name || doc.data().courseName || doc.data().title || "Unknown Course",
+              title: doc.data().name || doc.data().courseName || doc.data().title || "Unknown Course",
+              status: doc.data().status || "active",
+              courseType: "advanced",
+              ...doc.data()
+            }))
+            
+            // Combine both course types
+            const allCoursesData = [...regularCoursesData, ...advancedCoursesData]
+            
+            // If both collections are empty, use mock data as fallback
+            if (allCoursesData.length === 0) {
+              setCourses(mockCoursesData)
+            } else {
+              setCourses(allCoursesData.filter(course => course.status === "active"))
+            }
+            
+            setLoading(prev => ({ ...prev, courses: false }))
+          },
+          (err) => {
+            console.error("Error fetching advanced courses:", err)
+            // Even if advanced courses fail, we still have regular courses
+            if (regularCoursesData.length === 0) {
+              setCourses(mockCoursesData)
+            } else {
+              setCourses(regularCoursesData.filter(course => course.status === "active"))
+            }
+            setError(prev => ({ ...prev, courses: "Failed to load advanced course data" }))
+            setLoading(prev => ({ ...prev, courses: false }))
+          }
+        )
+        
+        // Return cleanup for advanced courses
+        return () => unsubscribeAdvanced()
       },
       (err) => {
-        console.error("Error fetching courses:", err)
+        console.error("Error fetching regular courses:", err)
+        // If regular courses fail, use mock data as fallback
+        setCourses(mockCoursesData)
         setError(prev => ({ ...prev, courses: "Failed to load course data" }))
         setLoading(prev => ({ ...prev, courses: false }))
       }
     )
 
     // Clean up listener on unmount
-    return () => unsubscribe()
+    return () => unsubscribeRegular()
   }, [])
 
   // Fetch teachers from Firestore
@@ -377,7 +416,7 @@ export default function BatchAssignment() {
               <p>No batches found. Create your first batch by clicking the "Add Batch" button.</p>
             </div>
           ) : (
-            <table className="table">
+            <table className="admin-table">
               <thead>
                 <tr>
                   <th>Batch ID</th>
