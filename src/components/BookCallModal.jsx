@@ -78,7 +78,8 @@ const BookCallModal = ({ isOpen, onClose, onBooking, collectionName = "bookings"
         <form onSubmit={handleSubmit} className="bookcall-form">
 
           {/* Date Picker */}
-          <div className="bookcall-date">
+          <div className='date-picker-wrapper'>
+            <div className="bookcall-date">
             <label>Select Date</label>
             <DatePicker
               selected={date}
@@ -90,6 +91,7 @@ const BookCallModal = ({ isOpen, onClose, onBooking, collectionName = "bookings"
             />
           </div>
 
+          </div>
           {/* Time Slots */}
           <div className="bookcall-times">
             <label>Available Times</label>

@@ -94,6 +94,17 @@
 }
 
 /* react-datepicker inline calendar custom styles */
+.date-picker-wrapper {
+  display: flex;
+  justify-content: center; /* Center horizontally */
+  align-items: center;     /* Center vertically */
+  width: 100%;
+}
+
+.date-picker-wrapper .react-datepicker {
+  margin: 0 auto; /* Extra safety for horizontal centering */
+}
+
 .bookcall-date .react-datepicker {
   border: 1.5px solid #f0f0f0;
   border-radius: 14px;
@@ -134,7 +145,7 @@
 }
 
 .bookcall-date .react-datepicker__navigation {
-  top: 1.5rem;
+  /* top: 1.5rem; */
 }
 
 .bookcall-date .react-datepicker__navigation-icon::before {

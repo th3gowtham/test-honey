@@ -43,12 +43,14 @@
   margin: 0;
   font-weight: 600;
   color: #ffffff;
+  margin-bottom: 5px;
 }
 
 .batch-header-text p {
   font-size: 12px;
   color: rgba(255,255,255,0.9);
   margin: 0;
+
 }
 
 .batch-actions {
@@ -584,11 +586,11 @@
   overflow-y: auto;
   overflow-x: hidden; /* prevent horizontal scrollbar line above input */
   padding: 14px; /* WhatsApp spacing */
-  padding-bottom: 84px;
   display: flex;
   flex-direction: column;
   gap: 16px;
   background-color: transparent; /* inherit page wallpaper */
+ 
 }
 
 .batch-message {
@@ -612,8 +614,8 @@
   flex-direction: row-reverse;
   padding-right: 8px; /* keep bubble from touching right edge */
   margin-right: 12px; /* keep off the right edge */
+ 
 }
-
 /* Align text blocks flush-left inside both bubbles */
 .batch-message .message-content { display: block; }
 .batch-message .message-content .sender-name { margin-left: 0; }
@@ -642,7 +644,7 @@
 .message-content {
   display: flex;
   flex-direction: column;
-  max-width: calc(100% - 42px); /* Account for avatar + gap */
+ 
 }
 
 /* Hide the meta row above bubbles to mimic WhatsApp (we keep time inside bubble) */
@@ -663,19 +665,26 @@
 .message-bubble {
   position: relative;
   display: grid;
-  grid-template-columns: 1fr auto;
+  /* grid-template-columns: 1fr auto; */
   column-gap: 8px;
   padding: 12px 16px;
   border-radius: 18px;
   font-size: 14px;
   line-height: 1.4;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
-  max-width: min(620px, 78%); /* WhatsApp-like max bubble width */
+  /* max-width: min(620px, 78%); */
   min-width: 160px;
+  max-width: 500px;
+
+  
 }
 
 /* Ensure text wraps but timestamp stays on one line */
-.bubble-text { white-space: normal; overflow-wrap: break-word; word-break: break-word; }
+.bubble-text { white-space: normal;
+   overflow-wrap: break-word;
+    word-break: break-word;
+    margin: 0;
+   }
 
 .bubble-time {
   white-space: nowrap;
@@ -1524,4 +1533,47 @@
   color: #d1d5db; /* gray text */
   cursor: not-allowed;
   background-color: #ffffff;
+}
+.batch-modal-student .modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.batch-modal-student .modal-content {
+  background: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  width: 300px;
+  text-align: center;
+}
+
+.batch-modal-student .modal-content h3 {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 15px;
+}
+
+.batch-modal-student .modal-content button {
+  /* margin-top: px; */
+  padding: 4px 10px;
+  background: #075e54; /* WhatsApp green */
+  color: #fff;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-left: 20px;
+}
+
+.batch-modal-student .modal-content button:hover {
+  background: #0a7c67;
+}
+.batch-modal-student .modal-header h3::after {
+  content: none; /* or override/reset */
 }

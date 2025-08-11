@@ -372,9 +372,9 @@ const PrivateChat = ({ activeChat, receiverId: propReceiverId, chatId: propChatI
 
       messageElements.push(
         <div key={msg.id} className={`batch-message ${msg.senderId === currentUser.uid ? 'sent' : 'received'}`}>
-          <div className={`message-avatar role-${roleClass}`}>
+          {/* <div className={`message-avatar role-${roleClass}`}>
             <span>{avatarChar}</span>
-          </div>
+          </div> */}
           <div className="message-content">
             <div className="sender-name">{nameToShow}</div>
             <div className="message-bubble">
