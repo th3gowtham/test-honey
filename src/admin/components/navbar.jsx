@@ -5,6 +5,9 @@ import { useState, useRef, useEffect } from "react"
 import { useIsMobile } from "../hooks/use-mobile"
 import { db } from "../../services/firebase"
 import { collection, onSnapshot, query, orderBy, limit } from "firebase/firestore"
+import { useAuth } from "../../context/AuthContext"
+import { useNavigate } from "react-router-dom"
+import { toast } from "react-toastify"
 
 export default function Navbar() {
   const [showProfileDropdown, setShowProfileDropdown] = useState(false)
@@ -21,6 +24,26 @@ export default function Navbar() {
   const activityBtnRef = useRef(null)
   const modalRef = useRef(null)
   const isMobile = useIsMobile()
+  const { logout } = useAuth()
+  const navigate = useNavigate()
+
+  const handleLogout = async () => {
+    try {
+      await logout()
+      navigate('/')
+    } catch (error) {
+      toast.error("Logout failed", {
+        position: "top-right",
+        autoClose: 4000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+      })
+    }
+  }
 
   // Close dropdowns when clicking outside
   useEffect(() => {
@@ -190,7 +213,7 @@ export default function Navbar() {
                   <FiSettings />
                   Profile Settings
                 </button>
-                <button className="dropdown-item">
+                <button className="dropdown-item" onClick={handleLogout}>
                   <FiLogOut />
                   Logout
                 </button>

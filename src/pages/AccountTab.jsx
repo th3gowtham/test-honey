@@ -1,10 +1,31 @@
 import { Shield } from "lucide-react";
 import "../styles/AccountTab.css";
+import { useAuth } from "../context/AuthContext";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 const AccountTab = () => {
-  function Signout() {
-    alert("You are signed out");
-  }
+  const { logout } = useAuth();
+  const navigate = useNavigate();
+
+  const handleSignout = async () => {
+    try {
+      await logout();
+      navigate('/');
+     
+    } catch (error) {
+      toast.error("Logout failed", {
+        position: "top-right",
+        autoClose: 4000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+      });
+    }
+  };
 
   return (
     <div className="account-tab">
@@ -40,7 +61,7 @@ const AccountTab = () => {
 
       {/* Danger Zone Section */}
       <div className="danger-zone">
-        <button onClick={Signout} className="sign-out-button">
+        <button onClick={handleSignout} className="sign-out-button">
           <span className="sign-out-icon">▷</span>
           Sign Out
         </button>

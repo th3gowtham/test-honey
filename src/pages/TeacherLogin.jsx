@@ -4,6 +4,7 @@ import { auth } from '../services/firebase';
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import { toast } from "react-toastify";
 
 const eyeIcons = {
   open: (
@@ -44,7 +45,7 @@ const TeacherLogin = () => {
   const [success, setSuccess] = useState(false);
 
   const apiUrl = import.meta.env.VITE_API_URL;
-  const { login } = useAuth();
+  const { login, showLoginSuccess } = useAuth();
   const navigate = useNavigate();
 
   // On mount, check if email exists in Teacher collection
@@ -113,17 +114,30 @@ const TeacherLogin = () => {
 
       setSuccess(true);
       setMessage('Welcome! Redirecting to your dashboard...');
+      showLoginSuccess();
       setTimeout(() => {
         navigate('/chat');
       }, 1000);
     } catch (err) {
+      let errorMessage = '';
       if (err.response?.data?.error) {
-        setMessage(err.response.data.error);
+        errorMessage = err.response.data.error;
       } else if (err.code === 'auth/email-already-in-use') {
-        setMessage('This email is already registered. Please try logging in with the main login form.');
+        errorMessage = 'This email is already registered. Please try logging in with the main login form.';
       } else {
-        setMessage(err.message || 'An error occurred');
+        errorMessage = err.message || 'An error occurred';
       }
+      setMessage(errorMessage);
+      toast.error(errorMessage, {
+        position: "top-right",
+        autoClose: 4000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+      });
     }
     setLoading(false);
   };

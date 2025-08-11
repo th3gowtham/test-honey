@@ -12,6 +12,7 @@ import { useAuth } from '../context/AuthContext';
 import React from 'react';
 import ForgotPassword from './ForgotPassword';
 import './Login.css';
+import { toast } from "react-toastify";
 
 const eyeIcons = {
   open: (
@@ -52,7 +53,7 @@ const globalStyles = `
 
 const Login = ({ onClose }) => {
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const { login, showLoginSuccess } = useAuth();
   const [isRegister, setIsRegister] = useState(false);
   const [showForgotPassword, setShowForgotPassword] = useState(false);
   const [form, setForm] = useState({ email: "", password: "", name: "" });
@@ -86,8 +87,19 @@ const Login = ({ onClose }) => {
       await axios.post(`${apiUrl}/api/auth/google-login`, { idToken }, { withCredentials: true });
       await login();
       closeModal();
+      showLoginSuccess();
     } catch (err) {
-      alert("Login failed: " + err.message);
+      closeModal();
+      toast.error("Login failed", {
+        position: "top-right",
+        autoClose: 4000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+      });
     } finally {
       setIsLoading(false);
     }
@@ -101,7 +113,16 @@ const Login = ({ onClose }) => {
       const email = form.email.trim().toLowerCase();
       const { password, name } = form;
       if (!email || !password || !name) {
-        alert("Please fill all fields.");
+        toast.error("Please fill all fields.", {
+          position: "top-right",
+          autoClose: 4000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+        });
         setIsLoading(false);
         return;
       }
@@ -112,14 +133,34 @@ const Login = ({ onClose }) => {
       await axios.post(`${apiUrl}/api/auth/google-login`, { idToken, name }, { withCredentials: true });
       await login();
       closeModal();
+      showLoginSuccess();
     } catch (err) {
       // **THE FIX IS HERE**
       // Check for the specific "email already in use" error code
+      closeModal();
       if (err.code === 'auth/email-already-in-use') {
-        alert('This email address is already registered. Please try logging in instead.');
+        toast.error('This email address is already registered. Please try logging in instead.', {
+          position: "top-right",
+          autoClose: 4000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+        });
       } else {
         // For any other error, show the default message
-        alert("Registration failed: " + err.message);
+        toast.error("Registration failed", {
+          position: "top-right",
+          autoClose: 4000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+        });
       }
     } finally {
       setIsLoading(false);
@@ -134,7 +175,16 @@ const Login = ({ onClose }) => {
       const email = form.email.trim().toLowerCase();
       const { password } = form;
       if (!email || !password) {
-        alert("Please fill all fields.");
+        toast.error("Please fill all fields.", {
+          position: "top-right",
+          autoClose: 4000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+        });
         setIsLoading(false);
         return;
       }
@@ -144,8 +194,19 @@ const Login = ({ onClose }) => {
       await axios.post(`${apiUrl}/api/auth/google-login`, { idToken }, { withCredentials: true });
       await login();
       closeModal();
+      showLoginSuccess();
     } catch (err) {
-      alert("Login failed: " + err.message);
+      closeModal();
+      toast.error("Login failed", {
+        position: "top-right",
+        autoClose: 4000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+      });
     } finally {
       setIsLoading(false);
     }

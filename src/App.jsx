@@ -54,6 +54,22 @@ function AppContent({ showLogin, setShowLogin }) {
         pauseOnHover
         theme="light"
       />
+
+      {/* Global container for auth toasts (e.g., login/signout/payment) with 90px top offset */}
+      <ToastContainer
+        containerId="auth"
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+        style={{ top: 90 }}
+      />
       
       <Toaster
         position="top-right"
@@ -67,6 +83,8 @@ function AppContent({ showLogin, setShowLogin }) {
             duration: 3000,
             style: {
               background: '#14b8a6',
+              position:'relative',
+              top:'60px'
             },
           },
           error: {

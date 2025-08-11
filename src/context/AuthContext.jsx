@@ -3,9 +3,9 @@ import { createContext, useContext, useEffect, useState, useCallback } from 'rea
 import axios from 'axios';
 import { auth, db } from '../services/firebase';
 import { onAuthStateChanged } from 'firebase/auth';
-import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { addCurrentUserToFirestore, initializeSampleUsers } from '../utils/initializeUsers';
 import { signOut } from "firebase/auth";
+import { toast } from "react-toastify";
 
 const AuthContext = createContext();
 
@@ -108,6 +108,21 @@ export const AuthProvider = ({ children }) => {
     return p;
   };
 
+  // Show login success toast - call this after modal closes
+  const showLoginSuccess = () => {
+    toast.success("Logged in successfully!", {
+      position: "top-right",
+      containerId: "auth",
+      autoClose: 3000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: "light",
+    });
+  };
+
   const logout = async () => {
     setLoading(true);
     try {
@@ -129,6 +144,18 @@ export const AuthProvider = ({ children }) => {
 
       // 5. Broadcast event (optional)
       broadcastAuthEvent && broadcastAuthEvent();
+      
+      // 6. Show success toast (rendered in global container with id "auth")
+      toast.success("Signed out successfully!", {
+        containerId: "auth",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+      });
     } catch (err) {
       // no-op
     } finally {
@@ -147,7 +174,8 @@ export const AuthProvider = ({ children }) => {
       logout,
       loading,
       refreshUser,
-      currentUser // Add Firebase currentUser to context
+      currentUser, // Add Firebase currentUser to context
+      showLoginSuccess
     }}>
       {children}
     </AuthContext.Provider>

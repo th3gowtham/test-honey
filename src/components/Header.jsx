@@ -7,6 +7,7 @@ import img2r from "../assets/2r.png";
 import EnquiryModal from './EnquiryModal';
 import "./Header.css"
 import React, { useEffect, useRef, useState } from 'react';
+import { toast } from "react-toastify";
 
 
 
@@ -19,7 +20,7 @@ const Header = ({ onLoginClick }) => {         // Main Header component that rec
   const log = () => {};
 
   // Hide header when on /chat route
-  if (location.pathname.startsWith('/chat')) {
+  if (location.pathname.startsWith('/chat') || location.pathname.startsWith('/teacher-login')) {
     return null;
   }
 
@@ -72,6 +73,16 @@ const Header = ({ onLoginClick }) => {         // Main Header component that rec
       log('Navigated to / after logout');
     } catch (error) {
       log('Logout failed', error);
+      toast.error("Logout failed: " + error.message, {
+        position: "top-right",
+        autoClose: 4000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+      });
     }
   };
 
