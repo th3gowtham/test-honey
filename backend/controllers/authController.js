@@ -255,7 +255,7 @@ const forgotPassword = async (req, res) => {
         
         // Generate password reset link
         const actionCodeSettings = {
-          url: `${process.env.CLIENT_URL || 'http://localhost:5173'}/login`,
+          url: `${process.env.CLIENT_URL}/login`,
           handleCodeInApp: true,
         };
         

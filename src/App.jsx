@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, useLocation, useNavigate } from "react-router-dom";
 import ProtectedAdminRoute from "./components/ProtectedAdminRoute";
 import Unauthorized from "./pages/Unauthorized";
 import Home from "./pages/Home";
@@ -23,10 +23,13 @@ import Footer from './components/Footer';
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { Toaster } from "react-hot-toast";
+import { useAuth } from "./context/AuthContext";
 
 // App inner content
 function AppContent({ showLogin, setShowLogin }) {
   const location = useLocation();
+  const navigate = useNavigate();
+  const { userRole, loading } = useAuth();
 
   const showFooterPaths = [
     "/", "/about", "/classes", "/contact", "/gallery",
@@ -37,6 +40,19 @@ function AppContent({ showLogin, setShowLogin }) {
   const showFooter = showFooterPaths.includes(location.pathname);
   const isChatRoute = location.pathname.startsWith('/chat');
   const isAdminRoute = location.pathname.startsWith('/admin');
+
+  // Redirect to /admin once per session when role becomes Admin and loading is done
+  React.useEffect(() => {
+    if (loading) return;
+
+    const alreadyRedirected = sessionStorage.getItem('adminRedirectedOnce') === 'true';
+
+    if (!alreadyRedirected && userRole === 'Admin' && !isAdminRoute) {
+      if (showLogin) setShowLogin(false);
+      sessionStorage.setItem('adminRedirectedOnce', 'true');
+      navigate('/admin', { replace: true });
+    }
+  }, [loading, userRole, isAdminRoute, showLogin, setShowLogin, navigate]);
 
   return (
     <>
@@ -68,7 +84,7 @@ function AppContent({ showLogin, setShowLogin }) {
         draggable
         pauseOnHover
         theme="light"
-        style={{ top: 90 }}
+        style={{ top: 80 }}
       />
       
       <Toaster

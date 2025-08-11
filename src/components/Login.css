@@ -25,15 +25,45 @@
 /* Close button */
 .login-close-btn {
   position: absolute;
-  top: 16px;
-  right: 16px;
+  top: -2px;
+  right: -6px;
   background: none;
   border: none;
-  font-size: 22px;
+  font-size: 26px;
   color: #666;
   cursor: pointer;
   font-weight: bold;
+  transition: transform 0.2s ease, color 0.2s ease, text-shadow 0.2s ease;
 }
+
+.login-close-btn:hover {
+  color: #127d8e;
+  transform: rotate(90deg) scale(1.5);
+  text-shadow: 0 2px 8px rgba(18, 125, 142, 0.25);
+}
+
+.login-close-btn:active {
+  transform: rotate(90deg) scale(1.1);
+}
+
+.login-close-btn:focus-visible {
+  outline: 5px solid #127d8e;
+  outline-offset: 2px;
+  border-radius: 50%;
+}
+
+/* Soft circular hover background without changing layout */
+.login-close-btn::after {
+  content: "";
+  position: absolute;
+  inset: -6px;
+  border-radius: 50%;
+  background: transparent;
+  transition: background-color 0.2s ease;
+  pointer-events: none;
+}
+
+
 
 /* Title */
 .login-title {
