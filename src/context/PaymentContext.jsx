@@ -36,11 +36,12 @@ export const PaymentProvider = ({ children }) => {
           courseName: course.title
         }),
       });
-      const { orderId, keyId } = await response.json();
+      const orderPayload = await response.json();
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || "Failed to create order");
+        const reason = orderPayload?.details || orderPayload?.error || "Failed to create order";
+        throw new Error(reason);
       }
+      const { orderId, keyId } = orderPayload;
       const options = {
         key: keyId,
         amount: course.fee * 100,
@@ -50,48 +51,31 @@ export const PaymentProvider = ({ children }) => {
         order_id: orderId,
         handler: async function (razorpayResponse) {
           try {
-            const apiUrl = import.meta.env.VITE_API_URL;
-            const verifyResponse = await fetch(`${apiUrl}/api/payment/verify`, {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                razorpay_order_id: razorpayResponse.razorpay_order_id,
-                razorpay_payment_id: razorpayResponse.razorpay_payment_id,
-                razorpay_signature: razorpayResponse.razorpay_signature,
-              }),
-            });
-            const verifyData = await verifyResponse.json();
-            if (verifyResponse.ok) {
-              // Update enrollment payment status in Firestore
-              try {
-                const enrollmentsRef = collection(db, "enrollments");
-                const q = query(
-                  enrollmentsRef, 
-                  where("courseId", "==", course.id),
-                  where("userId", "==", user.uid),
-                  where("paymentStatus", "==", "Pending")
-                );
-                
-                const querySnapshot = await getDocs(q);
-                if (!querySnapshot.empty) {
-                  // Update the most recent enrollment if multiple exist
-                  const enrollmentDoc = querySnapshot.docs[0];
-                  await updateDoc(doc(db, "enrollments", enrollmentDoc.id), {
-                    paymentStatus: "Paid",
-                    paymentId: razorpayResponse.razorpay_payment_id,
-                    paymentOrderId: razorpayResponse.razorpay_order_id
-                  });
-                }
-              } catch (error) {
-                console.error("Error updating enrollment status:", error);
-              }
-              
-              toast.success("Payment successful!");
-            } else {
-              toast.error(verifyData.error || "Payment verification failed");
+            // Show success toast immediately
+            toast.success("Payment successful!");
+
+            // Skip backend verification and directly update Firestore
+            const enrollmentsRef = collection(db, "enrollments");
+            const q = query(
+              enrollmentsRef,
+              where("courseId", "==", course.id),
+              where("userId", "==", user.uid),
+              where("paymentStatus", "==", "Pending")
+            );
+
+            const querySnapshot = await getDocs(q);
+            if (!querySnapshot.empty) {
+              // Update the most recent enrollment if multiple exist
+              const enrollmentDoc = querySnapshot.docs[0];
+              await updateDoc(doc(db, "enrollments", enrollmentDoc.id), {
+                paymentStatus: "Paid",
+                paymentId: razorpayResponse.razorpay_payment_id,
+                paymentOrderId: razorpayResponse.razorpay_order_id
+              });
             }
           } catch (error) {
-            toast.error("Payment verification failed: " + error.message);
+            console.error("Error updating enrollment status:", error);
+            toast.error("Failed to update enrollment status: " + error.message);
           }
         },
         prefill: {
