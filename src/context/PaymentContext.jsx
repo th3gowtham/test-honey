@@ -2,7 +2,7 @@ import React, { createContext, useContext, useState } from "react";
 import { useAuth } from "./AuthContext";
 import { toast } from "react-toastify";
 import { db } from "../services/firebase";
-import { collection, query, where, getDocs, updateDoc, doc } from "firebase/firestore";
+import { collection, addDoc, serverTimestamp, updateDoc, doc } from "firebase/firestore";
 
 const PaymentContext = createContext();
 
@@ -25,23 +25,52 @@ export const PaymentProvider = ({ children }) => {
     }
     try {
       setLoading(true);
-      const apiUrl = import.meta.env.VITE_API_URL;
+
+      // Create enrollment record first with pending status
+      const enrollmentData = {
+        courseId: course.id,
+        userId: user.uid,
+        userEmail: user.email,
+        userName: userName || user.displayName || '',
+        courseName: course.title,
+        courseFee: course.fee,
+        paymentStatus: "Pending",
+        paymentId: null,
+        paymentOrderId: null,
+        enrolledAt: serverTimestamp(),
+        updatedAt: serverTimestamp()
+      };
+
+      const enrollmentRef = await addDoc(collection(db, "enrollments"), enrollmentData);
+      console.log("Enrollment created with ID:", enrollmentRef.id);
+
+      // Create Razorpay order
+      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3001';
       const response = await fetch(`${apiUrl}/api/payment/order`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           amount: course.fee,
-          name: userName || '',
+          name: userName || user.displayName || '',
           email: user.email,
           courseName: course.title
         }),
       });
+
       const orderPayload = await response.json();
       if (!response.ok) {
         const reason = orderPayload?.details || orderPayload?.error || "Failed to create order";
         throw new Error(reason);
       }
+
       const { orderId, keyId } = orderPayload;
+
+      // Update enrollment with order ID
+      await updateDoc(doc(db, "enrollments", enrollmentRef.id), {
+        paymentOrderId: orderId,
+        updatedAt: serverTimestamp()
+      });
+
       const options = {
         key: keyId,
         amount: course.fee * 100,
@@ -49,33 +78,18 @@ export const PaymentProvider = ({ children }) => {
         name: "The Honey Bee",
         description: `Payment for ${course.title}`,
         order_id: orderId,
-        handler: async function (razorpayResponse) {
-          try {
-            // Show success toast immediately
-            toast.success("Payment successful!");
+        handler: function (razorpayResponse) {
+          // Payment initiated successfully
+          console.log("Payment response:", razorpayResponse);
+          toast.success("Payment initiated, you will receive confirmation shortly!");
 
-            // Skip backend verification and directly update Firestore
-            const enrollmentsRef = collection(db, "enrollments");
-            const q = query(
-              enrollmentsRef,
-              where("courseId", "==", course.id),
-              where("userId", "==", user.uid),
-              where("paymentStatus", "==", "Pending")
-            );
-
-            const querySnapshot = await getDocs(q);
-            if (!querySnapshot.empty) {
-              // Update the most recent enrollment if multiple exist
-              const enrollmentDoc = querySnapshot.docs[0];
-              await updateDoc(doc(db, "enrollments", enrollmentDoc.id), {
-                paymentStatus: "Paid",
-                paymentId: razorpayResponse.razorpay_payment_id,
-                paymentOrderId: razorpayResponse.razorpay_order_id
-              });
-            }
-          } catch (error) {
-            console.error("Error updating enrollment status:", error);
-            toast.error("Failed to update enrollment status: " + error.message);
+          // Note: The webhook will handle the actual payment verification and status update
+          // No need to update Firestore here as the webhook will do it securely
+        },
+        modal: {
+          ondismiss: function() {
+            console.log("Payment modal dismissed");
+            // You can add any cleanup logic here if needed
           }
         },
         prefill: {
@@ -101,3 +115,4 @@ export const PaymentProvider = ({ children }) => {
 };
 
 export const usePayment = () => useContext(PaymentContext);
+

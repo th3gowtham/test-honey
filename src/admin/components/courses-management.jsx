@@ -7,7 +7,6 @@ import { collection, onSnapshot, query, doc, deleteDoc, updateDoc, addDoc, serve
 import { toast, ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 
-
 export default function CoursesManagement() {
   const [courses, setCourses] = useState([])
   const [advancedCourses, setAdvancedCourses] = useState([])
@@ -244,20 +243,6 @@ export default function CoursesManagement() {
         <div>
           <h2>Courses Management</h2>
           <p>Manage all courses and their assignments</p>
-          <div className="course-type-selector">
-            <button 
-              className={`btn ${courseType === "regular" ? "btn-primary" : "btn-outline-primary"}`}
-              onClick={() => setCourseType("regular")}
-            >
-              Regular Courses
-            </button>
-            <button 
-              className={`btn ${courseType === "advanced" ? "btn-primary" : "btn-outline-primary"}`}
-              onClick={() => setCourseType("advanced")}
-            >
-              Advanced Courses
-            </button>
-          </div>
         </div>
         <button className="btn btn-primary" onClick={() => setShowModal(true)}>
           <FiPlus /> Add New Course
@@ -269,7 +254,7 @@ export default function CoursesManagement() {
           <FiSearch />
           <input
             type="text"
-            placeholder="Search courses..."
+            placeholder="Search courses or teachers..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
@@ -277,30 +262,28 @@ export default function CoursesManagement() {
       </div>
 
       <div className="table-container">
-        {loading[courseType === "regular" ? "courses" : "advancedCourses"] ? (
+        {loading.courses ? (
           <div className="loading-container">
-            <p>Loading {courseType} courses...</p>
+            <p>Loading courses...</p>
           </div>
-        ) : error[courseType === "regular" ? "courses" : "advancedCourses"] ? (
+        ) : error.courses ? (
           <div className="error-container">
-            <p>{error[courseType === "regular" ? "courses" : "advancedCourses"]}</p>
+            <p>{error.courses}</p>
             <button onClick={() => window.location.reload()}>Retry</button>
           </div>
-        ) : filteredCourses.length === 0 ? (
+        ) : courses.length === 0 ? (
           <div className="empty-container">
-            <p>No {courseType} courses found. Add your first course to get started.</p>
+            <p>No courses found. Add your first course to get started.</p>
           </div>
         ) : (
-          <table className="admin-table">
+          <table className="table">
             <thead>
               <tr>
                 <th>Course ID</th>
-                <th>Image</th>
-                <th>Title</th>
-                <th>Age Group</th>
-                <th>Seats</th>
+                <th>Course Name</th>
+                <th>Assigned Teacher</th>
+                <th>Total Students</th>
                 <th>Duration</th>
-                <th>Fee</th>
                 <th>Status</th>
                 <th>Actions</th>
               </tr>
@@ -308,29 +291,19 @@ export default function CoursesManagement() {
             <tbody>
               {paginatedCourses.map((course) => (
                 <tr key={course.id}>
-                  <td>{course.id.slice(0, 8)}...</td>
-                  <td>
-                    {course.imgSrc && (
-                      <img 
-                        src={course.imgSrc} 
-                        alt={course.title} 
-                        style={{ width: '50px', height: '50px', objectFit: 'cover' }} 
-                      />
-                    )}
-                  </td>
+                  <td>{course.id}</td>
                   <td>
                     <div>
-                      <div className="course-title">{course.title}</div>
-                      <div className="course-description">{course.description?.substring(0, 50)}...</div>
+                      <div className="course-name">{course.name}</div>
+                      <div className="course-description">{course.description}</div>
                     </div>
                   </td>
-                  <td>{course.age}</td>
-                  <td>{course.seats}</td>
+                  <td>{course.teacher}</td>
+                  <td>{course.students}</td>
                   <td>{course.duration}</td>
-                  <td>${course.fee}</td>
                   <td>
                     <span className={`status-badge ${course.status === "active" ? "status-active" : "status-inactive"}`}>
-                      {course.status || "active"}
+                      {course.status}
                     </span>
                   </td>
                   <td>
@@ -338,7 +311,7 @@ export default function CoursesManagement() {
                       <button className="btn-icon" onClick={() => handleEdit(course)}>
                         <FiEdit />
                       </button>
-                      <button className="btn-icon btn-danger" onClick={() => handleDelete(course)}>
+                      <button className="btn-icon btn-danger" onClick={() => handleDelete(course.id)}>
                         <FiTrash2 />
                       </button>
                     </div>
@@ -384,23 +357,12 @@ export default function CoursesManagement() {
             </div>
             <form onSubmit={handleSubmit}>
               <div className="form-group">
-                <label className="form-label">Course Type</label>
-                <select
-                  className="form-select"
-                  value={formData.courseType}
-                  onChange={(e) => setFormData({ ...formData, courseType: e.target.value })}
-                >
-                  <option value="regular">Regular Course</option>
-                  <option value="advanced">Advanced Course</option>
-                </select>
-              </div>
-              <div className="form-group">
-                <label className="form-label">Course Title</label>
+                <label className="form-label">Course Name</label>
                 <input
                   type="text"
                   className="form-input"
-                  value={formData.title}
-                  onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                  value={formData.name}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                   required
                 />
               </div>
@@ -415,59 +377,23 @@ export default function CoursesManagement() {
                 />
               </div>
               <div className="form-group">
-                <label className="form-label">Image URL</label>
+                <label className="form-label">Course Image</label>
+                <input
+                  type="file"
+                  accept="image/*"
+                  className="form-input"
+                />
+              </div>
+              <div className="form-group">
+                <label className="form-label">Course Duration</label>
                 <input
                   type="text"
                   className="form-input"
-                  value={formData.imgSrc}
-                  onChange={(e) => setFormData({ ...formData, imgSrc: e.target.value })}
+                  placeholder="e.g., 8 weeks"
+                  value={formData.duration}
+                  onChange={(e) => setFormData({ ...formData, duration: e.target.value })}
                   required
                 />
-              </div>
-              <div className="form-row">
-                <div className="form-group">
-                  <label className="form-label">Age Group</label>
-                  <input
-                    type="text"
-                    className="form-input"
-                    value={formData.age}
-                    onChange={(e) => setFormData({ ...formData, age: e.target.value })}
-                    required
-                  />
-                </div>
-                <div className="form-group">
-                  <label className="form-label">Available Seats</label>
-                  <input
-                    type="text"
-                    className="form-input"
-                    value={formData.seats}
-                    onChange={(e) => setFormData({ ...formData, seats: e.target.value })}
-                    required
-                  />
-                </div>
-              </div>
-              <div className="form-row">
-                <div className="form-group">
-                  <label className="form-label">Course Duration</label>
-                  <input
-                    type="text"
-                    className="form-input"
-                    placeholder="e.g., 8 weeks"
-                    value={formData.duration}
-                    onChange={(e) => setFormData({ ...formData, duration: e.target.value })}
-                    required
-                  />
-                </div>
-                <div className="form-group">
-                  <label className="form-label">Fee ($)</label>
-                  <input
-                    type="number"
-                    className="form-input"
-                    value={formData.fee}
-                    onChange={(e) => setFormData({ ...formData, fee: Number(e.target.value) })}
-                    required
-                  />
-                </div>
               </div>
               <div className="form-group">
                 <label className="form-label">Status</label>
